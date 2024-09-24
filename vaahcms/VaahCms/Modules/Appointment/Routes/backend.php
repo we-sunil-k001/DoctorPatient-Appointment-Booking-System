@@ -33,3 +33,4 @@ Route::group(
  */
 include("backend/routes-doctors.php");
 include("backend/routes-patients.php");
+include("backend/routes-appointments.php");

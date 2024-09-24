@@ -38,6 +38,11 @@ const items = ref([
                 icon: 'fa-regular fa-chart-bar',
                 route: "/patients"
             },
+            {
+                label: 'Appointments',
+                icon: 'fa-regular fa-chart-bar',
+                route: "/appointments"
+            },
         ]
     },
 ]);
