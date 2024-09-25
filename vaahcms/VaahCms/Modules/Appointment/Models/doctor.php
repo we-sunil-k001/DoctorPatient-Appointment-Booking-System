@@ -9,6 +9,8 @@ use WebReinvent\VaahCms\Models\VaahModel;
 use WebReinvent\VaahCms\Traits\CrudWithUuidObservantTrait;
 use WebReinvent\VaahCms\Models\User;
 use WebReinvent\VaahCms\Libraries\VaahSeeder;
+use Carbon\Carbon;
+
 
 class doctor extends VaahModel
 {
@@ -33,6 +35,8 @@ class doctor extends VaahModel
         'phone_number',
         'specialization',
         'qualification',
+        'working_hours_end',
+        'working_hours_start',
         'experience',
         'gender',
         'is_active',
@@ -160,6 +164,10 @@ class doctor extends VaahModel
         if (!$validation['success']) {
             return $validation;
         }
+
+
+        $inputs['working_hours_start'] = Carbon::parse($inputs['working_hours_start'])->setTimezone('Asia/Kolkata')->format('H:i:s');
+        $inputs['working_hours_end'] = Carbon::parse($inputs['working_hours_end'])->setTimezone('Asia/Kolkata')->format('H:i:s');
 
 
         // check if name exist
