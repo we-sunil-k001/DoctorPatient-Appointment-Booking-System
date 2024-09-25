@@ -33,6 +33,7 @@ import RadioButton from "primevue/radiobutton";
 import Message from "primevue/message";
 import Tag from "primevue/tag";
 import Calendar from "primevue/calendar";
+import Dropdown from 'primevue/dropdown';
 
 //-------------/CRUD PrimeVue Imports
 
@@ -87,6 +88,7 @@ app.component('DataTable', DataTable);
 app.component('Message', Message);
 app.component('Tag', Tag);
 app.component('Calendar', Calendar);
+app.component('Dropdown',Dropdown);
 
 //-------------/CRUD PrimeVue Use
 
