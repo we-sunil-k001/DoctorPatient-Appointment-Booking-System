@@ -129,6 +129,7 @@ class Appointment extends VaahModel
         return $query->select(array_diff($this->getTableColumns(), $columns));
     }
 
+
     //-------------------------------------------------
     public function scopeBetweenDates($query, $from, $to)
     {
@@ -261,7 +262,7 @@ class Appointment extends VaahModel
         $list->isActiveFilter($request->filter);
         $list->trashedFilter($request->filter);
         $list->searchFilter($request->filter);
-
+        $list->with(['doctor', 'patient']);
         $rows = config('vaahcms.per_page');
 
         if($request->has('rows'))
@@ -627,12 +628,13 @@ class Appointment extends VaahModel
 
 
 
-    //  Relationship with Doctor
+    //  Relation with Doctor
         public function doctor()
         {
             return $this->belongsTo(Doctor::class, 'doctor_id', 'id');
         }
-    //  Relationship with Patient
+
+    //  Relation with Patient
         public function patient()
         {
             return $this->belongsTo(Patient::class, 'patient_id', 'id');
