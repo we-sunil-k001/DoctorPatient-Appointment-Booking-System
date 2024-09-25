@@ -28,7 +28,7 @@ const toggleFormMenu = (event) => {
     form_menu.value.toggle(event);
 };
 //--------/form_menu
-
+const isValidTime = (date) => date instanceof Date && !isNaN(date.getTime());
 </script>
 <template>
 
@@ -155,6 +155,64 @@ const toggleFormMenu = (event) => {
                                    data-testid="doctors-slug"
                                    v-model="store.item.slug" required/>
                         <div class="required-field hidden"></div>
+                    </div>
+                </VhField>
+
+                <VhField label="Email">
+                    <div class="p-inputgroup">
+                        <InputText class="w-full"
+                                   placeholder="Enter the Email"
+                                   name="doctors-email"
+                                   data-testid="doctors-email"
+                                   v-model="store.item.email" required/>
+                        <div class="required-field hidden"></div>
+                    </div>
+                </VhField>
+
+                <VhField label="Phone Number">
+                    <div class="p-inputgroup">
+                        <InputText class="w-full"
+                                   placeholder="Enter the Phone Number"
+                                   name="doctors-phone_number"
+                                   data-testid="doctors-phone_number"
+                                   v-model="store.item.phone_number" required/>
+                        <div class="required-field hidden"></div>
+                    </div>
+                </VhField>
+
+                <VhField label="Specialization">
+                    <div class="p-inputgroup">
+                        <InputText class="w-full"
+                                   placeholder="Mention your specialization here.."
+                                   name="doctors-specialization"
+                                   data-testid="doctors-specialization"
+                                   v-model="store.item.specialization" required/>
+                        <div class="required-field hidden"></div>
+                    </div>
+                </VhField>
+
+                <VhField label="Working Hour starts at">{{store.item.working_hours_start}}
+                    <div class="p-inputgroup">
+                        <Calendar v-model="store.item.working_hours_start" timeOnly hourFormat="24" showIcon
+                            placeholder="Select time" name="working_hours_start"
+                                  :minDate="isValidTime(store.item.slot_start_time) ? store.item.slot_start_time : null"
+                            @change="formatTimeForDatabase">
+                            <template #inputicon="{ clickCallback }">
+                                <i class="pi pi-clock cursor-pointer" @click="clickCallback"></i>
+                            </template>
+                        </Calendar>
+                    </div>
+                </VhField>
+
+                <VhField label="Working Hour ends at">
+                    <div class="p-inputgroup">
+                        <Calendar v-model="store.item.working_hours_end" timeOnly hourFormat="24" showIcon
+                            placeholder="Select time" name="working_hours_end"
+                            @change="formatTimeForDatabase">
+                            <template #inputicon="{ clickCallback }">
+                                <i class="pi pi-clock cursor-pointer" @click="clickCallback"></i>
+                            </template>
+                        </Calendar>
                     </div>
                 </VhField>
 
