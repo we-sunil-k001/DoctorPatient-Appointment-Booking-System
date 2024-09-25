@@ -29,6 +29,8 @@ class Patient extends VaahModel
         'uuid',
         'name',
         'slug',
+        'email',
+        'phone_number',
         'is_active',
         'created_by',
         'updated_by',
@@ -154,7 +156,6 @@ class Patient extends VaahModel
         if (!$validation['success']) {
             return $validation;
         }
-
 
         // check if name exist
         $item = self::where('name', $inputs['name'])->withTrashed()->first();

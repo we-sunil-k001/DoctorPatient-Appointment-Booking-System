@@ -22,8 +22,8 @@ class VhPatients extends Migration
                 $table->string('name')->nullable()->index();
                 $table->string('slug')->nullable()->index();
 
-                $table->string('email')->unique(); // Patient's email address
-                $table->string('phone_number')->nullable(); // Patient's phone number
+                $table->string('email')->nullable();
+                $table->string('phone_number')->nullable();
                 $table->date('dob')->nullable(); // Patient's date of birth
                 $table->enum('gender', ['male', 'female', 'other'])->nullable(); // Gender
 
