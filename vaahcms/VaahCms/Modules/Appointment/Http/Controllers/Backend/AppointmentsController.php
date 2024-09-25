@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use VaahCms\Modules\Appointment\Models\Appointment;
+use VaahCms\Modules\Appointment\Models\doctor;
+use VaahCms\Modules\Appointment\Models\Patient;
 
 
 class AppointmentsController extends Controller
@@ -31,6 +33,13 @@ class AppointmentsController extends Controller
             $data['fillable']['except'] = Appointment::getUnFillableColumns();
             $data['empty_item'] = Appointment::getEmptyItem();
 
+            // Fetching data from Doctor - after making relation
+            $data['doctors'] = Doctor::where('is_active',1)->select('id','name','email','phone_number')->get();
+
+            // Fetching data from Patient - after making relation
+            $data['patients'] = Patient::where('is_active',1)->select('id','name','email','phone_number')->get();
+
+
             $data['actions'] = [];
 
             $response['success'] = true;
@@ -53,8 +62,10 @@ class AppointmentsController extends Controller
     //----------------------------------------------------------
     public function getList(Request $request)
     {
+
         try{
             return Appointment::getList($request);
+
         }catch (\Exception $e){
             $response = [];
             $response['success'] = false;
