@@ -38,7 +38,30 @@ const useVaah = vaah();
                            severity="danger"></Badge>
                     {{prop.data.name}}
                 </template>
+            </Column>
 
+            <Column field="email" header="Email"
+                    class="overflow-wrap-anywhere"
+                    :sortable="true">
+
+                <template #body="prop">
+                    <Badge v-if="prop.data.deleted_at"
+                           value="Trashed"
+                           severity="danger"></Badge>
+                    {{prop.data.email}}
+                </template>
+            </Column>
+
+            <Column field="phone_number" header="Phone Number"
+                    class="overflow-wrap-anywhere"
+                    :sortable="true">
+
+                <template #body="prop">
+                    <Badge v-if="prop.data.deleted_at"
+                           value="Trashed"
+                           severity="danger"></Badge>
+                    {{prop.data.phone_number}}
+                </template>
             </Column>
 
 

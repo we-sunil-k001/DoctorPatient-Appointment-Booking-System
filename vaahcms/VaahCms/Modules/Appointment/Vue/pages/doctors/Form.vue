@@ -191,15 +191,10 @@ const isValidTime = (date) => date instanceof Date && !isNaN(date.getTime());
                     </div>
                 </VhField>
 
-                <VhField label="Working Hour starts at">{{store.item.working_hours_start}}
+                <VhField label="Working Hour starts at">
                     <div class="p-inputgroup">
                         <Calendar v-model="store.item.working_hours_start" timeOnly hourFormat="24" showIcon
-                            placeholder="Select time" name="working_hours_start"
-                                  :minDate="isValidTime(store.item.slot_start_time) ? store.item.slot_start_time : null"
-                            @change="formatTimeForDatabase">
-                            <template #inputicon="{ clickCallback }">
-                                <i class="pi pi-clock cursor-pointer" @click="clickCallback"></i>
-                            </template>
+                            placeholder="Select time" name="working_hours_start" >
                         </Calendar>
                     </div>
                 </VhField>
@@ -207,11 +202,7 @@ const isValidTime = (date) => date instanceof Date && !isNaN(date.getTime());
                 <VhField label="Working Hour ends at">
                     <div class="p-inputgroup">
                         <Calendar v-model="store.item.working_hours_end" timeOnly hourFormat="24" showIcon
-                            placeholder="Select time" name="working_hours_end"
-                            @change="formatTimeForDatabase">
-                            <template #inputicon="{ clickCallback }">
-                                <i class="pi pi-clock cursor-pointer" @click="clickCallback"></i>
-                            </template>
+                            placeholder="Select time" name="working_hours_end" >
                         </Calendar>
                     </div>
                 </VhField>
