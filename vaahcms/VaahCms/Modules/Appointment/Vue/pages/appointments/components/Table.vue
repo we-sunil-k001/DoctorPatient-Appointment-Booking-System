@@ -28,21 +28,51 @@ const useVaah = vaah();
             <Column field="id" header="ID" :style="{width: '80px'}" :sortable="true">
             </Column>
 
-            <Column field="name" header="Name"
-                    class="overflow-wrap-anywhere"
-                    :sortable="true">
+<!--             <Column field="Patient name" header="Patient name" class="overflow-wrap-anywhere" :sortable="true">-->
+<!--                 <template #body="prop">-->
+<!--                     <Badge v-if="prop.data.deleted_at" value="Trashed" severity="danger"></Badge>-->
+<!--                     {{ prop.data.patientFetch ? prop.data.patientFetch.name : 'No Patient' }}-->
+<!--                 </template>-->
+<!--             </Column>-->
 
-                <template #body="prop">
-                    <Badge v-if="prop.data.deleted_at"
-                           value="Trashed"
-                           severity="danger"></Badge>
-                    {{prop.data.name}}
-                </template>
+             <Column field="name" header="Doctor name" class="overflow-wrap-anywhere" :sortable="true">
+                 <template  #body="prop">
+                     {{ prop.data.doctor.name }}
+                 </template>
+             </Column>
 
-            </Column>
+             <Column field="Patient name" header="Patient name" class="overflow-wrap-anywhere" :sortable="true">
+                 <template  #body="prop">
+                     {{ prop.data.patient.name }}
+                 </template>
+             </Column>
+
+             <Column field="appointment_date" header="Appointment Date"
+                     class="overflow-wrap-anywhere"
+                     :sortable="true">
+                 <template #body="prop">
+                     {{prop.data.appointment_date}}
+                 </template>
+             </Column>
+
+             <Column field="appointment_time" header="Appointment Time"
+                     class="overflow-wrap-anywhere"
+                     :sortable="true">
+                 <template #body="prop">
+                     {{prop.data.appointment_time}}
+                 </template>
+             </Column>
+
+             <Column field="status" header="Booking Status"
+                     class="overflow-wrap-anywhere"
+                     :sortable="true">
+                 <template #body="prop">
+                     {{prop.data.status}}
+                 </template>
+             </Column>
 
 
-                <Column field="updated_at" header="Updated"
+             <Column field="updated_at" header="Updated"
                         v-if="store.isViewLarge()"
                         style="width:150px;"
                         :sortable="true">
