@@ -27,8 +27,12 @@ class Appointment extends VaahModel
     //-------------------------------------------------
     protected $fillable = [
         'uuid',
-        'name',
-        'slug',
+        'doctor_id',
+        'patient_id',
+        'appointment_date',
+        'appointment_time',
+        'status',
+        'reason_for_visit',
         'is_active',
         'created_by',
         'updated_by',
@@ -150,31 +154,12 @@ class Appointment extends VaahModel
 
         $inputs = $request->all();
 
-        $validation = self::validation($inputs);
-        if (!$validation['success']) {
-            return $validation;
-        }
+//        $validation = self::validation($inputs);
+//        if (!$validation['success']) {
+//            return $validation;
+//        }
 
-
-        // check if name exist
-        $item = self::where('name', $inputs['name'])->withTrashed()->first();
-
-        if ($item) {
-            $error_message = "This name is already exist".($item->deleted_at?' in trash.':'.');
-            $response['success'] = false;
-            $response['messages'][] = $error_message;
-            return $response;
-        }
-
-        // check if slug exist
-        $item = self::where('slug', $inputs['slug'])->withTrashed()->first();
-
-        if ($item) {
-            $error_message = "This slug is already exist".($item->deleted_at?' in trash.':'.');
-            $response['success'] = false;
-            $response['messages'][] = $error_message;
-            return $response;
-        }
+        $inputs['status'] = "confirmed";
 
         $item = new self();
         $item->fill($inputs);
@@ -563,8 +548,8 @@ class Appointment extends VaahModel
     {
 
         $rules = array(
-            'name' => 'required|max:150',
-            'slug' => 'required|max:150',
+//            'name' => 'required|max:150',
+//            'slug' => 'required|max:150',
         );
 
         $validator = \Validator::make($inputs, $rules);
@@ -639,6 +624,19 @@ class Appointment extends VaahModel
         $response['data']['fill'] = $inputs;
         return $response;
     }
+
+
+
+    //  Relationship with Doctor
+        public function doctor()
+        {
+            return $this->belongsTo(Doctor::class, 'doctor_id', 'id');
+        }
+    //  Relationship with Patient
+        public function patient()
+        {
+            return $this->belongsTo(Patient::class, 'patient_id', 'id');
+        }
 
     //-------------------------------------------------
     //-------------------------------------------------
