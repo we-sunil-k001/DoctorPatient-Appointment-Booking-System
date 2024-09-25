@@ -134,29 +134,60 @@ const toggleFormMenu = (event) => {
 
                 </Message>
 
-
-                <VhField label="Name">
+                <VhField label="Doctor">
                     <div class="p-inputgroup">
-                        <InputText class="w-full"
-                                   placeholder="Enter the name"
-                                   name="appointments-name"
-                                   data-testid="appointments-name"
-                                   @update:modelValue="store.watchItem"
-                                   v-model="store.item.name" required/>
+                        <Dropdown  v-model="store.item.doctor_id"
+                                   :options="store.assets.doctor"
+                                   option-label="name"
+                                   option-value="id"
+                                   name="doctor_name"
+                                   data-testid="doctor_name"
+                                   required/>
                         <div class="required-field hidden"></div>
                     </div>
                 </VhField>
 
-                <VhField label="Slug">
+                <VhField label="Patient">
                     <div class="p-inputgroup">
-                        <InputText class="w-full"
-                                   placeholder="Enter the slug"
-                                   name="appointments-slug"
-                                   data-testid="appointments-slug"
-                                   v-model="store.item.slug" required/>
+                        <Dropdown  v-model="store.item.patient_id"
+                                   :options="store.assets.patient"
+                                   option-label="name"
+                                   option-value="id"
+                                   name="patient_name"
+                                   data-testid="patient_name"
+                                   required/>
                         <div class="required-field hidden"></div>
                     </div>
                 </VhField>
+
+                <VhField label="Appointment Date">
+                    <div class="p-inputgroup">
+                        <Calendar v-model="store.item.appointment_date"
+                                  placeholder="Select Date" name="appointment_date">
+                        </Calendar>
+                    </div>
+                </VhField>
+
+                <VhField label="Appointment Time">
+                    <div class="p-inputgroup">
+                        <Calendar v-model="store.item.appointment_time" timeOnly hourFormat="24" showIcon
+                                  placeholder="Select time" name="appointment_time" >
+                        </Calendar>
+                    </div>
+                </VhField>
+
+                <VhField label="Medical Concern">
+                    <div class="p-inputgroup">
+                        <InputText class="w-full"
+                                   placeholder="Share a little about your medical concern.."
+                                   name="reason_for_visit"
+                                   data-testid="reason_for_visit"
+                                   v-model="store.item.reason_for_visit" required/>
+                        <div class="required-field hidden"></div>
+                    </div>
+                </VhField>
+
+
 
                 <VhField label="Is Active">
                     <InputSwitch v-bind:false-value="0"
