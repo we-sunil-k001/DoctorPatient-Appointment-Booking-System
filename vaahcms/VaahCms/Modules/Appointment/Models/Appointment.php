@@ -5,10 +5,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Faker\Factory;
+use WebReinvent\VaahCms\Libraries\VaahMail;
 use WebReinvent\VaahCms\Models\VaahModel;
 use WebReinvent\VaahCms\Traits\CrudWithUuidObservantTrait;
 use WebReinvent\VaahCms\Models\User;
 use WebReinvent\VaahCms\Libraries\VaahSeeder;
+use Carbon\Carbon;
 
 class Appointment extends VaahModel
 {
@@ -166,11 +168,17 @@ class Appointment extends VaahModel
         $item->fill($inputs);
         $item->save();
 
+        //Calling Email to Notify Booking confirm
+        $subject = 'Appintment Confirmed';
+        self::appointmentMail($inputs,$subject);
+
         $response = self::getItem($item->id);
         $response['messages'][] = trans("vaahcms-general.saved_successfully");
         return $response;
 
     }
+
+
 
     //-------------------------------------------------
     public function scopeGetSorted($query, $filter)
@@ -639,6 +647,55 @@ class Appointment extends VaahModel
         {
             return $this->belongsTo(Patient::class, 'patient_id', 'id');
         }
+
+    // function to convert UTC to IST
+    public static function convertToIST($inputs)
+    {
+        // Convert 'appointment_date' from UTC to Asia/Kolkata
+        $appointmentDate = Carbon::parse($inputs['appointment_date'])
+            ->setTimezone('Asia/Kolkata')
+            ->format('M. d Y');
+
+        // Convert 'appointment_time' from UTC to Asia/Kolkata
+        $appointmentTime = Carbon::parse($inputs['appointment_time'])
+            ->setTimezone('Asia/Kolkata')
+            ->format('h:i A');
+
+        // Concatenate both values
+        return $appointmentDate . ', ' . $appointmentTime;
+    }
+
+
+    // Email definition
+    public static function appointmentMail($inputs, $subject)
+    {
+
+        $doctor = Doctor::find($inputs['doctor_id']);
+        $patient = Patient::find($inputs['patient_id']);
+        // Convert UTC data and time to IST
+        $row_date_time = [
+            'appointment_date' => $inputs['appointment_date'], // Example UTC input for date
+            'appointment_time' =>  $inputs['appointment_time'], // Example UTC input for time
+        ];
+
+        $formatted_date_time = self::convertToIST($row_date_time);
+        $email_content_for_patient = sprintf(
+            "Dear %s,\n\nYour appointment with Dr. %s has been successfully booked.\nThe details of your appointment are as follows:\n\nAppointment Date & Time: %s\n\nPlease make sure to arrive 10 minutes before the scheduled time.\n\nRegards,\nWebreinvent Technologies",
+            $patient->name,
+            $doctor->name,
+            $formatted_date_time
+        );
+
+        $email_content_for_doctor = sprintf(
+        "Dear Dr. %s,\n\nYou have a new appointment scheduled with %s.\nThe details are as follows:\n\nAppointment Date & Time: %s\n\nPlease be on time for the appointment.\n\nRegards,\nWebreinvent Technologies",
+            $doctor->name,
+            $patient->name,
+            $formatted_date_time
+        );
+
+        VaahMail::dispatchGenericMail($subject, $email_content_for_doctor, $doctor->email);
+        VaahMail::dispatchGenericMail($subject, $email_content_for_patient, $patient->email);
+    }
 
     //-------------------------------------------------
     //-------------------------------------------------

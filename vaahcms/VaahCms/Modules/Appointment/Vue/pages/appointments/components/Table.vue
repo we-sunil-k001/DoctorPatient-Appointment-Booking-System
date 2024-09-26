@@ -80,11 +80,11 @@ function convertUTCtoKolkata(date,time) {
                  </template>
              </Column>
 
-             <Column field="status" header="Booking Status"
+             <Column field="reason_for_visit" header="Medical Concern"
                      class="overflow-wrap-anywhere"
                      :sortable="true">
                  <template #body="prop">
-                     {{prop.data.status}}
+                     {{prop.data.reason_for_visit}}
                  </template>
              </Column>
 
