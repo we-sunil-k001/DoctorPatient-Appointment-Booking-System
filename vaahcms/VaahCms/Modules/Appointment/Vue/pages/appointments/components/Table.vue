@@ -5,6 +5,30 @@ import { useAppointmentStore } from '../../../stores/store-appointments'
 const store = useAppointmentStore();
 const useVaah = vaah();
 
+// Function to convert UTC time to Asia/Kolkata
+function convertUTCtoKolkata(date,time) {
+    const date_time_string = `${date} ${time} UTC`;
+    const appointment_date_time = new Date(date_time_string);
+
+    // Adjust to the correct date in IST
+    appointment_date_time.setUTCDate(appointment_date_time.getUTCDate() + 1);
+
+    const formattedDate = appointment_date_time.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit'
+    });
+
+    const formattedTime = appointment_date_time.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    });
+
+    return `${formattedDate}, ${formattedTime}`;
+}
+
+
 </script>
 
 <template>
@@ -28,13 +52,6 @@ const useVaah = vaah();
             <Column field="id" header="ID" :style="{width: '80px'}" :sortable="true">
             </Column>
 
-<!--             <Column field="Patient name" header="Patient name" class="overflow-wrap-anywhere" :sortable="true">-->
-<!--                 <template #body="prop">-->
-<!--                     <Badge v-if="prop.data.deleted_at" value="Trashed" severity="danger"></Badge>-->
-<!--                     {{ prop.data.patientFetch ? prop.data.patientFetch.name : 'No Patient' }}-->
-<!--                 </template>-->
-<!--             </Column>-->
-
              <Column field="name" header="Doctor name" class="overflow-wrap-anywhere" :sortable="true">
                  <template  #body="prop">
                      {{ prop.data.doctor.name }}
@@ -47,19 +64,11 @@ const useVaah = vaah();
                  </template>
              </Column>
 
-             <Column field="appointment_date" header="Appointment Date"
+             <Column field="appointment_date" header="Appointment Date and time"
                      class="overflow-wrap-anywhere"
                      :sortable="true">
                  <template #body="prop">
-                     {{prop.data.appointment_date}}
-                 </template>
-             </Column>
-
-             <Column field="appointment_time" header="Appointment Time"
-                     class="overflow-wrap-anywhere"
-                     :sortable="true">
-                 <template #body="prop">
-                     {{prop.data.appointment_time}}
+                    {{ convertUTCtoKolkata(prop.data.appointment_date, prop.data.appointment_time)}}
                  </template>
              </Column>
 
@@ -71,17 +80,13 @@ const useVaah = vaah();
                  </template>
              </Column>
 
-
-             <Column field="updated_at" header="Updated"
-                        v-if="store.isViewLarge()"
-                        style="width:150px;"
-                        :sortable="true">
-
-                    <template #body="prop">
-                        {{useVaah.strToSlug(prop.data.updated_at)}}
-                    </template>
-
-                </Column>
+             <Column field="status" header="Booking Status"
+                     class="overflow-wrap-anywhere"
+                     :sortable="true">
+                 <template #body="prop">
+                     {{prop.data.status}}
+                 </template>
+             </Column>
 
             <Column field="is_active" v-if="store.isViewLarge()"
                     :sortable="true"
