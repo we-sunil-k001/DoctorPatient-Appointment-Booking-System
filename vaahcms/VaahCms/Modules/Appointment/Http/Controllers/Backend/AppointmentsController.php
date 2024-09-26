@@ -34,10 +34,10 @@ class AppointmentsController extends Controller
             $data['empty_item'] = Appointment::getEmptyItem();
 
             // Fetching data from Doctor - after making relation
-            $data['doctors'] = Doctor::where('is_active',1)->select('id','name','email','phone_number')->get();
+            $data['doctor'] = Doctor::where('is_active',1)->select('id','name','email','phone_number')->get();
 
             // Fetching data from Patient - after making relation
-            $data['patients'] = Patient::where('is_active',1)->select('id','name','email','phone_number')->get();
+            $data['patient'] = Patient::where('is_active',1)->select('id','name','email','phone_number')->get();
 
 
             $data['actions'] = [];
