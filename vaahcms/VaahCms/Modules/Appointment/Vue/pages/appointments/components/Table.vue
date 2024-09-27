@@ -117,11 +117,6 @@ function convertUTCtoKolkata(date,time) {
                                 @click="store.toView(prop.data)"
                                 icon="pi pi-eye" />
 
-                        <Button class="p-button-tiny p-button-text"
-                                data-testid="appointments-table-to-edit"
-                                v-tooltip.top="'Update'"
-                                @click="store.toEdit(prop.data)"
-                                icon="pi pi-pencil" />
 
                         <Button class="p-button-tiny p-button-danger p-button-text"
                                 data-testid="appointments-table-action-trash"
@@ -138,6 +133,12 @@ function convertUTCtoKolkata(date,time) {
                                 v-tooltip.top="'Restore'"
                                 icon="pi pi-replay" />
 
+                        <Button class="p-button-tiny p-button-text"
+                                v-if="prop.data.status != 'cancelled'"
+                                data-testid="appointments-table-to-edit"
+                                v-tooltip.top="'Update'"
+                                @click="store.toEdit(prop.data)"
+                                icon="pi pi-pencil" />
 
                     </div>
 

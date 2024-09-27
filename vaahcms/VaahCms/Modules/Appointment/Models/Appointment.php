@@ -486,35 +486,6 @@ class Appointment extends VaahModel
     {
         $inputs = $request->all();
 
-        $validation = self::validation($inputs);
-        if (!$validation['success']) {
-            return $validation;
-        }
-
-        // check if name exist
-        $item = self::where('id', '!=', $id)
-            ->withTrashed()
-            ->where('name', $inputs['name'])->first();
-
-         if ($item) {
-             $error_message = "This name is already exist".($item->deleted_at?' in trash.':'.');
-             $response['success'] = false;
-             $response['errors'][] = $error_message;
-             return $response;
-         }
-
-         // check if slug exist
-         $item = self::where('id', '!=', $id)
-             ->withTrashed()
-             ->where('slug', $inputs['slug'])->first();
-
-         if ($item) {
-             $error_message = "This slug is already exist".($item->deleted_at?' in trash.':'.');
-             $response['success'] = false;
-             $response['errors'][] = $error_message;
-             return $response;
-         }
-
         $item = self::where('id', $id)->withTrashed()->first();
         $item->fill($inputs);
         $item->save();

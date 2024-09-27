@@ -31,6 +31,12 @@ const toggleFormMenu = (event) => {
 
 const appointment_time= ref(null); // Initialize the appointment time
 
+//Dropdown - booking status
+const statusCancel = ref();
+const status = ref([
+    { name: 'Cancel', code: 'cancelled' },
+
+]);
 //--------/form_menu
 
 </script>
@@ -192,16 +198,19 @@ const appointment_time= ref(null); // Initialize the appointment time
                     </div>
                 </VhField>
 
-
-
-                <VhField label="Is Active">
-                    <InputSwitch v-bind:false-value="0"
-                                 v-bind:true-value="1"
-                                 class="p-inputswitch-sm"
-                                 name="appointments-active"
-                                 data-testid="appointments-active"
-                                 v-model="store.item.is_active"/>
+                <VhField label="Status">
+                    <div class="p-inputgroup">
+                        <Dropdown v-model="store.item.status"
+                                  :options="[{ label: 'Select status' },{ label: 'Cancel', value: 'cancelled' }]"
+                                  optionLabel="label"
+                                  optionValue="value"
+                                  name="status"
+                                  class="w-full md:w-14rem"
+                                  placeholder="Select Status" />
+                    </div>
                 </VhField>
+
+
 
             </div>
         </Panel>
