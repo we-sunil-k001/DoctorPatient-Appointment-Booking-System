@@ -157,12 +157,30 @@ class Appointment extends VaahModel
 
         $inputs = $request->all();
 
-//        $validation = self::validation($inputs);
-//        if (!$validation['success']) {
-//            return $validation;
-//        }
-
+        $inputs['appointment_date']= Carbon::parse($inputs['appointment_date'])->toDateString();  // Extract date part
+        // Extract hour and minute part, ignoring seconds
+        $inputs['appointment_time'] = Carbon::parse($inputs['appointment_time'])->format('H:i:00');  // Format as HH:MM
         $inputs['status'] = "confirmed";
+
+        //------------------------------------------------------------
+        // Compare if there is an existing booking at same time and date
+
+            $inputAppointmentDate = Carbon::parse($inputs['appointment_date'])->toDateString();  // Extract date part
+            $inputAppointmentTime = Carbon::parse($inputs['appointment_time'])->toTimeString();  // Extract time part
+
+            // Fetch doctor's name with doctor_id
+            $doctor = Doctor::find($inputs['doctor_id']);
+
+            $existingAppointment = self::where('appointment_date', $inputAppointmentDate)
+                ->where('appointment_time', $inputAppointmentTime)
+                ->where('doctor_id', $inputs['doctor_id'])
+                ->first();
+
+            if ($existingAppointment) {
+                $response['messages'][] = trans('Requested time Slot is not available with '.$doctor->name.'! Choose any other slot.');
+                return $response;
+            }
+        //------------------------------------------------------------
 
         $item = new self();
         $item->fill($inputs);

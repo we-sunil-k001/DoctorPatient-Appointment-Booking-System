@@ -27,6 +27,10 @@ const form_menu = ref();
 const toggleFormMenu = (event) => {
     form_menu.value.toggle(event);
 };
+
+
+const appointment_time= ref(null); // Initialize the appointment time
+
 //--------/form_menu
 
 </script>
@@ -171,7 +175,8 @@ const toggleFormMenu = (event) => {
                 <VhField label="Appointment Time">
                     <div class="p-inputgroup">
                         <Calendar v-model="store.item.appointment_time" timeOnly hourFormat="24" showIcon
-                                  placeholder="Select time" name="appointment_time" >
+                                  placeholder="Select time" name="appointment_time"
+                                  :stepMinute="60">
                         </Calendar>
                     </div>
                 </VhField>
