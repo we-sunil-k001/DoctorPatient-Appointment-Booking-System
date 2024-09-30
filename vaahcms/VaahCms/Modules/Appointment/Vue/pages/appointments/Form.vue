@@ -17,6 +17,7 @@ onMounted(async () => {
             && route.params && route.params.id)
     {
         await store.getItem(route.params.id);
+
     }
 
     await store.getFormMenu();
@@ -197,19 +198,6 @@ const status = ref([
                         <div class="required-field hidden"></div>
                     </div>
                 </VhField>
-
-                <VhField label="Status">
-                    <div class="p-inputgroup">
-                        <Dropdown v-model="store.item.status"
-                                  :options="[{ label: 'Select status' },{ label: 'Cancel', value: 'cancelled' }]"
-                                  optionLabel="label"
-                                  optionValue="value"
-                                  name="status"
-                                  class="w-full md:w-14rem"
-                                  placeholder="Select Status" />
-                    </div>
-                </VhField>
-
 
 
             </div>
