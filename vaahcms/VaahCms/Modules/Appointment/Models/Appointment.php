@@ -515,6 +515,7 @@ class Appointment extends VaahModel
     //-------------------------------------------------
     public static function itemAction($request, $id, $type): array
     {
+
         switch($type)
         {
             case 'activate':
@@ -531,6 +532,11 @@ class Appointment extends VaahModel
                 self::find($id)
                     ->delete();
                 break;
+            case 'cancel':
+                self::find($id)
+                    ->update(['status'=> 'cancelled']);
+                break;
+
             case 'restore':
                 self::where('id', $id)
                     ->onlyTrashed()

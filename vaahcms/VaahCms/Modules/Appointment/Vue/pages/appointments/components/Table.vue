@@ -88,21 +88,7 @@ function convertUTCtoKolkata(date,time) {
                  </template>
              </Column>
 
-            <Column field="is_active" v-if="store.isViewLarge()"
-                    :sortable="true"
-                    style="width:100px;"
-                    header="Is Active">
 
-                <template #body="prop">
-                    <InputSwitch v-model.bool="prop.data.is_active"
-                                 data-testid="appointments-table-is-active"
-                                 v-bind:false-value="0"  v-bind:true-value="1"
-                                 class="p-inputswitch-sm"
-                                 @input="store.toggleIsActive(prop.data)">
-                    </InputSwitch>
-                </template>
-
-            </Column>
 
             <Column field="actions" style="width:150px;"
                     :style="{width: store.getActionWidth() }"
@@ -111,19 +97,22 @@ function convertUTCtoKolkata(date,time) {
                 <template #body="prop">
                     <div class="p-inputgroup ">
 
+                        <!--  Below btn will work If the : v-if="prop.data.status !== 'cancelled'"-->
+                        <Button label="Cancel" severity="danger" rounded
+                                v-if="prop.data.status !== 'cancelled'"
+                                @click="store.itemAction('cancel', prop.data)"
+                                v-tooltip.top="'Cancel'"/>
+
+                        <!--  Below btn will work If the : v-if="prop.data.status === 'cancelled'"-->
+                        <Button label="Cancel" severity="secondary" rounded
+                                disabled v-else
+                                v-tooltip.top="'Cancel'"/>
+
                         <Button class="p-button-tiny p-button-text"
                                 data-testid="appointments-table-to-view"
                                 v-tooltip.top="'View'"
                                 @click="store.toView(prop.data)"
                                 icon="pi pi-eye" />
-
-
-                        <Button class="p-button-tiny p-button-danger p-button-text"
-                                data-testid="appointments-table-action-trash"
-                                v-if="store.isViewLarge() && !prop.data.deleted_at"
-                                @click="store.itemAction('trash', prop.data)"
-                                v-tooltip.top="'Trash'"
-                                icon="pi pi-trash" />
 
 
                         <Button class="p-button-tiny p-button-success p-button-text"
@@ -134,11 +123,16 @@ function convertUTCtoKolkata(date,time) {
                                 icon="pi pi-replay" />
 
                         <Button class="p-button-tiny p-button-text"
-                                v-if="prop.data.status != 'cancelled'"
+                                v-if="prop.data.status !== 'cancelled'"
                                 data-testid="appointments-table-to-edit"
                                 v-tooltip.top="'Update'"
                                 @click="store.toEdit(prop.data)"
                                 icon="pi pi-pencil" />
+
+                        <!--  Below btn will work If the : v-if="prop.data.status === 'cancelled'"-->
+                        <Button class="p-button-tiny p-button-text"
+                                disabled v-else
+                                icon="pi pi-pencil"/>
 
                     </div>
 
