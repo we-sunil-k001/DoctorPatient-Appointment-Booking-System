@@ -625,6 +625,7 @@ export const useAppointmentStore = defineStore({
             this.item = vaah().clone(this.assets.empty_item);
             this.$router.push({name: 'appointments.index',query:this.query})
         },
+
         //---------------------------------------------------------------------
         toForm()
         {
@@ -674,7 +675,13 @@ export const useAppointmentStore = defineStore({
 
             return text;
         },
+
         //---------------------------------------------------------------------
+        hasPermission(permissions, slug) {
+            return vaah().hasPermission(permissions, slug);
+        },
+        //---------------------------------------------------------------------
+
         async getListSelectedMenu()
         {
             this.list_selected_menu = [
