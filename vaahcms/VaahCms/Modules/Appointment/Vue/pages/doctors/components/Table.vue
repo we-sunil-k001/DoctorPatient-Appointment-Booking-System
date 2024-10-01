@@ -80,7 +80,7 @@ const useVaah = vaah();
 
             </Column>
 
-            <Column field="specialization" header="Working hours"
+            <Column field="" header="Working hours"
                     class="overflow-wrap-anywhere"
                     :sortable="true">
 
