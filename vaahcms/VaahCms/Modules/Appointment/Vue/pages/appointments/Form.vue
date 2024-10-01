@@ -38,6 +38,34 @@ const status = ref([
     { name: 'Cancel', code: 'cancelled' },
 
 ]);
+
+
+// Function to convert UTC time to Asia/Kolkata
+function convertUTCtoKolkata(date,time) {
+    const date_time_string = `${date} ${time} UTC`;
+    const appointment_date_time = new Date(date_time_string);
+
+    // Adjust to the correct date in IST
+    appointment_date_time.setUTCDate(appointment_date_time.getUTCDate() + 1);
+
+    const formattedDate = appointment_date_time.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit'
+    });
+
+    const formattedTime = appointment_date_time.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    });
+
+    return `${formattedDate}, ${formattedTime}`;
+}
+
+//Initilizing some null variables
+let re_appointment_date = ref(null);
+let re_appointment_time = ref(null);
 //--------/form_menu
 
 </script>
@@ -77,7 +105,7 @@ const status = ref([
                             @click="store.toView(store.item)"
                             icon="pi pi-eye"/>
 
-                    <Button label="Save"
+                    <Button label="Reschedule"
                             class="p-button-sm"
                             v-if="store.item && store.item.id"
                             data-testid="appointments-save"
@@ -145,48 +173,60 @@ const status = ref([
 
                 </Message>
 
-                <VhField label="Doctor">
-                    <div class="p-inputgroup">
-                        <Dropdown  v-model="store.item.doctor_id"
-                                   :options="store.assets.doctor"
-                                   option-label="name"
-                                   option-value="id"
-                                   name="doctor_name"
-                                   data-testid="doctor_name"
-                                   required/>
-                        <div class="required-field hidden"></div>
-                    </div>
-                </VhField>
+                <div class="existing_details"
+                     v-if="store.item.status !== 'pending'" >
+                    <VhField label="Doctor">
+                        <div class="p-inputgroup">
+                            <Dropdown  v-model="store.item.doctor_id"
+                                       :options="store.assets.doctor"
+                                       option-label="name"
+                                       option-value="id"
+                                       name="doctor_name"
+                                       data-testid="doctor_name"
+                                       required/>
+                            <div class="required-field hidden"></div>
+                        </div>
+                    </VhField>
 
-                <VhField label="Patient">
-                    <div class="p-inputgroup">
-                        <Dropdown  v-model="store.item.patient_id"
-                                   :options="store.assets.patient"
-                                   option-label="name"
-                                   option-value="id"
-                                   name="patient_name"
-                                   data-testid="patient_name"
-                                   required/>
-                        <div class="required-field hidden"></div>
-                    </div>
-                </VhField>
+                    <VhField label="Patient">
+                        <div class="p-inputgroup">
+                            <Dropdown  v-model="store.item.patient_id"
+                                       :options="store.assets.patient"
+                                       option-label="name"
+                                       option-value="id"
+                                       name="patient_name"
+                                       data-testid="patient_name"
+                                       required/>
+                            <div class="required-field hidden"></div>
+                        </div>
+                    </VhField>
+                </div>
+                <div class="existing_details"
+                     v-if="store.item.status == 'pending'" >
+                    <VhField label="Patient Name: ">
+                        <div class="p-inputgroup">
+                            <strong> {{ store.assets.patient.find(p => p.id === store.item.patient_id)?.name || 'Unknown Patient' }}</strong>
+                        </div>
+                    </VhField>
 
-                <VhField label="Appointment Date">
-                    <div class="p-inputgroup">
-                        <Calendar v-model="store.item.appointment_date"
-                                  placeholder="Select Date" name="appointment_date">
-                        </Calendar>
-                    </div>
-                </VhField>
+                    <VhField label="Doctor Name: ">
+                        <div class="p-inputgroup">
+                            <strong> {{ store.assets.doctor.find(p => p.id === store.item.doctor_id)?.name || 'Unknown Doctor' }} </strong>
+                        </div>
+                    </VhField>
 
-                <VhField label="Appointment Time">
-                    <div class="p-inputgroup">
-                        <Calendar v-model="store.item.appointment_time" timeOnly hourFormat="24" showIcon
-                                  placeholder="Select time" name="appointment_time"
-                                  :stepMinute="60">
-                        </Calendar>
-                    </div>
-                </VhField>
+                    <VhField label="Appointment Scheduled: ">
+                        <div class="p-inputgroup">
+                            <strong>{{ convertUTCtoKolkata(store.item.appointment_date, store.item.appointment_time)}}</strong>
+                        </div>
+                    </VhField>
+
+                    <VhField label="Current Status:">
+                        <div class="p-inputgroup">
+                            <Button icon="pi pi-undo" label="Reschedule Pending" severity="secondary" rounded />
+                        </div>
+                    </VhField>
+                </div>
 
                 <VhField label="Medical Concern">
                     <div class="p-inputgroup">
@@ -198,6 +238,26 @@ const status = ref([
                         <div class="required-field hidden"></div>
                     </div>
                 </VhField>
+
+                <VhField label="Appointment Date">
+                    <div class="p-inputgroup">
+                        <Calendar v-model="store.item.appointment_date"
+                                  placeholder="Select Date" name="re_appointment_date">
+                        </Calendar>
+
+                    </div>
+                </VhField>
+
+                <VhField label="Appointment Time">
+                    <div class="p-inputgroup">
+                        <Calendar v-model="store.item.appointment_time" timeOnly hourFormat="24" showIcon
+                                  placeholder="Select time" name="re_appointment_time"
+                                  :stepMinute="60">
+                        </Calendar>
+                    </div>
+                </VhField>
+
+
 
 
             </div>

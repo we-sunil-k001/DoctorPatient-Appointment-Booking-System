@@ -28,7 +28,6 @@ function convertUTCtoKolkata(date,time) {
     return `${formattedDate}, ${formattedTime}`;
 }
 
-
 </script>
 
 <template>
@@ -76,7 +75,15 @@ function convertUTCtoKolkata(date,time) {
                      class="overflow-wrap-anywhere"
                      :sortable="true">
                  <template #body="prop">
-                     {{prop.data.status}}
+                      <span v-html="
+                                prop.data.status === 'pending'
+                                ? '<b style=color:#3b82f6;\n>Reschedule Pending</b>'
+                                : prop.data.status === 'cancelled'
+                                ? '<b style=color:red>Cancelled</b>'
+                                : prop.data.status === 'confirmed'
+                                ? '<b style=color:green>Confirmed</b>'
+                                : prop.data.status
+                            "></span>
                  </template>
              </Column>
 
@@ -85,6 +92,84 @@ function convertUTCtoKolkata(date,time) {
                      :sortable="true">
                  <template #body="prop">
                      {{prop.data.reason_for_visit}}
+                 </template>
+             </Column>
+
+             <Column  header="Appointment Actions"
+                     class="overflow-wrap-anywhere"
+                     :sortable="true">
+                 <template #body="prop">
+
+
+                     <!-- Below btn used for Doctor -->
+                     <div class="button-group"
+                          v-if="store.hasPermission(store.assets.permissions, 'appointment-has-access-of-doctors-section')">
+
+                         <!-- Below btn will work if Status set as pending to reschedule-->
+                         <Button label="Request to reschedule" severity="info" rounded
+                                 v-if="prop.data.status == 'confirmed'"
+                                 @click="store.itemAction('req_to_reschedule', prop.data)"
+                                 v-tooltip.top="'Reschedule'"/> &nbsp
+                     </div>
+
+
+                     <div class="button-group"> <!-- Below all btn used for patient -->
+
+                         <!-- Below btn will work if Status is set as pending to reschedule - it is at top right of form-->
+
+                         <Button label="Reschedule" severity="info" rounded
+                                       v-if="prop.data.status == 'pending' && store.hasPermission(store.assets.permissions, 'appointment-has-access-of-patient-section')"
+                                       @click="store.toEdit(prop.data)"
+                                       v-tooltip.top="'Reschedule'"/> &nbsp
+
+
+                         <!--  Below btn will work If the : v-if="prop.data.status !== 'cancelled'" and has mentioned permission-->
+
+<!--                         <Button label="Cancel" severity="danger" rounded-->
+<!--                                 v-if="prop.data.status !== 'cancelled' && store.hasPermission(store.assets.permissions, 'appointment-has-access-of-patient-section')"-->
+<!--                                 @click="store.itemAction('cancel', prop.data)"-->
+<!--                                 v-tooltip.top="'Cancel'"/>-->
+
+                             <div>
+                                 <Button
+                                     label="Cancel"
+                                     severity="danger"
+                                     rounded
+                                     v-if="prop.data.status !== 'cancelled' && store.hasPermission(store.assets.permissions, 'appointment-has-access-of-patient-section')"
+                                     @click="showDropdown = !showDropdown"
+                                     v-tooltip.top="'Cancel'"
+                                 />
+
+                                 <!-- Dropdown for cancellation reasons -->
+                                 <Dropdown
+                                     v-if="showDropdown"
+                                     v-model="selectedReason"
+                                     :options="cancellationReasons"
+                                     option-label="label"
+                                     option-value="value"
+                                     placeholder="Select a reason"
+                                     @change="onReasonChange"
+                                 />
+
+                                 <!-- Submit button -->
+                                 <Button
+                                     label="Confirm Cancellation"
+                                     severity="danger"
+                                     rounded
+                                     v-if="selectedReason"
+                                     @click="submitCancellation(prop.data)"
+                                     v-tooltip.top="'Confirm Cancellation'"
+                                 />
+                             </div>
+
+
+                         <!--  Below btn will work If the : v-if="prop.data.status === 'cancelled'"-->
+
+                         <Button label="Cancel" severity="secondary" rounded
+                             disabled v-if="prop.data.status === 'cancelled' && store.hasPermission(store.assets.permissions, 'appointment-has-access-of-patient-section')"
+                             v-tooltip.top="'Cancel'"/> &nbsp
+                    </div>
+
                  </template>
              </Column>
 
@@ -97,16 +182,6 @@ function convertUTCtoKolkata(date,time) {
                 <template #body="prop">
                     <div class="p-inputgroup ">
 
-                        <!--  Below btn will work If the : v-if="prop.data.status !== 'cancelled'"-->
-                        <Button label="Cancel" severity="danger" rounded
-                                v-if="prop.data.status !== 'cancelled'"
-                                @click="store.itemAction('cancel', prop.data)"
-                                v-tooltip.top="'Cancel'"/>
-
-                        <!--  Below btn will work If the : v-if="prop.data.status === 'cancelled'"-->
-                        <Button label="Cancel" severity="secondary" rounded
-                                disabled v-else
-                                v-tooltip.top="'Cancel'"/>
 
                         <Button class="p-button-tiny p-button-text"
                                 data-testid="appointments-table-to-view"
@@ -122,22 +197,21 @@ function convertUTCtoKolkata(date,time) {
                                 v-tooltip.top="'Restore'"
                                 icon="pi pi-replay" />
 
-                        <Button class="p-button-tiny p-button-text"
-                                v-if="prop.data.status !== 'cancelled'"
-                                data-testid="appointments-table-to-edit"
-                                v-tooltip.top="'Update'"
-                                @click="store.toEdit(prop.data)"
-                                icon="pi pi-pencil" />
+<!--                        <Button class="p-button-tiny p-button-text"-->
+<!--                                v-if="prop.data.status !== 'cancelled'"-->
+<!--                                data-testid="appointments-table-to-edit"-->
+<!--                                v-tooltip.top="'Update'"-->
+<!--                                @click="store.toEdit(prop.data)"-->
+<!--                                icon="pi pi-pencil" />-->
 
                         <!--  Below btn will work If the : v-if="prop.data.status === 'cancelled'"-->
-                        <Button class="p-button-tiny p-button-text"
-                                disabled v-else
-                                icon="pi pi-pencil"/>
+<!--                        <Button class="p-button-tiny p-button-text"-->
+<!--                                disabled v-else-->
+<!--                                icon="pi pi-pencil"/>-->
 
                     </div>
 
                 </template>
-
 
             </Column>
 
@@ -164,3 +238,15 @@ function convertUTCtoKolkata(date,time) {
     </div>
 
 </template>
+
+
+<style scoped>
+.button-group {
+    display: flex;
+    align-items: center;
+}
+
+button{
+    margin: 1px;
+}
+</style>

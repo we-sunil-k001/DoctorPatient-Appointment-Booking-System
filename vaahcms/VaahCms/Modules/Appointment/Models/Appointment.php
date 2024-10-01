@@ -152,6 +152,27 @@ class Appointment extends VaahModel
     }
 
     //-------------------------------------------------
+
+    // function to convert UTC to IST
+    public static function convertToIST($inputs)
+    {
+        // Convert 'appointment_date' from UTC to Asia/Kolkata
+        $appointmentDate = Carbon::parse($inputs['appointment_date'])
+            ->setTimezone('Asia/Kolkata')
+            ->format('M. d Y');
+
+        // Convert 'appointment_time' from UTC to Asia/Kolkata
+        $appointmentTime = Carbon::parse($inputs['appointment_time'])
+            ->setTimezone('Asia/Kolkata')
+            ->format('h:i A');
+
+        // Concatenate both values
+        return $appointmentDate . ', ' . $appointmentTime;
+    }
+
+
+
+    //-------------------------------------------------
     public static function createItem($request)
     {
 
@@ -186,9 +207,39 @@ class Appointment extends VaahModel
         $item->fill($inputs);
         $item->save();
 
+
+        //----------------------------------------------------------------
         //Calling Email to Notify Booking confirm
-        $subject = 'Appintment Confirmed';
-        self::appointmentMail($inputs,$subject);
+        $subject = 'Appointment Confirmed';
+        $doctor = Doctor::find($inputs['doctor_id']);
+        $patient = Patient::find($inputs['patient_id']);
+        // Convert UTC data and time to IST
+        $row_date_time = [
+            'appointment_date' => $inputs['appointment_date'], // Example UTC input for date
+            'appointment_time' =>  $inputs['appointment_time'], // Example UTC input for time
+        ];
+
+        $formatted_date_time = self::convertToIST($row_date_time);
+
+        $email_content_for_patient = sprintf(
+            "Dear %s,\n\nYour appointment with Dr. %s has been successfully booked.\nThe details of your appointment are as follows:\n\nAppointment Date & Time: %s\n\nPlease make sure to arrive 10 minutes before the scheduled time.\n\nRegards,\nWebreinvent Technologies",
+            $patient->name,
+            $doctor->name,
+            $formatted_date_time
+        );
+
+        $email_content_for_doctor = sprintf(
+            "Dear Dr. %s,\n\nYou have a new appointment scheduled with %s.\nThe details are as follows:\n\nAppointment Date & Time: %s\n\nPlease be on time for the appointment.\n\nRegards,\nWebreinvent Technologies",
+            $doctor->name,
+            $patient->name,
+            $formatted_date_time
+        );
+
+        $doctor_email = $doctor->email;
+        $patient_email = $patient->email;
+
+        self::appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email);
+        //-----------------------------------------------------------------
 
         $response = self::getItem($item->id);
         $response['messages'][] = trans("vaahcms-general.saved_successfully");
@@ -488,7 +539,44 @@ class Appointment extends VaahModel
 
         $item = self::where('id', $id)->withTrashed()->first();
         $item->fill($inputs);
+
+        // Set the status to 'confirmed'
+        $item->status = 'confirmed';
+
         $item->save();
+
+        //----------------------------------------------------------------
+        //Calling Email to Notify Booking confirm
+        $subject = 'Appointment Rescheduled';
+        $doctor = Doctor::find($inputs['doctor_id']);
+        $patient = Patient::find($inputs['patient_id']);
+        // Convert UTC data and time to IST
+        $row_date_time = [
+            'appointment_date' => $inputs['appointment_date'], // Example UTC input for date
+            'appointment_time' =>  $inputs['appointment_time'], // Example UTC input for time
+        ];
+
+        $formatted_date_time = self::convertToIST($row_date_time);
+
+        $email_content_for_patient = sprintf(
+            "Dear %s,\n\nYour appointment with Dr. %s has been rescheduled.\nThe details of your appointment are as follows:\n\nAppointment Date & Time: %s\n\nPlease make sure to arrive 10 minutes before the scheduled time.\n\nRegards,\nWebreinvent Technologies",
+            $patient->name,
+            $doctor->name,
+            $formatted_date_time
+        );
+
+        $email_content_for_doctor = sprintf(
+            "Dear Dr. %s,\n\nYour Appointment has been with rescheduled %s.\nThe details are as follows:\n\nAppointment Date & Time: %s\n\nPlease be on time for the appointment.\n\nRegards,\nWebreinvent Technologies",
+            $doctor->name,
+            $patient->name,
+            $formatted_date_time
+        );
+
+        $doctor_email = $doctor->email;
+        $patient_email = $patient->email;
+
+        self::appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email);
+        //-----------------------------------------------------------------
 
         $response = self::getItem($item->id);
         $response['messages'][] = trans("vaahcms-general.saved_successfully");
@@ -535,6 +623,82 @@ class Appointment extends VaahModel
             case 'cancel':
                 self::find($id)
                     ->update(['status'=> 'cancelled']);
+
+                // Fetch the data for the given $id
+                $inputs = self::find($id);
+
+                //----------------------------------------------------------------
+                //Calling Email to Notify Booking confirm
+                $subject = 'Appointment Cancelled';
+                $doctor = Doctor::find($inputs['doctor_id']);
+                $patient = Patient::find($inputs['patient_id']);
+                // Convert UTC data and time to IST
+                $row_date_time = [
+                    'appointment_date' => $inputs['appointment_date'], // Example UTC input for date
+                    'appointment_time' =>  $inputs['appointment_time'], // Example UTC input for time
+                ];
+
+                $formatted_date_time = self::convertToIST($row_date_time);
+
+                // Email content for patient
+                $email_content_for_patient = sprintf(
+                    "Dear %s,\n\nWe want to inform you that you have successfully cancelled your appointment with Dr. %s, originally scheduled for %s.\n\nIf you wish to reschedule, please feel free to visit our website or contact our support team for assistance.\n\nThank you for your understanding.\n\nBest regards,\nWebreinvent Technologies",
+                    $patient->name,
+                    $doctor->name,
+                    $formatted_date_time
+                );
+
+                // Email content for doctor
+                $email_content_for_doctor = sprintf(
+                    "Dear Dr. %s,\n\nWe would like to inform you that your appointment with patient %s has been cancelled. The appointment was originally scheduled for %s.\n\nPlease check your schedule for any necessary adjustments.\n\nThank you for your understanding.\n\nBest regards,\nWebreinvent Technologies",
+                    $doctor->name,
+                    $patient->name,
+                    $formatted_date_time
+                );
+
+                $doctor_email = $doctor->email;
+                $patient_email = $patient->email;
+
+                self::appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email);
+                //-----------------------------------------------------------------
+
+                break;
+
+            case 'req_to_reschedule':
+                self::find($id)
+                    ->update(['status'=> 'pending']);
+
+                // Fetch the data for the given $id
+                $inputs = self::find($id);
+
+                //----------------------------------------------------------------
+                //Calling Email to Notify Booking confirm
+                $subject = 'Appointment Slot Cancelled';
+                $doctor = Doctor::find($inputs['doctor_id']);
+                $patient = Patient::find($inputs['patient_id']);
+                // Convert UTC data and time to IST
+                $row_date_time = [
+                    'appointment_date' => $inputs['appointment_date'], // Example UTC input for date
+                    'appointment_time' =>  $inputs['appointment_time'], // Example UTC input for time
+                ];
+
+                $formatted_date_time = self::convertToIST($row_date_time);
+
+                $email_content_for_patient = sprintf(
+                    "Dear %s,\n\nWe would like to inform you that due to unforeseen circumstances, your appointment slot with Dr. %s has been cancelled. We kindly request you to reschedule your appointment at the next available slot.\n\nYou can easily rebook by visiting our website or contacting our support team.\n\nThank you for your understanding.\n\nBest regards,\nWebreinvent Technologies",
+                    $patient->name,
+                    $doctor->name
+                );
+
+
+                $patient_email = $patient->email;
+
+                $email_content_for_doctor = "";
+                $doctor_email = "";
+
+                self::appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email);
+                //-----------------------------------------------------------------
+
                 break;
 
             case 'restore':
@@ -643,54 +807,19 @@ class Appointment extends VaahModel
             return $this->belongsTo(Patient::class, 'patient_id', 'id');
         }
 
-    // function to convert UTC to IST
-    public static function convertToIST($inputs)
+    // Single Function for all kind of emails for Doctor and Patient
+    public static function appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email)
     {
-        // Convert 'appointment_date' from UTC to Asia/Kolkata
-        $appointmentDate = Carbon::parse($inputs['appointment_date'])
-            ->setTimezone('Asia/Kolkata')
-            ->format('M. d Y');
-
-        // Convert 'appointment_time' from UTC to Asia/Kolkata
-        $appointmentTime = Carbon::parse($inputs['appointment_time'])
-            ->setTimezone('Asia/Kolkata')
-            ->format('h:i A');
-
-        // Concatenate both values
-        return $appointmentDate . ', ' . $appointmentTime;
+        if ($email_content_for_patient !== "")
+        {
+            VaahMail::dispatchGenericMail($subject, $email_content_for_patient, $patient_email);
+        }
+        if ($email_content_for_doctor !== "")
+        {
+            VaahMail::dispatchGenericMail($subject, $email_content_for_doctor, $doctor_email);
+        }
     }
 
-
-    // Email definition
-    public static function appointmentMail($inputs, $subject)
-    {
-
-        $doctor = Doctor::find($inputs['doctor_id']);
-        $patient = Patient::find($inputs['patient_id']);
-        // Convert UTC data and time to IST
-        $row_date_time = [
-            'appointment_date' => $inputs['appointment_date'], // Example UTC input for date
-            'appointment_time' =>  $inputs['appointment_time'], // Example UTC input for time
-        ];
-
-        $formatted_date_time = self::convertToIST($row_date_time);
-        $email_content_for_patient = sprintf(
-            "Dear %s,\n\nYour appointment with Dr. %s has been successfully booked.\nThe details of your appointment are as follows:\n\nAppointment Date & Time: %s\n\nPlease make sure to arrive 10 minutes before the scheduled time.\n\nRegards,\nWebreinvent Technologies",
-            $patient->name,
-            $doctor->name,
-            $formatted_date_time
-        );
-
-        $email_content_for_doctor = sprintf(
-        "Dear Dr. %s,\n\nYou have a new appointment scheduled with %s.\nThe details are as follows:\n\nAppointment Date & Time: %s\n\nPlease be on time for the appointment.\n\nRegards,\nWebreinvent Technologies",
-            $doctor->name,
-            $patient->name,
-            $formatted_date_time
-        );
-
-        VaahMail::dispatchGenericMail($subject, $email_content_for_doctor, $doctor->email);
-        VaahMail::dispatchGenericMail($subject, $email_content_for_patient, $patient->email);
-    }
 
     //-------------------------------------------------
     //-------------------------------------------------
