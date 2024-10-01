@@ -27,7 +27,8 @@ class VhAppointments extends Migration
                 $table->date('appointment_date'); // Date of the appointment
                 $table->time('appointment_time'); // Time of the appointment
                 $table->enum('status', ['pending', 'confirmed', 'cancelled', 'completed'])->default('pending'); // Status of the appointment
-                $table->text('reason_for_visit')->nullable(); // Optional: Reason for the visit or any symptoms
+                $table->text('status_change_reason')->nullable();
+                $table->text('reason_for_visit')->nullable();
 
                 $table->boolean('is_active')->nullable()->index();
 
