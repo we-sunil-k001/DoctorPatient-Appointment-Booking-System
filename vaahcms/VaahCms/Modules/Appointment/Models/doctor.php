@@ -498,6 +498,11 @@ class doctor extends VaahModel
             ->withTrashed()
             ->first();
 
+        if ($item) {
+            // Hide specific columns
+            $item->makeHidden(['slug','qualification', 'experience', 'gender','meta']);
+        }
+
         if(!$item)
         {
             $response['success'] = false;
@@ -620,7 +625,6 @@ class doctor extends VaahModel
 
         $rules = array(
             'name' => 'required|max:150',
-            'slug' => 'required|max:150',
             'email' => 'required|email',
             'phone_number' => 'required|digits:10',
             'specialization' => 'required|max:100',
