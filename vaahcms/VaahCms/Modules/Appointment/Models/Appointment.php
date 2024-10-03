@@ -153,12 +153,13 @@ class Appointment extends VaahModel
 
     //-------------------------------------------------
 
-    // function to convert UTC to IST
-    public static function convertToIST($inputs)
+    // function to convert UTC to IST in M. d Y - h:i A (Alphabatically written)
+    public static function convertToISTEmailFormat($inputs)
     {
         // Convert 'appointment_date' from UTC to Asia/Kolkata
         $appointmentDate = Carbon::parse($inputs['appointment_date'])
             ->setTimezone('Asia/Kolkata')
+            ->addDay()
             ->format('M. d Y');
 
         // Convert 'appointment_time' from UTC to Asia/Kolkata
@@ -179,6 +180,7 @@ class Appointment extends VaahModel
         $inputs = $request->all();
 
         $inputs['appointment_date']= Carbon::parse($inputs['appointment_date'])->toDateString();  // Extract date part
+
         // Extract hour and minute part, ignoring seconds
         $inputs['appointment_time'] = Carbon::parse($inputs['appointment_time'])->format('H:i:00');  // Format as HH:MM
         $inputs['status'] = "confirmed";
@@ -219,7 +221,7 @@ class Appointment extends VaahModel
             'appointment_time' =>  $inputs['appointment_time'], // Example UTC input for time
         ];
 
-        $formatted_date_time = self::convertToIST($row_date_time);
+        $formatted_date_time = self::convertToISTEmailFormat($row_date_time);
 
         $email_content_for_patient = sprintf(
             "Dear %s,\n\nYour appointment with Dr. %s has been successfully booked.\nThe details of your appointment are as follows:\n\nAppointment Date & Time: %s\n\nPlease make sure to arrive 10 minutes before the scheduled time.\n\nRegards,\nWebreinvent Technologies",
@@ -349,12 +351,18 @@ class Appointment extends VaahModel
 
         $list = $list->paginate($rows);
 
+        // Convert working hours from UTC to IST
+        // Loop through the list and convert working hours to IST
+        foreach ($list as $item) {
+            $item->appointment_date = self::convertDateUTCtoIST($item->appointment_date);
+            $item->appointment_time = self::convertUTCtoIST12Hrs($item->appointment_time);
+        }
+
         $response['success'] = true;
         $response['data'] = $list;
 
+
         return $response;
-
-
     }
 
     //-------------------------------------------------
@@ -526,12 +534,46 @@ class Appointment extends VaahModel
             $response['errors'][] = 'Record not found with ID: '.$id;
             return $response;
         }
+        // Convert working hours from UTC to IST
+        $item->appointment_date = self::convertDateUTCtoIST($item->appointment_date);
+        $item->appointment_time = self::convertUTCtoIST12Hrs($item->appointment_time);
+
         $response['success'] = true;
         $response['data'] = $item;
 
         return $response;
 
     }
+
+
+    //-------------------------------------------------
+    // Helper function to convert time from UTC to IST and return in 12-hour format
+    public static function convertDateUTCtoIST($utcDateTime)
+    {
+        // Assuming $utcDateTime is in 'Y-m-d H:i:s' format
+        return Carbon::parse($utcDateTime, 'UTC')
+            ->setTimezone('Asia/Kolkata')
+            ->addDay()    // Add one day
+            ->format('Y-m-d');
+    }
+
+    public static function convertUTCtoIST12Hrs($time)
+    {
+        if (!$time) {
+            return null;
+        }
+
+        // Create a Carbon instance in UTC timezone
+        $utc_time = Carbon::createFromTimeString($time, 'UTC');
+
+        // Convert to Asia/Kolkata timezone
+        $ist_time = $utc_time->setTimezone('Asia/Kolkata');
+
+        // Return the formatted time in 'h:i A' (12-hour format with AM/PM)
+        return $ist_time->format('h:i A');
+    }
+
+
     //-------------------------------------------------
     public static function updateItem($request, $id)
     {
@@ -540,6 +582,7 @@ class Appointment extends VaahModel
         $item = self::where('id', $id)->withTrashed()->first();
         $item->fill($inputs);
 
+//        dd($inputs['appointment_date'], $inputs['appointment_time']);
         // Set the status to 'confirmed'
         $item->status = 'confirmed';
 
@@ -556,7 +599,7 @@ class Appointment extends VaahModel
             'appointment_time' =>  $inputs['appointment_time'], // Example UTC input for time
         ];
 
-        $formatted_date_time = self::convertToIST($row_date_time);
+        $formatted_date_time = self::convertToISTEmailFormat($row_date_time);
 
         $email_content_for_patient = sprintf(
             "Dear %s,\n\nYour appointment with Dr. %s has been rescheduled.\nThe details of your appointment are as follows:\n\nAppointment Date & Time: %s\n\nPlease make sure to arrive 10 minutes before the scheduled time.\n\nRegards,\nWebreinvent Technologies",
@@ -638,7 +681,7 @@ class Appointment extends VaahModel
                     'appointment_time' =>  $inputs['appointment_time'], // Example UTC input for time
                 ];
 
-                $formatted_date_time = self::convertToIST($row_date_time);
+                $formatted_date_time = self::convertToISTEmailFormat($row_date_time);
 
                 // Email content for patient
                 $email_content_for_patient = sprintf(
@@ -682,7 +725,7 @@ class Appointment extends VaahModel
                     'appointment_time' =>  $inputs['appointment_time'], // Example UTC input for time
                 ];
 
-                $formatted_date_time = self::convertToIST($row_date_time);
+                $formatted_date_time = self::convertToISTEmailFormat($row_date_time);
 
                 $email_content_for_patient = sprintf(
                     "Dear %s,\n\nWe would like to inform you that due to unforeseen circumstances, your appointment slot with Dr. %s has been cancelled. We kindly request you to reschedule your appointment at the next available slot.\n\nYou can easily rebook by visiting our website or contacting our support team.\n\nThank you for your understanding.\n\nBest regards,\nWebreinvent Technologies",

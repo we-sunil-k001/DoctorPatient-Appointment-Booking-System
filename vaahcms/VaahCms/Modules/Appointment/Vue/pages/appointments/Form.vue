@@ -30,42 +30,6 @@ const toggleFormMenu = (event) => {
 };
 
 
-const appointment_time= ref(null); // Initialize the appointment time
-
-//Dropdown - booking status
-const statusCancel = ref();
-const status = ref([
-    { name: 'Cancel', code: 'cancelled' },
-
-]);
-
-
-// Function to convert UTC time to Asia/Kolkata
-function convertUTCtoKolkata(date,time) {
-    const date_time_string = `${date} ${time} UTC`;
-    const appointment_date_time = new Date(date_time_string);
-
-    // Adjust to the correct date in IST
-    appointment_date_time.setUTCDate(appointment_date_time.getUTCDate() + 1);
-
-    const formattedDate = appointment_date_time.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: '2-digit'
-    });
-
-    const formattedTime = appointment_date_time.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-    });
-
-    return `${formattedDate}, ${formattedTime}`;
-}
-
-//Initilizing some null variables
-let re_appointment_date = ref(null);
-let re_appointment_time = ref(null);
 //--------/form_menu
 
 </script>
@@ -217,7 +181,7 @@ let re_appointment_time = ref(null);
 
                     <VhField label="Appointment Scheduled: ">
                         <div class="p-inputgroup">
-                            <strong>{{ convertUTCtoKolkata(store.item.appointment_date, store.item.appointment_time)}}</strong>
+                            <strong>{{ store.item.appointment_date}} - {{store.item.appointment_time}}</strong>
                         </div>
                     </VhField>
 
@@ -242,16 +206,16 @@ let re_appointment_time = ref(null);
                 <VhField label="Appointment Date">
                     <div class="p-inputgroup">
                         <Calendar v-model="store.item.appointment_date"
-                                  placeholder="Select Date" name="re_appointment_date">
+                                  placeholder="Select Date" name="appointment_date">
                         </Calendar>
-
                     </div>
                 </VhField>
 
                 <VhField label="Appointment Time">
                     <div class="p-inputgroup">
-                        <Calendar v-model="store.item.appointment_time" timeOnly hourFormat="24" showIcon
-                                  placeholder="Select time" name="re_appointment_time"
+                        <Calendar v-model="store.item.appointment_time" timeOnly hourFormat="12" showIcon
+                                  placeholder="Select time"
+                                  name="appointment_time"
                                   :stepMinute="60">
                         </Calendar>
                     </div>

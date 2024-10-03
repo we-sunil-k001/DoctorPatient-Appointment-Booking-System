@@ -518,23 +518,6 @@ class doctor extends VaahModel
 
     }
 
-    //-------------------------------------------------
-    // Helper function to convert time from UTC to IST and return in 12-hour format
-    public static function convertUTCtoIST($time)
-    {
-        if (!$time) {
-            return null;
-        }
-
-        // Create a Carbon instance in UTC timezone
-        $utc_time = Carbon::createFromTimeString($time, 'UTC');
-
-        // Convert to Asia/Kolkata timezone
-        $ist_time = $utc_time->setTimezone('Asia/Kolkata');
-
-        // Return the formatted time in 'h:i:' (24-hour format)
-        return $ist_time->format('h:i:s');
-    }
 
 
     //-------------------------------------------------
@@ -546,7 +529,6 @@ class doctor extends VaahModel
         if (!$validation['success']) {
             return $validation;
         }
-
 
         // Extract hour and minute part, ignoring seconds
         $inputs['working_hours_start'] = Carbon::parse($inputs['working_hours_start'])->format('H:i:00');  // Format as HH:MM

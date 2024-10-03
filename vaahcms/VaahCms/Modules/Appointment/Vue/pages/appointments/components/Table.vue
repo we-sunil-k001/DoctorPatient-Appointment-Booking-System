@@ -5,29 +5,6 @@ import { useAppointmentStore } from '../../../stores/store-appointments'
 const store = useAppointmentStore();
 const useVaah = vaah();
 
-// Function to convert UTC time to Asia/Kolkata
-function convertUTCtoKolkata(date,time) {
-    const date_time_string = `${date} ${time} UTC`;
-    const appointment_date_time = new Date(date_time_string);
-
-    // Adjust to the correct date in IST
-    appointment_date_time.setUTCDate(appointment_date_time.getUTCDate() + 1);
-
-    const formattedDate = appointment_date_time.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: '2-digit'
-    });
-
-    const formattedTime = appointment_date_time.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-    });
-
-    return `${formattedDate}, ${formattedTime}`;
-}
-
 </script>
 
 <template>
@@ -67,7 +44,7 @@ function convertUTCtoKolkata(date,time) {
                      class="overflow-wrap-anywhere"
                      :sortable="true">
                  <template #body="prop">
-                    {{ convertUTCtoKolkata(prop.data.appointment_date, prop.data.appointment_time)}}
+                    {{ prop.data.appointment_date}} - {{ prop.data.appointment_time}}
                  </template>
              </Column>
 
@@ -125,42 +102,10 @@ function convertUTCtoKolkata(date,time) {
 
                          <!--  Below btn will work If the : v-if="prop.data.status !== 'cancelled'" and has mentioned permission-->
 
-<!--                         <Button label="Cancel" severity="danger" rounded-->
-<!--                                 v-if="prop.data.status !== 'cancelled' && store.hasPermission(store.assets.permissions, 'appointment-has-access-of-patient-section')"-->
-<!--                                 @click="store.itemAction('cancel', prop.data)"-->
-<!--                                 v-tooltip.top="'Cancel'"/>-->
-
-                             <div>
-                                 <Button
-                                     label="Cancel"
-                                     severity="danger"
-                                     rounded
-                                     v-if="prop.data.status !== 'cancelled' && store.hasPermission(store.assets.permissions, 'appointment-has-access-of-patient-section')"
-                                     @click="showDropdown = !showDropdown"
-                                     v-tooltip.top="'Cancel'"
-                                 />
-
-                                 <!-- Dropdown for cancellation reasons -->
-                                 <Dropdown
-                                     v-if="showDropdown"
-                                     v-model="selectedReason"
-                                     :options="cancellationReasons"
-                                     option-label="label"
-                                     option-value="value"
-                                     placeholder="Select a reason"
-                                     @change="onReasonChange"
-                                 />
-
-                                 <!-- Submit button -->
-                                 <Button
-                                     label="Confirm Cancellation"
-                                     severity="danger"
-                                     rounded
-                                     v-if="selectedReason"
-                                     @click="submitCancellation(prop.data)"
-                                     v-tooltip.top="'Confirm Cancellation'"
-                                 />
-                             </div>
+                         <Button label="Cancel" severity="danger" rounded
+                                 v-if="prop.data.status !== 'cancelled' && store.hasPermission(store.assets.permissions, 'appointment-has-access-of-patient-section')"
+                                 @click="store.itemAction('cancel', prop.data)"
+                                 v-tooltip.top="'Cancel'"/>
 
 
                          <!--  Below btn will work If the : v-if="prop.data.status === 'cancelled'"-->
