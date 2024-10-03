@@ -147,7 +147,7 @@ const toggleFormMenu = (event) => {
                     </div>
                 </VhField>
 
-                <VhField label="Slug">
+                <VhField label="Slug" style="display: none">
                     <div class="p-inputgroup">
                         <InputText class="w-full"
                                    placeholder="Enter the slug"

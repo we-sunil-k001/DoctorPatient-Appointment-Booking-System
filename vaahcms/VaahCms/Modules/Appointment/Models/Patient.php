@@ -458,6 +458,11 @@ class Patient extends VaahModel
             ->withTrashed()
             ->first();
 
+        if ($item) {
+            // Hide specific columns
+            $item->makeHidden(['slug','dob', 'gender']);
+        }
+
         if(!$item)
         {
             $response['success'] = false;
@@ -565,7 +570,6 @@ class Patient extends VaahModel
 
         $rules = array(
             'name' => 'required|max:150',
-            'slug' => 'required|max:150',
             'email' => 'required|email',
             'phone_number' => 'required|digits:10',
         );
