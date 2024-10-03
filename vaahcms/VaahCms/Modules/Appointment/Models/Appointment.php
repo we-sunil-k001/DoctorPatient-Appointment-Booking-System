@@ -716,8 +716,11 @@ class Appointment extends VaahModel
     {
 
         $rules = array(
-//            'name' => 'required|max:150',
-//            'slug' => 'required|max:150',
+            'doctor_id' => 'required',
+            'patient_id' => 'required',
+            'appointment_date' => 'required',
+            'appointment_time' => 'required',
+
         );
 
         $validator = \Validator::make($inputs, $rules);
