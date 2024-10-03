@@ -28,7 +28,6 @@ const toggleFormMenu = (event) => {
     form_menu.value.toggle(event);
 };
 //--------/form_menu
-const isValidTime = (date) => date instanceof Date && !isNaN(date.getTime());
 </script>
 <template>
 
@@ -193,16 +192,18 @@ const isValidTime = (date) => date instanceof Date && !isNaN(date.getTime());
 
                 <VhField label="Working Hour starts at">
                     <div class="p-inputgroup">
-                        <Calendar v-model="store.item.working_hours_start" timeOnly hourFormat="24" showIcon
-                            placeholder="Select time" name="working_hours_start" >
+                        <Calendar v-model="store.item.working_hours_start" timeOnly hourFormat="12" showIcon
+                            placeholder="Select time" name="working_hours_start" :stepMinute="60">
                         </Calendar>
                     </div>
                 </VhField>
 
                 <VhField label="Working Hour ends at">
                     <div class="p-inputgroup">
-                        <Calendar v-model="store.item.working_hours_end" timeOnly hourFormat="24" showIcon
-                            placeholder="Select time" name="working_hours_end" >
+                        <Calendar v-model="store.item.working_hours_end" timeOnly hourFormat="12" showIcon
+                                    placeholder="Select time"
+                                    name="working_hours_end"
+                                    :stepMinute="60">
                         </Calendar>
                     </div>
                 </VhField>

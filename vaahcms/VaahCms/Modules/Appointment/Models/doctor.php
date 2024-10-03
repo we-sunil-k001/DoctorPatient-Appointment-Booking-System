@@ -165,10 +165,11 @@ class doctor extends VaahModel
             return $validation;
         }
 
+        // Extract hour and minute part, ignoring seconds
+        $inputs['working_hours_start'] = Carbon::parse($inputs['working_hours_start'])->format('H:i:00');  // Format as HH:MM
+        $inputs['working_hours_end'] = Carbon::parse($inputs['working_hours_end'])->format('H:i:00');  // Format as HH:MM
 
-        $inputs['working_hours_start'] = Carbon::parse($inputs['working_hours_start'])->setTimezone('Asia/Kolkata')->format('H:i:s');
-        $inputs['working_hours_end'] = Carbon::parse($inputs['working_hours_end'])->setTimezone('Asia/Kolkata')->format('H:i:s');
-
+//        dd($inputs['working_hours_start'], $inputs['working_hours_end']);
 
         // check if name exist
         $item = self::where('name', $inputs['name'])->withTrashed()->first();
@@ -291,6 +292,7 @@ class doctor extends VaahModel
         $list->trashedFilter($request->filter);
         $list->searchFilter($request->filter);
 
+
         $rows = config('vaahcms.per_page');
 
         if($request->has('rows'))
@@ -300,13 +302,38 @@ class doctor extends VaahModel
 
         $list = $list->paginate($rows);
 
+        // Loop through the list and convert working hours to IST
+        foreach ($list as $item) {
+            $item->working_hours_start = self::convertUTCtoIST12Hrs($item->working_hours_start);
+            $item->working_hours_end = self::convertUTCtoIST12Hrs($item->working_hours_end);
+        }
+
         $response['success'] = true;
         $response['data'] = $list;
 
         return $response;
 
-
     }
+
+    //-------------------------------------------------
+    // Helper function to convert time from UTC to IST and return in 12-hour format
+    public static function convertUTCtoIST12Hrs($time)
+    {
+        if (!$time) {
+            return null;
+        }
+
+        // Create a Carbon instance in UTC timezone
+        $utc_time = Carbon::createFromTimeString($time, 'UTC');
+
+        // Convert to Asia/Kolkata timezone
+        $ist_time = $utc_time->setTimezone('Asia/Kolkata');
+
+        // Return the formatted time in 'h:i A' (12-hour format with AM/PM)
+        return $ist_time->format('h:i A');
+    }
+
+
 
     //-------------------------------------------------
     public static function updateList($request)
@@ -477,12 +504,39 @@ class doctor extends VaahModel
             $response['errors'][] = 'Record not found with ID: '.$id;
             return $response;
         }
+
+        // Convert working hours from UTC to IST
+        $item->working_hours_start = self::convertUTCtoIST12Hrs($item->working_hours_start);
+        $item->working_hours_end = self::convertUTCtoIST12Hrs($item->working_hours_end);
+
         $response['success'] = true;
         $response['data'] = $item;
+
+//        dd($item->working_hours_start, $item->working_hours_end);
 
         return $response;
 
     }
+
+    //-------------------------------------------------
+    // Helper function to convert time from UTC to IST and return in 12-hour format
+    public static function convertUTCtoIST($time)
+    {
+        if (!$time) {
+            return null;
+        }
+
+        // Create a Carbon instance in UTC timezone
+        $utc_time = Carbon::createFromTimeString($time, 'UTC');
+
+        // Convert to Asia/Kolkata timezone
+        $ist_time = $utc_time->setTimezone('Asia/Kolkata');
+
+        // Return the formatted time in 'h:i:' (24-hour format)
+        return $ist_time->format('h:i:s');
+    }
+
+
     //-------------------------------------------------
     public static function updateItem($request, $id)
     {
@@ -492,6 +546,12 @@ class doctor extends VaahModel
         if (!$validation['success']) {
             return $validation;
         }
+
+
+        // Extract hour and minute part, ignoring seconds
+        $inputs['working_hours_start'] = Carbon::parse($inputs['working_hours_start'])->format('H:i:00');  // Format as HH:MM
+        $inputs['working_hours_end'] = Carbon::parse($inputs['working_hours_end'])->format('H:i:00');  // Format as HH:MM
+
 
         // check if name exist
         $item = self::where('id', '!=', $id)
@@ -579,6 +639,12 @@ class doctor extends VaahModel
         $rules = array(
             'name' => 'required|max:150',
             'slug' => 'required|max:150',
+            'email' => 'required|email',
+            'phone_number' => 'required|digits:10',
+            'specialization' => 'required|max:100',
+            'working_hours_start' => 'required',
+            'working_hours_end' => 'required'
+
         );
 
         $validator = \Validator::make($inputs, $rules);
