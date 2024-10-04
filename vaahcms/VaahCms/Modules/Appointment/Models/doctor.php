@@ -20,7 +20,7 @@ class doctor extends VaahModel
     use CrudWithUuidObservantTrait;
 
     //-------------------------------------------------
-    protected $table = 'vh_doctor';
+    protected $table = 'vh_doctors';
     //-------------------------------------------------
     protected $dates = [
         'created_at',
@@ -499,10 +499,6 @@ class doctor extends VaahModel
             ->withTrashed()
             ->first();
 
-        if ($item) {
-            // Hide specific columns
-            $item->makeHidden(['slug','qualification', 'experience', 'gender','meta']);
-        }
 
         if(!$item)
         {
