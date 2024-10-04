@@ -10,6 +10,7 @@ use WebReinvent\VaahCms\Traits\CrudWithUuidObservantTrait;
 use WebReinvent\VaahCms\Models\User;
 use WebReinvent\VaahCms\Libraries\VaahSeeder;
 use Carbon\Carbon;
+use WebReinvent\VaahCms\Libraries\VaahMail;
 
 
 class doctor extends VaahModel
@@ -517,11 +518,33 @@ class doctor extends VaahModel
         $response['success'] = true;
         $response['data'] = $item;
 
-//        dd($item->working_hours_start, $item->working_hours_end);
 
         return $response;
 
     }
+
+
+
+    //-------------------------------------------------
+
+    // function to convert UTC to IST in M. d Y - h:i A (Alphabatically written)
+    public static function convertToISTEmailFormat($inputs)
+    {
+        // Convert 'appointment_date' from UTC to Asia/Kolkata
+        $appointmentDate = Carbon::parse($inputs['appointment_date'])
+            ->setTimezone('Asia/Kolkata')
+            ->addDay()
+            ->format('M. d Y');
+
+        // Convert 'appointment_time' from UTC to Asia/Kolkata
+        $appointmentTime = Carbon::parse($inputs['appointment_time'])
+            ->setTimezone('Asia/Kolkata')
+            ->format('h:i A');
+
+        // Concatenate both values
+        return $appointmentDate . ', ' . $appointmentTime;
+    }
+
 
 
 
@@ -539,6 +562,75 @@ class doctor extends VaahModel
         $inputs['working_hours_start'] = Carbon::parse($inputs['working_hours_start'])->format('H:i:00');  // Format as HH:MM
         $inputs['working_hours_end'] = Carbon::parse($inputs['working_hours_end'])->format('H:i:00');  // Format as HH:MM
 
+        //-----------------------------------------------------------------
+        // Compare new working hours with existing---------
+
+            //Fetch existing working hours and convert in IST
+            $item = self::where('id', $id)->withTrashed()->first();
+            $existing_working_hours_start = Carbon::parse($item->working_hours_start)->setTimezone('Asia/Kolkata')->format('H:i:00');
+            $existing_working_hours_end = Carbon::parse($item->working_hours_end)->setTimezone('Asia/Kolkata')->format('H:i:00');
+
+            //New Working hours in IST
+            $new_working_hours_start = Carbon::parse($inputs['working_hours_start'])->setTimezone('Asia/Kolkata')->format('H:i:00');
+            $new_working_hours_end = Carbon::parse($inputs['working_hours_end'])->setTimezone('Asia/Kolkata')->format('H:i:00');
+
+            // Check if the working hours have changed
+            $working_hours_changed = (
+                $new_working_hours_start !== $existing_working_hours_start ||
+                $new_working_hours_end !== $existing_working_hours_end
+            );
+
+            if ($working_hours_changed) {
+
+                // Fetch appointments that are outside the new working hours
+                $appointments = Appointment::where('doctor_id', $id)->get();
+
+                foreach ($appointments as $appointment) {
+
+                    $appointment_time = Carbon::parse($appointment->appointment_time)->setTimezone('Asia/Kolkata')->format('H:i:00');
+
+                    if ($appointment_time < $new_working_hours_start || $appointment_time > $new_working_hours_end){
+
+                        //update status with "Pending"-----------------------------------
+                        Appointment::where('id', $appointment->id)
+                            ->update(['status' => 'pending']);
+
+                        //----------------------------------------------------------------
+                        //Calling Email to Notify Booking confirm
+                        $subject = 'Appointment Slot Cancelled';
+                        $doctor = Doctor::find($appointment->doctor_id);
+                        $patient = Patient::find($appointment->patient_id);
+                        // Convert UTC data and time to IST
+                        $row_date_time = [
+                            'appointment_date' => $appointment->appointment_date, // Example UTC input for date
+                            'appointment_time' =>  $appointment->appointment_time, // Example UTC input for time
+                        ];
+
+                        $formatted_date_time = self::convertToISTEmailFormat($row_date_time);
+
+                        $email_content_for_patient = sprintf(
+                            "Dear %s,\n\nWe would like to inform you that due to unforeseen circumstances, your appointment slot with Dr. %s on %s has been cancelled. We kindly request you to reschedule your appointment at the next available slot.\n\nYou can easily rebook by visiting our website or contacting our support team.\n\nThank you for your understanding.\n\nBest regards,\nWebreinvent Technologies",
+                            $patient->name,
+                            $doctor->name,
+                            $formatted_date_time
+                        );
+
+
+                        $patient_email = $patient->email;
+
+                        $email_content_for_doctor = "";
+                        $doctor_email = "";
+
+                        self::appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email);
+                        //-----------------------------------------------------------------
+
+                    }
+
+                }
+
+            }
+
+//        dd("stop here..");
 
         // check if name exist
         $item = self::where('id', '!=', $id)
@@ -552,21 +644,10 @@ class doctor extends VaahModel
              return $response;
          }
 
-         // check if slug exist
-         $item = self::where('id', '!=', $id)
-             ->withTrashed()
-             ->where('slug', $inputs['slug'])->first();
-
-         if ($item) {
-             $error_message = "This slug is already exist".($item->deleted_at?' in trash.':'.');
-             $response['success'] = false;
-             $response['errors'][] = $error_message;
-             return $response;
-         }
-
         $item = self::where('id', $id)->withTrashed()->first();
         $item->fill($inputs);
         $item->save();
+
 
         $response = self::getItem($item->id);
         $response['messages'][] = trans("vaahcms-general.saved_successfully");
@@ -709,6 +790,28 @@ class doctor extends VaahModel
     //-------------------------------------------------
     //-------------------------------------------------
     //-------------------------------------------------
+
+
+    // Relation with Appointments
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class, 'doctor_id', 'id');
+    }
+
+
+    // Single Function for all kind of emails for Doctor and Patient
+    public static function appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email)
+    {
+        if ($email_content_for_patient !== "")
+        {
+            VaahMail::dispatchGenericMail($subject, $email_content_for_patient, $patient_email);
+        }
+        if ($email_content_for_doctor !== "")
+        {
+            VaahMail::dispatchGenericMail($subject, $email_content_for_doctor, $doctor_email);
+        }
+    }
+
 
 
 }

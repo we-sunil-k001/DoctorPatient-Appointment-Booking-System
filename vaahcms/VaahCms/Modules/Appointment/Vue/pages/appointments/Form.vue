@@ -136,8 +136,7 @@ const toggleFormMenu = (event) => {
                     </div>
 
                 </Message>
-
-                <div class="existing_details"
+                <div class="new_details"
                      v-if="store.item.status !== 'pending'" >
                     <VhField label="Doctor">
                         <div class="p-inputgroup">
