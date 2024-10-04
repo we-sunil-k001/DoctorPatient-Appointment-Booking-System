@@ -186,6 +186,26 @@ class Appointment extends VaahModel
         $inputs['status'] = "confirmed";
 
         //------------------------------------------------------------
+        // Check if booking time is in b/w working hours
+
+            //Fetch doctor's existing working hours and convert in IST
+            $doctor = doctor::where('id', $inputs['doctor_id'])->first();
+
+            $existing_working_hours_start = Carbon::parse($doctor->working_hours_start)->setTimezone('Asia/Kolkata')->format('H:i:00');
+            $existing_working_hours_end = Carbon::parse($doctor->working_hours_end)->setTimezone('Asia/Kolkata')->format('H:i:00');
+
+            // convert appointment time in IST
+            $appointment_time = Carbon::parse($inputs['appointment_time'])->setTimezone('Asia/Kolkata')->format('H:i:00');
+
+
+            if ($appointment_time < $existing_working_hours_start || $appointment_time > $existing_working_hours_end) {
+                $response['success'] = false;
+                $response['errors'][] = "Doctor is not available at this time!";
+                return $response;
+            }
+
+        //------------------------------------------------------------
+
         // Compare if there is an existing booking at same time and date
 
             $inputAppointmentDate = Carbon::parse($inputs['appointment_date'])->toDateString();  // Extract date part
@@ -524,9 +544,23 @@ class Appointment extends VaahModel
     {
 
         $item = self::where('id', $id)
-            ->with(['createdByUser', 'updatedByUser', 'deletedByUser'])
+            ->with(['createdByUser', 'updatedByUser', 'deletedByUser','doctor', 'patient'])
             ->withTrashed()
             ->first();
+
+        if ($item) {
+            // Hide specific columns
+            $item->makeHidden(['slug', 'status_change_reason']);
+        }
+
+        // Fetch doctor and patient names
+        $doctor = Doctor::find($item['doctor_id']);
+        $patient = Patient::find($item['patient_id']);
+
+        // Add doctor and patient names to the item
+        $item['doctor_name'] = $doctor ? $doctor->name : null;
+        $item['patient_name'] = $patient ? $patient->name : null;
+
 
         if(!$item)
         {
@@ -581,6 +615,28 @@ class Appointment extends VaahModel
 
         $item = self::where('id', $id)->withTrashed()->first();
         $item->fill($inputs);
+
+        //------------------------------------------------------------
+        // Check if booking time is in b/w working hours
+
+        //Fetch doctor's existing working hours and convert in IST
+        $doctor = doctor::where('id', $inputs['doctor_id'])->first();
+
+        $existing_working_hours_start = Carbon::parse($doctor->working_hours_start)->setTimezone('Asia/Kolkata')->format('H:i:00');
+        $existing_working_hours_end = Carbon::parse($doctor->working_hours_end)->setTimezone('Asia/Kolkata')->format('H:i:00');
+
+        // convert appointment time in IST
+        $appointment_time = Carbon::parse($inputs['appointment_time'])->setTimezone('Asia/Kolkata')->format('H:i:00');
+
+
+        if ($appointment_time < $existing_working_hours_start || $appointment_time > $existing_working_hours_end) {
+            $response['success'] = false;
+            $response['errors'][] = "Doctor is not available at this time!";
+            return $response;
+        }
+
+        //------------------------------------------------------------
+
 
 //        dd($inputs['appointment_date'], $inputs['appointment_time']);
         // Set the status to 'confirmed'
@@ -728,9 +784,10 @@ class Appointment extends VaahModel
                 $formatted_date_time = self::convertToISTEmailFormat($row_date_time);
 
                 $email_content_for_patient = sprintf(
-                    "Dear %s,\n\nWe would like to inform you that due to unforeseen circumstances, your appointment slot with Dr. %s has been cancelled. We kindly request you to reschedule your appointment at the next available slot.\n\nYou can easily rebook by visiting our website or contacting our support team.\n\nThank you for your understanding.\n\nBest regards,\nWebreinvent Technologies",
+                    "Dear %s,\n\nWe would like to inform you that due to unforeseen circumstances, your appointment slot with Dr. %s on %s has been cancelled. We kindly request you to reschedule your appointment at the next available slot.\n\nYou can easily rebook by visiting our website or contacting our support team.\n\nThank you for your understanding.\n\nBest regards,\nWebreinvent Technologies",
                     $patient->name,
-                    $doctor->name
+                    $doctor->name,
+                    $formatted_date_time
                 );
 
 
