@@ -144,6 +144,7 @@ const toggleFormMenu = (event) => {
                                        :options="store.assets.doctor"
                                        option-label="name"
                                        option-value="id"
+                                       filter
                                        name="doctor_name"
                                        data-testid="doctor_name"
                                        required/>
@@ -158,6 +159,7 @@ const toggleFormMenu = (event) => {
                                        option-label="name"
                                        option-value="id"
                                        name="patient_name"
+                                       filter
                                        data-testid="patient_name"
                                        required/>
                             <div class="required-field hidden"></div>
