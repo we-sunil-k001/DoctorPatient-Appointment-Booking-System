@@ -544,14 +544,9 @@ class Appointment extends VaahModel
     {
 
         $item = self::where('id', $id)
-            ->with(['createdByUser', 'updatedByUser', 'deletedByUser','doctor', 'patient'])
+            ->with(['createdByUser', 'updatedByUser', 'deletedByUser'])
             ->withTrashed()
             ->first();
-
-        if ($item) {
-            // Hide specific columns
-            $item->makeHidden(['slug', 'status_change_reason']);
-        }
 
         // Fetch doctor and patient names
         $doctor = Doctor::find($item['doctor_id']);

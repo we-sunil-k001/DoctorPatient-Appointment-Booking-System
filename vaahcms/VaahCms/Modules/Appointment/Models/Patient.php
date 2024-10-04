@@ -458,11 +458,6 @@ class Patient extends VaahModel
             ->withTrashed()
             ->first();
 
-        if ($item) {
-            // Hide specific columns
-            $item->makeHidden(['slug','dob', 'gender']);
-        }
-
         if(!$item)
         {
             $response['success'] = false;
