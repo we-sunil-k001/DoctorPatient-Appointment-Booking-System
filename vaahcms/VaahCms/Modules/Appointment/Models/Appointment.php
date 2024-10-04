@@ -345,11 +345,18 @@ class Appointment extends VaahModel
             return $query;
         }
         $search_array = explode(' ',$filter['q']);
+
         foreach ($search_array as $search_item){
             $query->where(function ($q1) use ($search_item) {
-                $q1->where('name', 'LIKE', '%' . $search_item . '%')
-                    ->orWhere('slug', 'LIKE', '%' . $search_item . '%')
-                    ->orWhere('id', 'LIKE', $search_item . '%');
+                $q1->where('status', 'LIKE', '%' . $search_item . '%')
+                    ->orWhere('reason_for_visit', 'LIKE', '%' . $search_item . '%')
+                    ->orWhereHas('doctor', function ($q2) use ($search_item) {
+                        $q2->where('name', 'LIKE', '%' . $search_item . '%');
+                    })
+                    ->orWhereHas('patient', function ($q3) use ($search_item) {
+                        $q3->where('name', 'LIKE', '%' . $search_item . '%');
+                    })
+                ;
             });
         }
 
