@@ -170,7 +170,7 @@ const toggleFormMenu = (event) => {
 
                 <VhField label="Phone Number">
                     <div class="p-inputgroup">
-                        <InputText class="w-full"
+                        <InputNumber class="w-full"
                                    placeholder="Enter the Phone Number"
                                    name="doctors-phone_number"
                                    data-testid="doctors-phone_number"
