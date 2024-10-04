@@ -122,7 +122,8 @@ const toggleItemMenu = (event) => {
                     <template v-for="(value, column) in store.item ">
 
                         <template v-if="column === 'created_by' || column === 'updated_by'
-                        || column === 'deleted_by'">
+                        || column === 'deleted_by' || column === 'status_change_reason' || column === 'meta'
+                        || column === 'doctor_id' || column === 'patient_id'">
                         </template>
 
                         <template v-else-if="column === 'id' || column === 'uuid'">
@@ -131,6 +132,25 @@ const toggleItemMenu = (event) => {
                                        :can_copy="true"
                             />
                         </template>
+
+                        <template v-else-if="column === 'status'">
+                            <VhViewRow :label="column"
+                                       :value="value == 'pending' ? 'Reschedule pending' : value"
+                            />
+                        </template>
+
+                        <template v-else-if="column === 'doctor_name'">
+                            <VhViewRow label="Doctor name"
+                                       :value="value"
+                            />
+                        </template>
+
+                        <template v-else-if="column === 'patient_id'">
+                            <VhViewRow label="Patient name"
+                                       :value="value"
+                            />
+                        </template>
+
 
                         <template v-else-if="(column === 'created_by_user' || column === 'updated_by_user'
                         || column === 'deleted_by_user') && (typeof value === 'object' && value !== null)">
