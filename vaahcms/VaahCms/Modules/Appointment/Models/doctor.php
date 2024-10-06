@@ -170,27 +170,7 @@ class doctor extends VaahModel
         $inputs['working_hours_start'] = Carbon::parse($inputs['working_hours_start'])->format('H:i:00');  // Format as HH:MM
         $inputs['working_hours_end'] = Carbon::parse($inputs['working_hours_end'])->format('H:i:00');  // Format as HH:MM
 
-//        dd($inputs['working_hours_start'], $inputs['working_hours_end']);
 
-        // check if name exist
-        $item = self::where('name', $inputs['name'])->withTrashed()->first();
-
-        if ($item) {
-            $error_message = "This name is already exist".($item->deleted_at?' in trash.':'.');
-            $response['success'] = false;
-            $response['messages'][] = $error_message;
-            return $response;
-        }
-
-        // check if slug exist
-        $item = self::where('slug', $inputs['slug'])->withTrashed()->first();
-
-        if ($item) {
-            $error_message = "This slug is already exist".($item->deleted_at?' in trash.':'.');
-            $response['success'] = false;
-            $response['messages'][] = $error_message;
-            return $response;
-        }
 
         $item = new self();
         $item->fill($inputs);
@@ -684,10 +664,51 @@ class doctor extends VaahModel
                     ->withTrashed()
                     ->update(['is_active' => null]);
                 break;
+
             case 'trash':
+
+
+                // Fetch appointments that are outside the new working hours
+                $appointments = Appointment::where('doctor_id', $id)->get();
+
+                    foreach ($appointments as $appointment) {
+
+                        //update status with "Pending"-----------------------------------
+                            Appointment::where('id', $appointment->id)
+                                ->update(['status' => 'cancelled']);
+
+                            //----------------------------------------------------------------
+                            //Calling Email to Notify Booking confirm
+                            $subject = 'Appointment Cancelled';
+                            $doctor = Doctor::find($appointment->doctor_id);
+                            $patient = Patient::find($appointment->patient_id);
+                            // Convert UTC data and time to IST
+                            $row_date_time = [
+                                'appointment_date' => $appointment->appointment_date, // Example UTC input for date
+                                'appointment_time' =>  $appointment->appointment_time, // Example UTC input for time
+                            ];
+
+                            $formatted_date_time = self::convertToISTEmailFormat($row_date_time);
+
+                            $email_content_for_patient = sprintf(
+                                "Dear %s,\n\nWe would like to inform you that due to unforeseen circumstances, your appointment  with Dr. %s on %s has been cancelled. You can easily schedule a new appointment by visiting our website or contacting our support team.\n\nThank you for your understanding.\n\nBest regards,\nWebreinvent Technologies",
+                                $patient->name,
+                                $doctor->name,
+                                $formatted_date_time
+                            );
+
+                            $patient_email = $patient->email;
+
+                            $email_content_for_doctor = "";
+                            $doctor_email = "";
+
+                            self::appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email);
+                            //-----------------------------------------------------------------
+                    }
                 self::find($id)
                     ->delete();
                 break;
+
             case 'restore':
                 self::where('id', $id)
                     ->onlyTrashed()
