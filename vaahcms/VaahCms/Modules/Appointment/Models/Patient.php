@@ -157,23 +157,24 @@ class Patient extends VaahModel
             return $validation;
         }
 
-        // check if name exist
-        $item = self::where('name', $inputs['name'])->withTrashed()->first();
+        // check if email exist
+        $item = self::where('email', $inputs['email'])->withTrashed()->first();
 
         if ($item) {
-            $error_message = "This name is already exist".($item->deleted_at?' in trash.':'.');
+            $error_message = "There is an existing Patient with this email!".($item->deleted_at?' in trash.':'.');
             $response['success'] = false;
-            $response['messages'][] = $error_message;
+            $response['errors'][] = $error_message;
             return $response;
+
         }
 
-        // check if slug exist
-        $item = self::where('slug', $inputs['slug'])->withTrashed()->first();
+        // check if phone number exist
+        $item = self::where('phone_number', $inputs['phone_number'])->withTrashed()->first();
 
         if ($item) {
-            $error_message = "This slug is already exist".($item->deleted_at?' in trash.':'.');
+            $error_message = "There is an existing Patient with this Phone number!".($item->deleted_at?' in trash.':'.');
             $response['success'] = false;
-            $response['messages'][] = $error_message;
+            $response['errors'][] = $error_message;
             return $response;
         }
 
