@@ -171,6 +171,26 @@ class doctor extends VaahModel
         $inputs['working_hours_end'] = Carbon::parse($inputs['working_hours_end'])->format('H:i:00');  // Format as HH:MM
 
 
+        // check if email exist
+        $item = self::where('email', $inputs['email'])->withTrashed()->first();
+
+        if ($item) {
+            $error_message = "There is an existing Doctor with this email!".($item->deleted_at?' in trash.':'.');
+            $response['success'] = false;
+            $response['errors'][] = $error_message;
+            return $response;
+
+        }
+
+        // check if phone number exist
+        $item = self::where('phone_number', $inputs['phone_number'])->withTrashed()->first();
+
+        if ($item) {
+            $error_message = "There is an existing Doctor with this Phone number!".($item->deleted_at?' in trash.':'.');
+            $response['success'] = false;
+            $response['errors'][] = $error_message;
+            return $response;
+        }
 
         $item = new self();
         $item->fill($inputs);
