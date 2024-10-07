@@ -30,7 +30,7 @@ const useVaah = vaah();
 
              <Column field="name" header="Doctor name" class="overflow-wrap-anywhere" :sortable="true">
                  <template  #body="prop">
-                     {{ prop.data.doctor.name }}
+                     {{ prop.data.doctor?.name ?? 'NA' }}
                  </template>
              </Column>
 
@@ -56,7 +56,9 @@ const useVaah = vaah();
                                 prop.data.status === 'pending'
                                 ? '<b style=color:#3b82f6;\n>Reschedule Pending</b>'
                                 : prop.data.status === 'cancelled'
-                                ? '<b style=color:red>Cancelled</b>'
+                                ? (prop.data.doctor?.name
+                                    ? '<b style=color:red> Cancelled</b>'
+                                    : '<b style=color:#3b82f6>Doctor removed</b>')
                                 : prop.data.status === 'confirmed'
                                 ? '<b style=color:green>Confirmed</b>'
                                 : prop.data.status
@@ -142,17 +144,15 @@ const useVaah = vaah();
                                 v-tooltip.top="'Restore'"
                                 icon="pi pi-replay" />
 
-<!--                        <Button class="p-button-tiny p-button-text"-->
-<!--                                v-if="prop.data.status !== 'cancelled'"-->
-<!--                                data-testid="appointments-table-to-edit"-->
-<!--                                v-tooltip.top="'Update'"-->
-<!--                                @click="store.toEdit(prop.data)"-->
-<!--                                icon="pi pi-pencil" />-->
+                        <Button class="p-button-tiny p-button-danger p-button-text"
+                                data-testid="doctors-table-action-trash"
+                                v-if="store.isViewLarge() && !prop.data.deleted_at
+                                && !store.hasPermission(store.assets.permissions, 'appointment-has-access-of-patient-section')
+                                && !store.hasPermission(store.assets.permissions, 'appointment-has-access-of-doctors-section')"
+                                @click="store.itemAction('trash', prop.data)"
+                                v-tooltip.top="'Trash'"
+                                icon="pi pi-trash" />
 
-                        <!--  Below btn will work If the : v-if="prop.data.status === 'cancelled'"-->
-<!--                        <Button class="p-button-tiny p-button-text"-->
-<!--                                disabled v-else-->
-<!--                                icon="pi pi-pencil"/>-->
 
                     </div>
 
