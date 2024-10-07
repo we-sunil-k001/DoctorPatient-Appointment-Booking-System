@@ -217,7 +217,7 @@ const toggleFormMenu = (event) => {
                         <Calendar v-model="store.item.appointment_time" timeOnly hourFormat="12" showIcon
                                   placeholder="Select time"
                                   name="appointment_time"
-                                  :stepMinute="60">
+                                 >
                         </Calendar>
                     </div>
                 </VhField>

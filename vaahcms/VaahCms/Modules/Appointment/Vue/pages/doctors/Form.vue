@@ -195,7 +195,7 @@ const toggleFormMenu = (event) => {
                 <VhField label="Working Hour starts at">
                     <div class="p-inputgroup">
                         <Calendar v-model="store.item.working_hours_start" timeOnly hourFormat="12" showIcon
-                            placeholder="Select time" name="working_hours_start" :stepMinute="60">
+                            placeholder="Select time" name="working_hours_start" >
                         </Calendar>
                     </div>
                 </VhField>
@@ -205,7 +205,7 @@ const toggleFormMenu = (event) => {
                         <Calendar v-model="store.item.working_hours_end" timeOnly hourFormat="12" showIcon
                                     placeholder="Select time"
                                     name="working_hours_end"
-                                    :stepMinute="60">
+                                    >
                         </Calendar>
                     </div>
                 </VhField>
