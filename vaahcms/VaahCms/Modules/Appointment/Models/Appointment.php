@@ -260,7 +260,7 @@ class Appointment extends VaahModel
         $doctor_email = $doctor->email;
         $patient_email = $patient->email;
 
-        self::appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email);
+//        self::appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email);
 
         //-----------------------------------------------------------------
 
@@ -594,10 +594,10 @@ class Appointment extends VaahModel
 
     //-------------------------------------------------
     // Helper function to convert time from UTC to IST and return in 12-hour format
-    public static function convertDateUTCtoIST($utcDateTime)
+    public static function convertDateUTCtoIST($utc_date_time)
     {
         // Assuming $utcDateTime is in 'Y-m-d H:i:s' format
-        return Carbon::parse($utcDateTime, 'UTC')
+        return Carbon::parse($utc_date_time, 'UTC')
             ->setTimezone('Asia/Kolkata')
             ->addDay()    // Add one day
             ->format('Y-m-d');
