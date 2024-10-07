@@ -220,7 +220,8 @@ class Appointment extends VaahModel
                 ->first();
 
             if ($existingAppointment) {
-                $response['messages'][] = trans('Requested time Slot is not available with '.$doctor->name.'! Choose any other slot.');
+                $response['success'] = false;
+                $response['errors'][] = 'Requested time Slot is not available with '.$doctor->name.'! Choose any other slot.';
                 return $response;
             }
         //------------------------------------------------------------
