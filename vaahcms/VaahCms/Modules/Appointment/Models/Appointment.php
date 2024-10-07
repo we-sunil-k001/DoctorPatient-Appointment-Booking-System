@@ -261,6 +261,7 @@ class Appointment extends VaahModel
         $patient_email = $patient->email;
 
         self::appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email);
+
         //-----------------------------------------------------------------
 
         $response = self::getItem($item->id);
@@ -384,6 +385,15 @@ class Appointment extends VaahModel
             $item->appointment_date = self::convertDateUTCtoIST($item->appointment_date);
             $item->appointment_time = self::convertUTCtoIST12Hrs($item->appointment_time);
         }
+
+        // Fetch doctor and patient names
+        $doctor = Doctor::find($item['doctor_id']);
+        $patient = Patient::find($item['patient_id']);
+
+        // Add doctor and patient names to the item
+        $item['doctor_name'] = $doctor ? $doctor->name : null;
+        $item['patient_name'] = $patient ? $patient->name : null;
+
 
         $response['success'] = true;
         $response['data'] = $list;
