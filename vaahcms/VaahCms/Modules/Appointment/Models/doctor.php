@@ -423,7 +423,49 @@ class doctor extends VaahModel
         }
 
         $items_id = collect($inputs['items'])->pluck('id')->toArray();
-        self::whereIn('id', $items_id)->forceDelete();
+
+            foreach ($items_id as $item_id) {
+
+                    $appointments = Appointment::where('doctor_id', $item_id)->get();
+
+                    foreach ($appointments as $appointment) {
+
+                        //update status with "Pending"-----------------------------------
+                        Appointment::where('id', $appointment->id)
+                            ->update(['status' => 'cancelled']);
+
+                        //----------------------------------------------------------------
+                        //Calling Email to Notify Booking confirm
+                        $subject = 'Appointment Cancelled';
+                        $doctor = Doctor::find($appointment->doctor_id);
+                        $patient = Patient::find($appointment->patient_id);
+                        // Convert UTC data and time to IST
+                        $row_date_time = [
+                            'appointment_date' => $appointment->appointment_date, // Example UTC input for date
+                            'appointment_time' => $appointment->appointment_time, // Example UTC input for time
+                        ];
+
+                        $formatted_date_time = self::convertToISTEmailFormat($row_date_time);
+
+                        $email_content_for_patient = sprintf(
+                            "Dear %s,\n\nWe would like to inform you that due to unforeseen circumstances, your appointment  with Dr. %s on %s has been cancelled. You can easily schedule a new appointment by visiting our website or contacting our support team.\n\nThank you for your understanding.\n\nBest regards,\nWebreinvent Technologies",
+                            $patient->name,
+                            $doctor->name,
+                            $formatted_date_time
+                        );
+
+                        $patient_email = $patient->email;
+
+                        $email_content_for_doctor = "";
+                        $doctor_email = "";
+
+                        self::appointmentMail($email_content_for_patient, $email_content_for_doctor, $subject, $doctor_email, $patient_email);
+                        //-----------------------------------------------------------------
+                    }
+            }
+
+            self::whereIn('id', $items_id)->forceDelete();
+
 
         $response['success'] = true;
         $response['data'] = true;
@@ -431,6 +473,7 @@ class doctor extends VaahModel
 
         return $response;
     }
+
     //-------------------------------------------------
      public static function listAction($request, $type): array
     {
@@ -686,7 +729,6 @@ class doctor extends VaahModel
                 break;
 
             case 'trash':
-
 
                 // Fetch appointments that are outside the new working hours
                 $appointments = Appointment::where('doctor_id', $id)->get();
