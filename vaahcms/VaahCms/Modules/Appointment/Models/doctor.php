@@ -166,6 +166,18 @@ class doctor extends VaahModel
             return $validation;
         }
 
+        // Validate working hours
+        $validatedTime = $request->validate([
+            'working_hours_start' => 'required',
+            'working_hours_end' => [
+                'required',
+                'after:working_hours_start', // This ensures that working_hours_end is after working_hours_start
+            ],
+        ], [
+            'working_hours_end.after' => 'The working hours end must be after the start time.',
+        ]);
+
+
         // Extract hour and minute part, ignoring seconds
         $inputs['working_hours_start'] = Carbon::parse($inputs['working_hours_start'])->format('H:i:00');  // Format as HH:MM
         $inputs['working_hours_end'] = Carbon::parse($inputs['working_hours_end'])->format('H:i:00');  // Format as HH:MM
