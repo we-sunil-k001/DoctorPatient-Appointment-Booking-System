@@ -55,28 +55,7 @@ const toggleItemMenu = (event) => {
 
             <template #icons>
 
-
                 <div class="p-inputgroup">
-
-                    <Button label="Edit"
-                            class="p-button-sm"
-                            @click="store.toEdit(store.item)"
-                            data-testid="appointments-item-to-edit"
-                            icon="pi pi-save"/>
-
-                    <!--item_menu-->
-                    <Button
-                        type="button"
-                        class="p-button-sm"
-                        @click="toggleItemMenu"
-                        data-testid="appointments-item-menu"
-                        icon="pi pi-angle-down"
-                        aria-haspopup="true"/>
-
-                    <Menu ref="item_menu_state"
-                          :model="store.item_menu_list"
-                          :popup="true" />
-                    <!--/item_menu-->
 
                     <Button class="p-button-primary p-button-sm"
                             icon="pi pi-times"
@@ -84,9 +63,6 @@ const toggleItemMenu = (event) => {
                             @click="store.toList()"/>
 
                 </div>
-
-
-
             </template>
 
 
