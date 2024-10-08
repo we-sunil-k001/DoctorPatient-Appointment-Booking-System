@@ -651,7 +651,6 @@ class Appointment extends VaahModel
         //------------------------------------------------------------
 
 
-//        dd($inputs['appointment_date'], $inputs['appointment_time']);
         // Set the status to 'confirmed'
         $item->status = 'confirmed';
 
@@ -671,17 +670,34 @@ class Appointment extends VaahModel
         $formatted_date_time = self::convertToISTEmailFormat($row_date_time);
 
         $email_content_for_patient = sprintf(
-            "Dear %s,\n\nYour appointment with Dr. %s has been rescheduled.\nThe details of your appointment are as follows:\n\nAppointment Date & Time: %s\n\nPlease make sure to arrive 10 minutes before the scheduled time.\n\nRegards,\nWebreinvent Technologies",
+            "Dear %s,<br><br>Your appointment with Dr. %s has been rescheduled.<br>
+            The details of your appointment are as follows:<br><br>
+            Appointment Date & Time: %s<br><br>
+            <a href='%s' style='display:inline-block; background-color:#3b82f6; color:#ffffff; padding:10px 20px; text-align:center; text-decoration:none; border-radius:5px;'>
+                View Appointment
+            </a><br><br>
+            Please make sure to arrive 10 minutes before the scheduled time.<br><br>
+            Regards,<br>Webreinvent Technologies",
             $patient->name,
             $doctor->name,
-            $formatted_date_time
+            $formatted_date_time,
+            vh_get_assets_base_url().'/backend/appointment#/appointments'
         );
 
+
         $email_content_for_doctor = sprintf(
-            "Dear Dr. %s,\n\nYour Appointment has been with rescheduled %s.\nThe details are as follows:\n\nAppointment Date & Time: %s\n\nPlease be on time for the appointment.\n\nRegards,\nWebreinvent Technologies",
+            "Dear Dr. %s,<br><br>Your appointment with %s has been rescheduled.<br>
+            The details are as follows:<br><br>
+            Appointment Date & Time: %s<br><br>
+            <a href='%s' style='display:inline-block; padding:10px 15px; font-size:14px; color:#fff; background-color:#3b82f6; text-decoration:none; border-radius:5px;'>
+                View Appointment
+            </a><br><br>
+            Please be on time for the appointment.<br><br>
+            Regards,<br>Webreinvent Technologies",
             $doctor->name,
             $patient->name,
-            $formatted_date_time
+            $formatted_date_time,
+            vh_get_assets_base_url().'/backend/appointment#/appointments'
         );
 
         $doctor_email = $doctor->email;

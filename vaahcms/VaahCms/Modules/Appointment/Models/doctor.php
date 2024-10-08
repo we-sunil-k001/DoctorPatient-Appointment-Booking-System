@@ -460,11 +460,18 @@ class doctor extends VaahModel
                         $formatted_date_time = self::convertToISTEmailFormat($row_date_time);
 
                         $email_content_for_patient = sprintf(
-                            "Dear %s,\n\nWe would like to inform you that due to unforeseen circumstances, your appointment  with Dr. %s on %s has been cancelled. You can easily schedule a new appointment by visiting our website or contacting our support team.\n\nThank you for your understanding.\n\nBest regards,\nWebreinvent Technologies",
+                            "Dear %s,<br><br>We would like to inform you that due to unforeseen circumstances, your appointment with Dr. %s on %s has been cancelled.<br>
+                            You can easily schedule a new appointment by clicking the button below:<br><br>
+                            <a href='%s' style='display:inline-block; padding:10px 15px; font-size:14px; color:#fff; background-color:#3b82f6; text-decoration:none; border-radius:5px;'>
+                                Schedule New Appointment
+                            </a><br><br>
+                            Thank you for your understanding.<br><br>Best regards,<br>Webreinvent Technologies",
                             $patient->name,
                             $doctor->name,
-                            $formatted_date_time
+                            $formatted_date_time,
+                            vh_get_assets_base_url().'/backend/appointments#/appointments' // URL for the button
                         );
+
 
                         $patient_email = $patient->email;
 
@@ -611,6 +618,17 @@ class doctor extends VaahModel
             return $validation;
         }
 
+        // Validate working hours
+        $validatedTime = $request->validate([
+            'working_hours_start' => 'required',
+            'working_hours_end' => [
+                'required',
+                'after:working_hours_start', // This ensures that working_hours_end is after working_hours_start
+            ],
+        ], [
+            'working_hours_end.after' => 'The working hours end must be after the start time.',
+        ]);
+
         // Extract hour and minute part, ignoring seconds
         $inputs['working_hours_start'] = Carbon::parse($inputs['working_hours_start'])->format('H:i:00');  // Format as HH:MM
         $inputs['working_hours_end'] = Carbon::parse($inputs['working_hours_end'])->format('H:i:00');  // Format as HH:MM
@@ -662,12 +680,17 @@ class doctor extends VaahModel
                         $formatted_date_time = self::convertToISTEmailFormat($row_date_time);
 
                         $email_content_for_patient = sprintf(
-                            "Dear %s,\n\nWe would like to inform you that due to unforeseen circumstances, your appointment slot with Dr. %s on %s has been cancelled. We kindly request you to reschedule your appointment at the next available slot.\n\nYou can easily rebook by visiting our website or contacting our support team.\n\nThank you for your understanding.\n\nBest regards,\nWebreinvent Technologies",
+                            "Dear %s,<br><br>We would like to inform you that due to unforeseen circumstances, your appointment slot with Dr. %s on %s has been cancelled. We kindly request you to reschedule your appointment at the next available slot.<br><br>
+                            You can easily rebook by clicking the button below or by visiting:<br><br>
+                            <a href='%s' style='display:inline-block; padding:10px 15px; font-size:14px; color:#fff; background-color:#3b82f6; text-decoration:none; border-radius:5px;'>
+                                Reschedule Your Appointment
+                            </a><br><br>
+                            Thank you for your understanding.<br><br>Best regards,<br>Webreinvent Technologies",
                             $patient->name,
                             $doctor->name,
-                            $formatted_date_time
+                            $formatted_date_time,
+                            vh_get_assets_base_url().'/backend/appointments#/appointments' // URL for the button
                         );
-
 
                         $patient_email = $patient->email;
 
@@ -742,7 +765,6 @@ class doctor extends VaahModel
 
             case 'trash':
 
-                // Fetch appointments that are outside the new working hours
                 $appointments = Appointment::where('doctor_id', $id)->get();
 
                     foreach ($appointments as $appointment) {
@@ -764,14 +786,20 @@ class doctor extends VaahModel
 
                             $formatted_date_time = self::convertToISTEmailFormat($row_date_time);
 
-                            $email_content_for_patient = sprintf(
-                                "Dear %s,\n\nWe would like to inform you that due to unforeseen circumstances, your appointment  with Dr. %s on %s has been cancelled. You can easily schedule a new appointment by visiting our website or contacting our support team.\n\nThank you for your understanding.\n\nBest regards,\nWebreinvent Technologies",
-                                $patient->name,
-                                $doctor->name,
-                                $formatted_date_time
-                            );
+                        $email_content_for_patient = sprintf(
+                            "Dear %s,<br><br>We would like to inform you that due to unforeseen circumstances, your appointment with Dr. %s on %s has been cancelled.<br><br>
+                            You can easily schedule a new appointment by clicking the button below:<br><br>
+                            <a href='%s' style='display:inline-block; padding:10px 15px; font-size:14px; color:#fff; background-color:#3b82f6; text-decoration:none; border-radius:5px;'>
+                                Schedule New Appointment
+                            </a><br><br>
+                            Thank you for your understanding.<br><br>Best regards,<br>Webreinvent Technologies",
+                            $patient->name,
+                            $doctor->name,
+                            $formatted_date_time,
+                            vh_get_assets_base_url().'/backend/appointments#/appointments' // URL for the button
+                        );
 
-                            $patient_email = $patient->email;
+                        $patient_email = $patient->email;
 
                             $email_content_for_doctor = "";
                             $doctor_email = "";
