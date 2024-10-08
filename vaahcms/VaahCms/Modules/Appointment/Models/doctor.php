@@ -307,6 +307,11 @@ class doctor extends VaahModel
         $list->trashedFilter($request->filter);
         $list->searchFilter($request->filter);
 
+        // Select specific columns from the database
+        $list = $list->select('id','name', 'email', 'phone_number', 'specialization','working_hours_start','working_hours_end',
+        'updated_at','is_active')
+        ->withTrashed();
+
 
         $rows = config('vaahcms.per_page');
 
@@ -705,8 +710,6 @@ class doctor extends VaahModel
                 }
 
             }
-
-//        dd("stop here..");
 
         // check if name exist
         $item = self::where('id', '!=', $id)

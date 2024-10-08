@@ -279,6 +279,11 @@ class Patient extends VaahModel
         $list->trashedFilter($request->filter);
         $list->searchFilter($request->filter);
 
+        // Select specific columns from the database
+        $list = $list->select('id','name', 'email', 'phone_number',
+            'updated_at','is_active')
+            ->withTrashed();
+
         $rows = config('vaahcms.per_page');
 
         if($request->has('rows'))

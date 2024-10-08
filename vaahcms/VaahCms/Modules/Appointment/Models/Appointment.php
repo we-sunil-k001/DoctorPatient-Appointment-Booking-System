@@ -370,8 +370,18 @@ class Appointment extends VaahModel
         $list->isActiveFilter($request->filter);
         $list->trashedFilter($request->filter);
         $list->searchFilter($request->filter);
-        $list->with(['doctor', 'patient']);
         $rows = config('vaahcms.per_page');
+
+        // Specify the columns you want to retrieve from the relationships
+        $list->with([
+            'doctor:id,name', // Replace 'name' with any other fields you need from the doctor table
+            'patient:id,name'  // Replace 'name' with any other fields you need from the patient table
+        ]);
+
+        // Select specific columns from the database
+        $list = $list->select('id','doctor_id','patient_id','status', 'reason_for_visit','appointment_date','appointment_time',
+            )
+            ->withTrashed();
 
         if($request->has('rows'))
         {
@@ -386,15 +396,6 @@ class Appointment extends VaahModel
             $item->appointment_date = self::convertDateUTCtoIST($item->appointment_date);
             $item->appointment_time = self::convertUTCtoIST12Hrs($item->appointment_time);
         }
-
-        // Fetch doctor and patient names
-        $doctor = Doctor::find($item['doctor_id']);
-        $patient = Patient::find($item['patient_id']);
-
-        // Add doctor and patient names to the item
-        $item['doctor_name'] = $doctor ? $doctor->name : null;
-        $item['patient_name'] = $patient ? $patient->name : null;
-
 
         $response['success'] = true;
         $response['data'] = $list;
