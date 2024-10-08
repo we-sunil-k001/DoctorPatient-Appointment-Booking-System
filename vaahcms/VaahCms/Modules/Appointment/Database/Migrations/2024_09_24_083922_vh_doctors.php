@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class VhDoctor extends Migration
+class VhDoctors extends Migration
 {
     /**
      * Run the migrations.
