@@ -901,6 +901,13 @@ class doctor extends VaahModel
          * You can override the filled variables below this line.
          * You should also return relationship from here
          */
+        // adding dummy data for additional fields
+        $inputs['name'] = $faker->name;
+        $inputs['slug'] = $faker->slug;
+        $inputs['email'] = $faker->email;
+        $inputs['phone_number'] = sprintf('%010d', random_int(0, 9999999999)); // Generates a 10-digit number
+        $inputs['specialization'] = 'ENT';
+        $inputs['is_active'] = 1;
 
         if(!$is_response_return){
             return $inputs;
