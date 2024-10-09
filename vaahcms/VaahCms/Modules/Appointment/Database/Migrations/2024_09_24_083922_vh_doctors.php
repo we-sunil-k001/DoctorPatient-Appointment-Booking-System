@@ -27,7 +27,8 @@ class VhDoctors extends Migration
                 $table->string('specialization')->nullable();
                 $table->string('qualification')->nullable();
                 $table->integer('experience')->nullable();
-                $table->enum('gender', ['male', 'female', ' other'])->nullable();
+                $table->enum('gender')->nullable();
+                $table->integer('no_of_slot')->nullable();
 
                 // Working Hours
                 $table->time('working_hours_start')->nullable(); // Start time of the working day
