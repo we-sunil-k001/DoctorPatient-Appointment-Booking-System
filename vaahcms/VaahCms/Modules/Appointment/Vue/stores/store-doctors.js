@@ -65,7 +65,8 @@ export const usedoctorStore = defineStore({
         list_create_menu: [],
         item_menu_list: [],
         item_menu_state: null,
-        form_menu_list: []
+        form_menu_list: [],
+        end_time_temp: null
     }),
     getters: {
 
@@ -240,6 +241,7 @@ export const usedoctorStore = defineStore({
             if(data)
             {
                 this.item = data;
+                this.end_time_temp = data.working_hours_end;
             }else{
                 this.$router.push({name: 'doctors.index',query:this.query});
             }
@@ -930,7 +932,78 @@ export const usedoctorStore = defineStore({
             this.form_menu_list = form_menu;
 
         },
-        //---------------------------------------------------------------------
+
+        //Custom function ------------------------------------
+
+        //Convert to 12-Hour Format
+        formatTime(dateString) {
+            const date = new Date(dateString);
+            let hours = date.getHours();
+            const minutes = date.getMinutes();
+
+            const period = hours >= 12 ? 'pm' : 'am';
+            hours = hours % 12 || 12; // Convert to 12-hour format
+            const formattedMinutes = minutes < 10 ? '0' + minutes : minutes; // Add leading zero if needed
+
+            return `${hours}:${formattedMinutes} ${period}`;
+        },
+
+        //Function to Convert time like 10:00 am to UTC
+        convertToUTC(timeString) {
+            const date = new Date();
+            const [time, period] = timeString.split(' ');
+            let [hours, minutes] = time.split(':').map(Number);
+
+            // Convert to 24-hour format
+            if (period.toLowerCase() === 'pm' && hours !== 12) hours += 12;
+            if (period.toLowerCase() === 'am' && hours === 12) hours = 0;
+
+            // Set the current date with the converted time
+            date.setHours(hours, minutes, 0, 0);
+
+            return date.toISOString(); // Return UTC in ISO format
+        },
+
+        // Add minutes in the existing time
+        addMinutesToTime(time, minutesToAdd) {
+
+            //Split the time into hours, minutes, and period (AM/PM)
+            const [timePart, period] = time.split(' ');
+            let [hours, minutes] = timePart.split(':').map(Number);
+
+
+            // Convert to 24-hour format for easier calculations
+            if (period === 'pm' && hours !== 12) hours += 12;
+            if (period === 'am' && hours === 12) hours = 0;
+
+            // Create a new Date object and set the time
+            const date = new Date();
+            date.setHours(hours);
+            date.setMinutes(minutes);
+
+
+            // Add the specified minutes
+            date.setMinutes(date.getMinutes() + minutesToAdd);
+
+            // Get the updated hours and minutes
+            let updatedHours = date.getHours();
+            const updatedMinutes = date.getMinutes();
+
+
+            // Convert back to 12-hour format
+            const updatedPeriod = updatedHours >= 12 ? 'pm' : 'am';
+            updatedHours = updatedHours % 12 || 12; // Convert 0 hour to 12
+
+            // Format minutes to always have two digits
+            const formattedMinutes = updatedMinutes < 10 ? '0' + updatedMinutes : updatedMinutes;
+
+            // Return the updated time
+            return `${updatedHours}:${formattedMinutes} ${updatedPeriod}`;
+
+        }
+
+
+//---------------------------------------------------------------------
     }
 });
 

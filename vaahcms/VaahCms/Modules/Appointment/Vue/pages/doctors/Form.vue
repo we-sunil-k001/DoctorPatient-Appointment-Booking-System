@@ -1,14 +1,13 @@
 <script setup>
+
 import {onMounted, ref, watch} from "vue";
 import { usedoctorStore } from '../../stores/store-doctors'
 
 import VhField from './../../vaahvue/vue-three/primeflex/VhField.vue'
 import {useRoute} from 'vue-router';
 
-
 const store = usedoctorStore();
 const route = useRoute();
-
 onMounted(async () => {
     /**
      * Fetch the record from the database
@@ -17,17 +16,47 @@ onMounted(async () => {
             && route.params && route.params.id)
     {
         await store.getItem(route.params.id);
+
+        // Set end_time_temp when loading the record
+        if (store.item.working_hours_end) {
+            store.end_time_temp = store.formatTime(store.item.working_hours_end); // Ensure to format if needed
+            console.log(store.end_time_temp);
+        }
     }
 
     await store.getFormMenu();
+
 });
+
+// Watch for changes in the number of slots or working hours start time
+watch([() => store.item?.no_of_slot, () => store.item?.working_hours_start], () => {
+    const start_time = store.item.working_hours_start;
+
+    if (!start_time) return; // Ensure there's a valid start time before processing
+
+    // Convert start time to 12hr format
+    const formattedTime = store.formatTime(start_time);
+
+    // Add minutes based on the number of slots
+    const end_time = store.addMinutesToTime(formattedTime, store.item.no_of_slot * 30);
+
+    // Store the end time temporarily for display in the 12-hour format
+    store.end_time_temp = end_time;
+
+    // Convert the end time to UTC format for submission
+    store.item.working_hours_end = store.convertToUTC(end_time);
+});
+
 
 //--------form_menu
 const form_menu = ref();
 const toggleFormMenu = (event) => {
     form_menu.value.toggle(event);
 };
+
 //--------/form_menu
+
+
 </script>
 <template>
 
@@ -194,19 +223,44 @@ const toggleFormMenu = (event) => {
 
                 <VhField label="Working Hour starts at">
                     <div class="p-inputgroup">
-                        <Calendar v-model="store.item.working_hours_start" timeOnly hourFormat="12" showIcon
-                            placeholder="Select time" name="working_hours_start" >
-                        </Calendar>
+                        <Calendar
+                            v-model="store.item.working_hours_start"
+                            timeOnly
+                            hourFormat="12"
+                            showIcon
+                            placeholder="Select time"
+                            name="working_hours_start"
+                            :step-minute="5"
+                        ></Calendar>
+                    </div>
+                </VhField>
+
+                <VhField label="Number of slots">
+                    <div class="p-inputgroup">
+                        <InputNumber
+                            class="w-full"
+                            v-model="store.item.no_of_slot"
+                            mode="decimal"
+                            name="no_of_slots"
+                            showButtons
+                            :min="0"
+                            :max="100"
+                        />
                     </div>
                 </VhField>
 
                 <VhField label="Working Hour ends at">
                     <div class="p-inputgroup">
-                        <Calendar v-model="store.item.working_hours_end" timeOnly hourFormat="12" showIcon
-                                    placeholder="Select time"
-                                    name="working_hours_end"
-                                    >
-                        </Calendar>
+                        <Calendar
+                            v-model="store.end_time_temp"
+                            timeOnly
+                            hourFormat="12"
+                            showIcon
+                            placeholder="Select time"
+                            readonly
+                            name="working_hours_end"
+                            :step-minute="5"
+                        ></Calendar>
                     </div>
                 </VhField>
 

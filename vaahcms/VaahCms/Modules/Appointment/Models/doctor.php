@@ -40,6 +40,7 @@ class doctor extends VaahModel
         'working_hours_start',
         'experience',
         'gender',
+        'no_of_slot',
         'is_active',
         'created_by',
         'updated_by',
@@ -166,6 +167,9 @@ class doctor extends VaahModel
             return $validation;
         }
 
+        dd($inputs['working_hours_start'], $inputs['working_hours_end']);
+
+
         // Validate working hours
         $validatedTime = $request->validate([
             'working_hours_start' => 'required',
@@ -181,7 +185,6 @@ class doctor extends VaahModel
         // Extract hour and minute part, ignoring seconds
         $inputs['working_hours_start'] = Carbon::parse($inputs['working_hours_start'])->format('H:i:00');  // Format as HH:MM
         $inputs['working_hours_end'] = Carbon::parse($inputs['working_hours_end'])->format('H:i:00');  // Format as HH:MM
-
 
         // check if email exist
         $item = self::where('email', $inputs['email'])->withTrashed()->first();
@@ -309,7 +312,7 @@ class doctor extends VaahModel
 
         // Select specific columns from the database
         $list = $list->select('id','name', 'email', 'phone_number', 'specialization','working_hours_start','working_hours_end',
-        'updated_at','is_active')
+            'no_of_slot','updated_at','is_active')
         ->withTrashed();
 
 
@@ -610,7 +613,36 @@ class doctor extends VaahModel
         return $appointmentDate . ', ' . $appointmentTime;
     }
 
+    //-------------------------------------------------------------------------
+    // Function to check if a date string is in valid UTC format
+    public static function isValidUTC($dateString) {
+        // Check if the date string matches the UTC format
+        if (preg_match('/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}\.\d{3})Z$/', $dateString)) {
+            // Try to create a DateTime object from the string
+            $dateTime = DateTime::createFromFormat(DateTime::RFC3339, $dateString);
 
+            // Check if the created DateTime object is valid
+            return $dateTime !== false && !array_sum($dateTime->getLastErrors());
+        }
+        return false;
+    }
+
+    //-------------------------------------------------------------------------
+    // Function to convert time like 10:50 AM into UTC format
+    public static function convertToUTC($timeString) {
+        // Get the local timezone from environment configuration
+        $localTimezone = config('app.timezone'); // Assuming 'app.timezone' is set in your .env file
+
+        // Create a Carbon instance from the time string, assuming it's in the local timezone
+        // Use the current date to create the full datetime
+        $currentDate = Carbon::now()->toDateString();
+
+        // Create the datetime in local timezone
+        $dateTime = Carbon::createFromFormat('Y-m-d g:i A', "$currentDate $timeString", $localTimezone);
+
+        // Convert to UTC
+        return $dateTime->setTimezone('UTC')->toISOString(); // Return in ISO format
+    }
 
 
     //-------------------------------------------------
@@ -622,6 +654,27 @@ class doctor extends VaahModel
         if (!$validation['success']) {
             return $validation;
         }
+
+        echo $inputs['working_hours_start']." ".$inputs['working_hours_end'];
+
+        //---------------------------------------------------------
+        // Check the inputs
+        if (!self::isValidUTC($inputs['working_hours_start'])) {
+            $inputs['working_hours_start'] = self::convertToUTC("11:50 am");
+
+            echo $inputs['working_hours_start'];
+        }
+
+        if (!self::isValidUTC($inputs['working_hours_end'])) {
+            $inputs['working_hours_end'] = self::convertToUTC("03:50 pm");
+
+            echo $inputs['working_hours_end'];
+        }
+
+        //------------------------------------------------------------
+
+        dd($inputs['working_hours_start'],$inputs['working_hours_end']);
+
 
         // Validate working hours
         $validatedTime = $request->validate([
@@ -637,6 +690,7 @@ class doctor extends VaahModel
         // Extract hour and minute part, ignoring seconds
         $inputs['working_hours_start'] = Carbon::parse($inputs['working_hours_start'])->format('H:i:00');  // Format as HH:MM
         $inputs['working_hours_end'] = Carbon::parse($inputs['working_hours_end'])->format('H:i:00');  // Format as HH:MM
+
 
         //-----------------------------------------------------------------
         // Compare new working hours with existing---------
@@ -702,7 +756,7 @@ class doctor extends VaahModel
                         $email_content_for_doctor = "";
                         $doctor_email = "";
 
-                        self::appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email);
+//                        self::appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email);
                         //-----------------------------------------------------------------
 
                     }
