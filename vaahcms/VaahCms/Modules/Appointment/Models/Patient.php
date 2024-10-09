@@ -626,6 +626,7 @@ class Patient extends VaahModel
             'model_namespace' => self::class,
             'except' => self::getUnFillableColumns()
         ]);
+
         $fillable = VaahSeeder::fill($request);
         if(!$fillable['success']){
             return $fillable;
@@ -634,10 +635,13 @@ class Patient extends VaahModel
 
         $faker = Factory::create();
 
-        /*
-         * You can override the filled variables below this line.
-         * You should also return relationship from here
-         */
+        // adding dummy data for additional fields
+        $inputs['name'] = $faker->name;
+        $inputs['slug'] = $faker->slug;
+        $inputs['email'] = $faker->email;
+//      $inputs['phone_number'] = preg_replace('/\D/', '', $faker->phoneNumber); // Remove non-numeric characters
+        $inputs['phone_number'] = sprintf('%010d', random_int(0, 9999999999)); // Generates a 10-digit number
+        $inputs['is_active'] = 1;
 
         if(!$is_response_return){
             return $inputs;
