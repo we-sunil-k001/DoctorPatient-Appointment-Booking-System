@@ -221,6 +221,18 @@ const toggleFormMenu = (event) => {
                     </div>
                 </VhField>
 
+                <VhField label="Appointment Charges">
+                    <div class="p-inputgroup">
+                        <InputNumber class="w-full"
+                                     placeholder="₹"
+                                     name="doctors-charges"
+                                     data-testid="doctors-charges"
+                                     :useGrouping="false"
+                                     v-model="store.item.charges" required/>
+                        <div class="required-field hidden"></div>
+                    </div>
+                </VhField>
+
                 <VhField label="Working Hour starts at">
                     <div class="p-inputgroup">
                         <Calendar

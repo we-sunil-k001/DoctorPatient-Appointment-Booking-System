@@ -80,6 +80,19 @@ const useVaah = vaah();
 
             </Column>
 
+            <Column field="charges" header="Charges"
+                    class="overflow-wrap-anywhere"
+                    :sortable="true">
+
+                <template #body="prop">
+                    <Badge v-if="prop.data.deleted_at"
+                           value="Trashed"
+                           severity="danger"></Badge>
+                    ₹{{prop.data.charges}}/-
+                </template>
+
+            </Column>
+
             <Column field="" header="Working hours"
                     class="overflow-wrap-anywhere"
                     :sortable="true">

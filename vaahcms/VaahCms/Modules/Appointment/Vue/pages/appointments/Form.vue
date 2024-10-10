@@ -1,4 +1,4 @@
-<script setup>
+<script setup xmlns="http://www.w3.org/1999/html">
 import {onMounted, ref, watch} from "vue";
 import { useAppointmentStore } from '../../stores/store-appointments'
 
@@ -218,6 +218,17 @@ watch(doctor_details, (newVal) => {
                         </div>
                     </VhField>
 
+                        <div class="p-inputgroup">
+                            <!-- Display Doctor Details -->
+                            <div v-if="doctor_details">
+                                <p>Name: <strong>{{doctor_details.data.name}}</strong></p>
+                                <p>Working hour: <strong>{{doctor_details.data.working_hours_start}} to {{doctor_details.data.working_hours_end}}</strong></p>
+                                <p>Appointment Slot Duration: <strong>30 minutes</strong></p>
+                                <p>Appointment: <strong>₹{{doctor_details.data.charges}}/-</strong></p>
+                            </div>
+                        </div><br>
+
+
                     <VhField label="Patient">
                         <div class="p-inputgroup">
                             <Dropdown  v-model="store.item.patient_id"
@@ -288,18 +299,8 @@ watch(doctor_details, (newVal) => {
 <!--                    </div>-->
 <!--                </VhField>-->
 
-                <VhField label=" ">
-                    <div class="p-inputgroup">
-                        <!-- Display Doctor Details -->
-                        <div v-if="doctor_details">
-                            <h3>Doctor Details</h3>
-                            <p><strong>Name:</strong> {{doctor_details.data.name}}</p>
-                            <p><strong>Working hour start:</strong> {{doctor_details.data.working_hours_start}}</p>
-                            <p><strong>Working hour end:</strong> {{doctor_details.data.working_hours_end}}</p>
-                        </div>
-                    </div>
 
-                </VhField>
+
 
                 <VhField label="Appointment Time">
                     <div class="p-inputgroup">

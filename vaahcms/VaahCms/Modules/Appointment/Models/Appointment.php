@@ -374,7 +374,7 @@ class Appointment extends VaahModel
 
         // Specify the columns you want to retrieve from the relationships
         $list->with([
-            'doctor:id,name', // Replace 'name' with any other fields you need from the doctor table
+            'doctor:id,name,charges', // Replace 'name' with any other fields you need from the doctor table
             'patient:id,name'  // Replace 'name' with any other fields you need from the patient table
         ]);
 

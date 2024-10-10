@@ -48,6 +48,14 @@ const useVaah = vaah();
                  </template>
              </Column>
 
+             <Column field="charges" header="Appointment Charges"
+                     class="overflow-wrap-anywhere"
+                     :sortable="true">
+                 <template #body="prop">
+                     ₹{{ prop.data.doctor?.charges ?? 'NA' }}/-
+                 </template>
+             </Column>
+
              <Column field="status" header="Booking Status"
                      class="overflow-wrap-anywhere"
                      :sortable="true">
