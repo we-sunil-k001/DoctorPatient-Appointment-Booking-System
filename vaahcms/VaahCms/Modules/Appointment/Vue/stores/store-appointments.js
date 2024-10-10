@@ -1,7 +1,8 @@
-import {watch} from 'vue'
+import {ref, watch} from 'vue'
 import {acceptHMRUpdate, defineStore} from 'pinia'
 import qs from 'qs'
 import {vaah} from '../vaahvue/pinia/vaah'
+import axios from "axios";
 
 let model_namespace = 'VaahCms\\Modules\\Appointment\\Models\\Appointment';
 
@@ -66,6 +67,8 @@ export const useAppointmentStore = defineStore({
         item_menu_list: [],
         item_menu_state: null,
         form_menu_list: []
+        // doctor_details: null
+
     }),
     getters: {
 
@@ -937,6 +940,28 @@ export const useAppointmentStore = defineStore({
             this.form_menu_list = form_menu;
 
         },
+
+
+        //-------------------------------------------------------------
+        //Custom functions below
+        // async fetchDoctorDetails(event)
+        // {
+        //     alert("hello");
+        //     return "hello";
+        //     const selectedDoctorId = event.value; // Get the selected doctor ID
+        //     if (selectedDoctorId) {
+        //         try {
+        //             // Fetch doctor details from your API or data source
+        //             const response = await axios.get(`backend/appointment/doctors/${selectedDoctorId}`);
+        //             doctor_details.value = response.data; // Store the fetched data
+        //         } catch (error) {
+        //             console.error('Error fetching doctor details:', error);
+        //             doctor_details.value = null; // Reset if there's an error
+        //         }
+        //     } else {
+        //         doctor_details.value = null; // Reset if no doctor is selected
+        //     }
+        // },
         //---------------------------------------------------------------------
     }
 });

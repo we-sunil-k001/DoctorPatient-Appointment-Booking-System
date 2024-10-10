@@ -4,6 +4,7 @@ import { useAppointmentStore } from '../../stores/store-appointments'
 
 import VhField from './../../vaahvue/vue-three/primeflex/VhField.vue'
 import {useRoute} from 'vue-router';
+import axios from 'axios'; // Make sure to import axios
 
 
 const store = useAppointmentStore();
@@ -29,6 +30,70 @@ const toggleFormMenu = (event) => {
     form_menu.value.toggle(event);
 };
 
+// Reactive variable to hold doctor details
+const doctor_details = ref(null);
+
+// Function to fetch doctor details on dropdown selection
+const fetchDoctorDetails = async (event) => {
+    const selectedDoctorId = event.value; // Get the selected doctor ID
+    if (selectedDoctorId) {
+        try {
+            // Fetch doctor details from your API or data source
+            const response = await axios.get(`backend/appointment/doctors/${selectedDoctorId}`);
+            doctor_details.value = response.data; // Store the fetched data
+            console.log(doctor_details.value);
+        } catch (error) {
+            console.error('Error fetching doctor details:', error);
+            doctor_details.value = null; // Reset if there's an error
+        }
+    } else {
+        doctor_details.value = null; // Reset if no doctor is selected
+    }
+};
+
+
+
+// TO calculate and display 30min dropdown
+const time_slots = ref([]); // Reactive variable to hold the time slots
+
+// Helper function to convert "HH:MM AM/PM" to a Date object
+const parseTime = (timeStr) => {
+    const [time, modifier] = timeStr.split(' ');
+    let [hours, minutes] = time.split(':');
+    hours = parseInt(hours);
+    if (modifier === 'PM' && hours < 12) {
+        hours += 12; // Convert PM hour to 24-hour format
+    } else if (modifier === 'AM' && hours === 12) {
+        hours = 0; // Convert 12 AM to 0 hours
+    }
+    return new Date(1970, 0, 1, hours, minutes); // Use a fixed date for time calculations
+};
+
+// Function to generate time slots every 30 minutes
+const generateTimeSlots = () => {
+    if (doctor_details.value) {
+        const startTime = doctor_details.value.data.working_hours_start;
+        const endTime = doctor_details.value.data.working_hours_end;
+
+        const start = parseTime(startTime);
+        const end = parseTime(endTime);
+
+        time_slots.value = [];
+
+        while (start < end) {
+            const formattedTime = start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+            const utcTime = new Date(start).toISOString(); // Convert to UTC format
+            time_slots.value.push({ name: formattedTime, value: utcTime });
+            start.setMinutes(start.getMinutes() + 30); // Increment by 30 minutes
+        }
+    }
+};
+// Watch for changes in doctor details to regenerate time slots
+watch(doctor_details, (newVal) => {
+    if (newVal && newVal.data) {
+        generateTimeSlots();
+    }
+});
 
 //--------/form_menu
 
@@ -147,6 +212,7 @@ const toggleFormMenu = (event) => {
                                        filter
                                        name="doctor_name"
                                        data-testid="doctor_name"
+                                       @change="fetchDoctorDetails"
                                        required/>
                             <div class="required-field hidden"></div>
                         </div>
@@ -176,7 +242,7 @@ const toggleFormMenu = (event) => {
 
                     <VhField label="Doctor Name: ">
                         <div class="p-inputgroup">
-                            <strong> {{ store.assets.doctor.find(p => p.id === store.item.doctor_id)?.name || 'Unknown Doctor' }} </strong>
+                            <strong>  {{ store.assets.doctor.find(p => p.id === store.item.doctor_id)?.name || 'Unknown Doctor' }} </strong>
                         </div>
                     </VhField>
 
@@ -212,16 +278,42 @@ const toggleFormMenu = (event) => {
                     </div>
                 </VhField>
 
-                <VhField label="Appointment Time">
+<!--                <VhField label="Appointment Time">-->
+<!--                    <div class="p-inputgroup">-->
+<!--                        <Calendar v-model="store.item.appointment_time" timeOnly hourFormat="12" showIcon-->
+<!--                                  placeholder="Select time"-->
+<!--                                  name="appointment_time"-->
+<!--                                 >-->
+<!--                        </Calendar>-->
+<!--                    </div>-->
+<!--                </VhField>-->
+
+                <VhField label=" ">
                     <div class="p-inputgroup">
-                        <Calendar v-model="store.item.appointment_time" timeOnly hourFormat="12" showIcon
-                                  placeholder="Select time"
-                                  name="appointment_time"
-                                 >
-                        </Calendar>
+                        <!-- Display Doctor Details -->
+                        <div v-if="doctor_details">
+                            <h3>Doctor Details</h3>
+                            <p><strong>Name:</strong> {{doctor_details.data.name}}</p>
+                            <p><strong>Working hour start:</strong> {{doctor_details.data.working_hours_start}}</p>
+                            <p><strong>Working hour end:</strong> {{doctor_details.data.working_hours_end}}</p>
+                        </div>
                     </div>
+
                 </VhField>
 
+                <VhField label="Appointment Time">
+                    <div class="p-inputgroup">
+                        <Dropdown v-model="store.item.appointment_time"
+                                  :options="time_slots"
+                                  option-label="name"
+                                  option-value="value"
+                                  name="appointment_time"
+                                  filter
+                                  data-testid="appointment_time"
+                                  required/>
+                        <div class="required-field hidden"></div>
+                    </div>
+                </VhField>
 
 
 
