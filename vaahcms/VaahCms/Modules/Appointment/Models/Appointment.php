@@ -561,7 +561,6 @@ class Appointment extends VaahModel
     //-------------------------------------------------
     public static function getItem($id)
     {
-
         $item = self::where('id', $id)
             ->with(['createdByUser', 'updatedByUser', 'deletedByUser'])
             ->withTrashed()
@@ -927,19 +926,27 @@ class Appointment extends VaahModel
     }
 
 
+    // ----------------------------------------------------------------------------
+    //  Custom function
+    // ----------------------------------------------------------------------------
 
+    //-------------------------------------------------
     //  Relation with Doctor
-        public function doctor()
-        {
-            return $this->belongsTo(Doctor::class, 'doctor_id', 'id');
-        }
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class, 'doctor_id', 'id');
+    }
 
+
+    //-------------------------------------------------
     //  Relation with Patient
-        public function patient()
-        {
-            return $this->belongsTo(Patient::class, 'patient_id', 'id');
-        }
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class, 'patient_id', 'id');
+    }
 
+
+    //-------------------------------------------------
     // Single Function for all kind of emails for Doctor and Patient
     public static function appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email)
     {
@@ -953,6 +960,24 @@ class Appointment extends VaahModel
         }
     }
 
+
+    //-------------------------------------------------
+    // get Dashboard stats.
+    public static function getDashboardStats()
+    {
+        $totalDoctors = Doctor::count();
+        $totalPatients = Patient::count();
+        $totalAppointments = Appointment::count();
+        $cancelledAppointments = Appointment::where('status', 'cancelled')->count();
+
+
+        return response()->json([
+            'total_doctors' => $totalDoctors,
+            'total_patients' => $totalPatients,
+            'total_appointments' => $totalAppointments,
+            'cancelled_appointments' => $cancelledAppointments,
+        ]);
+    }
 
     //-------------------------------------------------
     //-------------------------------------------------
