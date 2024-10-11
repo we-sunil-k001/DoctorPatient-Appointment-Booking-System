@@ -969,6 +969,7 @@ class Appointment extends VaahModel
         $totalPatients = Patient::count();
         $totalAppointments = Appointment::count();
         $cancelledAppointments = Appointment::where('status', 'cancelled')->count();
+        $reschedule_pending = Appointment::where('status', 'pending')->count();
 
 
         return response()->json([
@@ -976,6 +977,7 @@ class Appointment extends VaahModel
             'total_patients' => $totalPatients,
             'total_appointments' => $totalAppointments,
             'cancelled_appointments' => $cancelledAppointments,
+            'reschedule_pending' => $reschedule_pending,
         ]);
     }
 
