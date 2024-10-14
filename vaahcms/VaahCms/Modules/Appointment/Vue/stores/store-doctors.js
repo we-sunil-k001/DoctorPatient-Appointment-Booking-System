@@ -66,7 +66,12 @@ export const usedoctorStore = defineStore({
         item_menu_list: [],
         item_menu_state: null,
         form_menu_list: [],
-        end_time_temp: null
+        end_time_temp: null,
+        //sidebar
+        visible: false,
+        // to get appointment data
+        selected_doctor: [],
+        appointments: []
     }),
     getters: {
 
@@ -1000,6 +1005,14 @@ export const usedoctorStore = defineStore({
             // Return the updated time
             return `${updatedHours}:${formattedMinutes} ${updatedPeriod}`;
 
+        },
+
+        // Get all Appointments related to particular doctor
+        async fetchDoctorAppointments(doctor_id) {
+            this.selected_doctor = doctor_id;
+            this.visible = true;
+            const response = await vaah().ajax('backend/appointment/appointments/doctors_appoint/' + this.selected_doctor);
+            this.appointments = response;
         }
 
 

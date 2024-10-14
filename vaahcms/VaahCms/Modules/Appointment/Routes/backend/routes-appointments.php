@@ -5,9 +5,9 @@ use VaahCms\Modules\Appointment\Http\Controllers\Backend\AppointmentsController;
 Route::group(
     [
         'prefix' => 'backend/appointment/appointments',
-        
+
         'middleware' => ['web', 'has.backend.access'],
-        
+
 ],
 function () {
     /**
@@ -43,6 +43,13 @@ function () {
      */
     Route::post('/', [AppointmentsController::class, 'createItem'])
         ->name('vh.backend.appointment.appointments.create');
+
+    /**
+     * Get Appointment details based on doctor id
+     */
+    Route::get('doctors_appoint/{id}', [AppointmentsController::class, 'getDoctorsAppoint'])
+        ->name('vh.backend.appointment.appointments.read');
+
     /**
      * Get Item
      */
