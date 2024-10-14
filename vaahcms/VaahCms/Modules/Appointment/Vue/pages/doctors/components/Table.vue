@@ -5,6 +5,10 @@ import { usedoctorStore } from '../../../stores/store-doctors'
 const store = usedoctorStore();
 const useVaah = vaah();
 
+// Sidebar ------
+import { ref } from "vue";
+const visible = ref(false);
+
 </script>
 
 <template>
@@ -37,6 +41,8 @@ const useVaah = vaah();
                            value="Trashed"
                            severity="danger"></Badge>
                     {{prop.data.name}}
+                    <Button icon="pi pi-arrow-left" @click="visible = true" />
+
                 </template>
 
             </Column>
@@ -195,6 +201,12 @@ const useVaah = vaah();
         </Paginator>
         <!--/paginator-->
 
+    </div>
+
+    <div class="card flex justify-content-center">
+        <Sidebar v-model:visible="visible" header="Sidebar" position="right" class="w-full md:w-20rem lg:w-30rem">
+            <p>Lorem ipsum dolor sit amet, commodo consequat.</p>
+        </Sidebar>
     </div>
 
 </template>
