@@ -108,7 +108,7 @@ const setChartOptions = () => {
 
       <div class="container">
           <div class="row" >
-              <div class="card1">
+              <div class="card">
                   <Card>
                       <template #header>
                           <h4 v-if="store.item">
@@ -117,14 +117,9 @@ const setChartOptions = () => {
                       </template>
                       <template #title><h5>Appointments Booked</h5></template>
                       <template #icons> <i class="pi pi-refresh"></i> </template>
-                      <template #content>
-                          <p class="m-0">
-                              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur
-                          </p>
-                      </template>
                   </Card>
               </div>
-              <div class="card2">
+              <div class="card">
                   <Card>
                       <template #header>
                           <h4 v-if="store.item">
@@ -132,14 +127,10 @@ const setChartOptions = () => {
                           </h4>
                       </template>
                       <template #title><h5>Total Doctors</h5></template>
-                      <template #content>
-                          <p class="m-0">
-                              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur
-                          </p>
-                      </template>
+
                   </Card>
               </div>
-              <div class="card3">
+              <div class="card">
                   <Card>
                       <template #header>
                           <h4 v-if="store.item">
@@ -147,14 +138,10 @@ const setChartOptions = () => {
                           </h4>
                       </template>
                       <template #title><h5>Total Patients</h5></template>
-                      <template #content>
-                          <p class="m-0">
-                              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur
-                          </p>
-                      </template>
+
                   </Card>
               </div>
-              <div class="card4">
+              <div class="card">
                   <Card>
                       <template #header>
                           <h4 v-if="store.item">
@@ -162,11 +149,7 @@ const setChartOptions = () => {
                           </h4>
                       </template>
                       <template #title><h5>Appointments Cancelled</h5></template>
-                      <template #content>
-                          <p class="m-0">
-                              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur
-                          </p>
-                      </template>
+
                   </Card>
               </div>
           </div>
@@ -190,6 +173,14 @@ const setChartOptions = () => {
 .row{
     display: inline-flex;
     gap: 10px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+.card{
+    width: 25%;
+}
+.row .card .p-card-content{
+    display: none;
 }
 h4{
     font-size: 40px;
