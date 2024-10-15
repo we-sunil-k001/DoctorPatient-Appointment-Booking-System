@@ -17,6 +17,7 @@ import Toast from 'primevue/toast';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 import Checkbox from 'primevue/checkbox';
+import Slider from 'primevue/slider';
 
 //-------------/PrimeVue Imports
 
@@ -75,6 +76,7 @@ app.component('Menu', Menu);
 app.component('ProgressBar', ProgressBar);
 app.component('Toast', Toast);
 app.component('Checkbox', Checkbox);
+app.component('Slider', Slider);
 //-------------/PrimeVue Use
 
 // -------------CRUD PrimeVue Use
