@@ -377,7 +377,7 @@ class Appointment extends VaahModel
             'patient:id,name'
         ]);
 
-        $list = $list->select('id','doctor_id','patient_id','status', 'reason_for_visit','appointment_date','appointment_time',
+        $list = $list->select('id','doctor_id','patient_id','status', 'reason_for_visit','appointment_date','appointment_time'
             )
             ->withTrashed();
 

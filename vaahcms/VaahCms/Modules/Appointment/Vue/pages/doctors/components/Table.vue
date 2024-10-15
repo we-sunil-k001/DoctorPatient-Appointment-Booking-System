@@ -204,7 +204,7 @@ const useVaah = vaah();
         <Sidebar v-model:visible="store.visible" header="Appointments" position="right" class="w-full md:w-50rem lg:w-30rem">
 
             <!-- Display Doctor's Name -->
-            <Tag severity="success" v-if="store.appointments && store.appointments.data && store.appointments.data.length > 0 && store.appointments.data[0].doctor_name">
+            <Tag severity="info" v-if="store.appointments && store.appointments.data && store.appointments.data.length > 0 && store.appointments.data[0].doctor_name">
                  Dr. {{ store.appointments.data[0].doctor_name }}
             </Tag>
             <div class="card" >
