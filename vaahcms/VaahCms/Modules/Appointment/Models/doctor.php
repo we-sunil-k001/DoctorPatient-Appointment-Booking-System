@@ -243,7 +243,6 @@ class doctor extends VaahModel
     //-------------------------------------------------
     public function scopeIsActiveFilter($query, $filter)
     {
-
         if(!isset($filter['is_active'])
             || is_null($filter['is_active'])
             || $filter['is_active'] === 'null'
@@ -312,7 +311,7 @@ class doctor extends VaahModel
 
         // Select specific columns from the database
         $list = $list->select('id','name', 'email', 'phone_number', 'specialization','working_hours_start','working_hours_end',
-            'no_of_slot','updated_at','is_active')
+            'no_of_slot','charges','updated_at','is_active')
         ->withTrashed();
 
 

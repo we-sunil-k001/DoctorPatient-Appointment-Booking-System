@@ -3,8 +3,22 @@
 import { usedoctorStore } from '../../../stores/store-doctors'
 import VhFieldVertical from './../../../vaahvue/vue-three/primeflex/VhFieldVertical.vue'
 
-const store = usedoctorStore();
+import { ref,watch } from "vue";
 
+const store = usedoctorStore();
+const categories = ref([
+    {name: "Pathology", key: "P"},
+    {name: "ENT", key: "E"},
+    {name: "Cardiology", key: "C"},
+    {name: "Neurologist", key: "N"},
+    {name: "Pediatrics", key: "P"}
+]);
+// const selectedCategories = ref(['Marketing']);
+const selectedCategories = ref();
+const rangeValues = ref([0, 200]); // Initial range values
+watch(selectedCategories, (newCategories) => {
+    store.query.filter.categories.key = newCategories;
+});
 </script>
 
 <template>
@@ -37,7 +51,41 @@ const store = usedoctorStore();
 
                 </template>
 
-            <VhFieldVertical >
+
+                <VhFieldVertical >
+                    <template #label>
+                        <b>Price</b>
+                    </template>
+
+                    <div class="field-radiobutton" style="display: block">
+                        <Slider v-model="rangeValues" :min="0" :max="200" range class="w-full"/>
+                        <p>{{ rangeValues[0] }} - {{ rangeValues[1] }}</p>
+                    </div>
+
+                </VhFieldVertical>
+
+
+                <VhFieldVertical >
+                    <template #label>
+                        <b>Specialization</b>
+                    </template>
+
+                    <div class="field-radiobutton">
+                        <div class="card flex justify-content-center">
+                            <div class="flex flex-column gap-3">
+                                <div v-for="category of categories" :key="category.key" class="flex align-items-center">
+                                    <Checkbox v-model="selectedCategories" :inputId="category.key" name="category" :value="category.name" />
+                                    <label :for="category.key">{{ category.name }}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </VhFieldVertical>
+
+                <Divider/>
+
+                <VhFieldVertical >
                 <template #label>
                     <b>Sort By:</b>
                 </template>
