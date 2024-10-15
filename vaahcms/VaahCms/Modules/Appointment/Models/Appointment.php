@@ -956,7 +956,7 @@ class Appointment extends VaahModel
     {
         $appointments = Appointment::where('doctor_id', $id)->get();
 
-        // If no appointments are found, return the doctor's name and a message
+        // If no appointments are found, return the doctor's name
         if ($appointments->isEmpty()) {
             $doctor = Doctor::find($id);
             $doctor_name = $doctor ? $doctor->name : null;
@@ -977,14 +977,15 @@ class Appointment extends VaahModel
             $appointment->doctor_name = $doctor ? $doctor->name : null;
             $appointment->charges = $doctor ? $doctor->charges : null;
             $appointment->patient_name = $patient ? $patient->name : null;
-        }
 
-        // Convert working hours from UTC to IST
-        $appointment->appointment_date = self::convertDateUTCtoIST($appointment->appointment_date);
-        $appointment->appointment_time = self::convertUTCtoIST12Hrs($appointment->appointment_time);
+            // Convert working hours from UTC to IST
+            $appointment->appointment_date = self::convertDateUTCtoIST($appointment->appointment_date);
+            $appointment->appointment_time = self::convertUTCtoIST12Hrs($appointment->appointment_time);
+        }
 
         return $appointments;
     }
+
 
 
     //-------------------------------------------------

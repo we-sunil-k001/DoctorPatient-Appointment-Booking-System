@@ -201,20 +201,159 @@ const useVaah = vaah();
     </div>
 
     <div class="card flex justify-content-center">
-        <Sidebar v-model:visible="store.visible" header="Appointments" position="right" class="w-full">
+        <Sidebar v-model:visible="store.visible" header="Appointments" position="right" class="w-full md:w-50rem lg:w-30rem">
 
+            <!-- Display Doctor's Name -->
+            <Tag severity="success" v-if="store.appointments && store.appointments.data && store.appointments.data.length > 0 && store.appointments.data[0].doctor_name">
+                 Dr. {{ store.appointments.data[0].doctor_name }}
+            </Tag>
             <div class="card" >
                 <TabView>
                     <TabPanel header="Booked">
 
-                        <!-- Display Doctor's Name -->
-<!--                        <Tag value="info" v-if="store.appointments && store.appointments.data && store.appointments.data[0].doctor_name">-->
-<!--                            {{ store.appointments.data[0].doctor_name }}-->
-<!--                        </Tag>-->
-
                         <div class="card" v-if="store.appointments && store.appointments.data && store.appointments.data.length > 0">
 
                             <DataTable :value="store.appointments.data.filter(a => a.status === 'confirmed')"
+                                       dataKey="id"
+                                       :rowClass="store.setRowClass"
+                                       class="p-datatable-sm p-datatable-hoverable-rows"
+                                       :nullSortOrder="-1"
+                                       stripedRows
+                                       responsiveLayout="scroll">
+
+                                <Column field="id" header="ID" :style="{width: '80px'}" :sortable="true">
+                                </Column>
+
+                                <Column field="patient_name" header="Patient name" class="overflow-wrap-anywhere"
+                                        :sortable="true">
+                                    <template #body="prop">
+                                        {{ prop.data.patient_name}}
+                                    </template>
+                                </Column>
+
+                                <Column field="appointment_date" header="Appointment Date and time"
+                                        class="overflow-wrap-anywhere"
+                                        :sortable="true">
+                                    <template #body="prop">
+                                        {{ prop.data.appointment_date}} - {{ prop.data.appointment_time}}
+                                    </template>
+                                </Column>
+
+                                <Column field="charges" header="Appointment Charges"
+                                        class="overflow-wrap-anywhere"
+                                        :sortable="true">
+                                    <template #body="prop">
+                                        ₹{{ prop.data.charges}}/-
+                                    </template>
+                                </Column>
+
+                                <Column field="status" header="Booking Status"
+                                        class="overflow-wrap-anywhere"
+                                        :sortable="true">
+                                    <template #body="prop">
+                                        <span v-html="
+                                            prop.data.status === 'pending'
+                                            ? '<b style=color:#3b82f6;\n>Reschedule Pending</b>'
+                                            : prop.data.status === 'cancelled'
+                                             ? '<b style=color:red> Cancelled</b>'
+                                            : prop.data.status === 'confirmed'
+                                            ? '<b style=color:green>Confirmed</b>'
+                                            : prop.data.status
+                                        "></span>
+                                    </template>
+                                </Column>
+
+                                <Column field="reason_for_visit" header="Medical Concern"
+                                        class="overflow-wrap-anywhere"
+                                        :sortable="true">
+                                    <template #body="prop">
+                                        {{ prop.data.reason_for_visit }}
+                                    </template>
+                                </Column>
+
+                            </DataTable>
+                        </div>
+                        <div class="card" v-else>
+                            <h4 style="color: #b32b23; font-size: 15px">No Booked Appointments found !</h4>
+                        </div>
+                    </TabPanel>
+
+
+                    <TabPanel header="Cancelled">
+                            <div class="card" v-if="store.appointments && store.appointments.data && store.appointments.data.length > 0">
+
+                                <DataTable :value="store.appointments.data.filter(a => a.status === 'cancelled')"
+                                           dataKey="id"
+                                           :rowClass="store.setRowClass"
+                                           class="p-datatable-sm p-datatable-hoverable-rows"
+                                           :nullSortOrder="-1"
+                                           stripedRows
+                                           responsiveLayout="scroll">
+
+                                    <Column field="s_no" header="S.no." class="overflow-wrap-anywhere" :sortable="false">
+                                        <template #body="prop">
+                                            {{ prop.data.id}}
+                                        </template>
+                                    </Column>
+
+                                    <Column field="patient_name" header="Patient name" class="overflow-wrap-anywhere"
+                                            :sortable="true">
+                                        <template #body="prop">
+                                            {{ prop.data.patient_name}}
+                                        </template>
+                                    </Column>
+
+                                    <Column field="appointment_date" header="Appointment Date and time"
+                                            class="overflow-wrap-anywhere"
+                                            :sortable="true">
+                                        <template #body="prop">
+                                            {{ prop.data.appointment_date}} - {{ prop.data.appointment_time}}
+                                        </template>
+                                    </Column>
+
+                                    <Column field="charges" header="Appointment Charges"
+                                            class="overflow-wrap-anywhere"
+                                            :sortable="true">
+                                        <template #body="prop">
+                                            ₹{{ prop.data.charges}}/-
+                                        </template>
+                                    </Column>
+
+                                    <Column field="status" header="Booking Status"
+                                            class="overflow-wrap-anywhere"
+                                            :sortable="true">
+                                        <template #body="prop">
+                                         <span v-html="
+                                            prop.data.status === 'pending'
+                                            ? '<b style=color:#3b82f6;\n>Reschedule Pending</b>'
+                                            : prop.data.status === 'cancelled'
+                                             ? '<b style=color:red> Cancelled</b>'
+                                            : prop.data.status === 'confirmed'
+                                            ? '<b style=color:green>Confirmed</b>'
+                                            : prop.data.status
+                                        "></span>
+                                        </template>
+                                    </Column>
+
+                                    <Column field="reason_for_visit" header="Medical Concern"
+                                            class="overflow-wrap-anywhere"
+                                            :sortable="true">
+                                        <template #body="prop">
+                                            {{ prop.data.reason_for_visit }}
+                                        </template>
+                                    </Column>
+
+                                </DataTable>
+                            </div>
+                            <div class="card" v-else>
+                                <h4 style="color: #b32b23; font-size: 15px">No Cancelled Appointments found !</h4>
+                            </div>
+                    </TabPanel>
+
+                    <TabPanel header="Reschedule Pending">
+                        <div class="card" v-if="store.appointments && store.appointments.data && store.appointments.data.length > 0">
+
+                            <DataTable :value="store.appointments.data.filter(a => a.status === 'pending')"
                                        dataKey="id"
                                        :rowClass="store.setRowClass"
                                        class="p-datatable-sm p-datatable-hoverable-rows"
@@ -259,9 +398,7 @@ const useVaah = vaah();
                                             prop.data.status === 'pending'
                                             ? '<b style=color:#3b82f6;\n>Reschedule Pending</b>'
                                             : prop.data.status === 'cancelled'
-                                            ? (prop.data.doctor?.name
-                                                ? '<b style=color:red> Cancelled</b>'
-                                                : '<b style=color:#3b82f6>Doctor removed</b>')
+                                             ? '<b style=color:red> Cancelled</b>'
                                             : prop.data.status === 'confirmed'
                                             ? '<b style=color:green>Confirmed</b>'
                                             : prop.data.status
@@ -280,94 +417,8 @@ const useVaah = vaah();
                             </DataTable>
                         </div>
                         <div class="card" v-else>
-                            <h4 style="color: #b32b23; font-size: 15px">No Booked Appointments found !</h4>
+                            <h4 style="color: #b32b23; font-size: 15px">No "Reschedule Pending" Appointments found !</h4>
                         </div>
-                    </TabPanel>
-
-
-                    <TabPanel header="Cancelled">
-
-                            <div class="card" v-if="store.appointments && store.appointments.data && store.appointments.data.length > 0">
-
-                                <DataTable :value="store.appointments.data.filter(a => a.status === 'cancelled')"
-                                           dataKey="id"
-                                           :rowClass="store.setRowClass"
-                                           class="p-datatable-sm p-datatable-hoverable-rows"
-                                           :nullSortOrder="-1"
-                                           stripedRows
-                                           responsiveLayout="scroll">
-
-                                    <Column field="s_no" header="S.no." class="overflow-wrap-anywhere" :sortable="false">
-                                        <template #body="prop">
-                                            {{ prop.data.id}}
-                                        </template>
-                                    </Column>
-
-                                    <Column field="patient_name" header="Patient name" class="overflow-wrap-anywhere"
-                                            :sortable="true">
-                                        <template #body="prop">
-                                            {{ prop.data.patient_name}}
-                                        </template>
-                                    </Column>
-
-                                    <Column field="appointment_date" header="Appointment Date and time"
-                                            class="overflow-wrap-anywhere"
-                                            :sortable="true">
-                                        <template #body="prop">
-                                            {{ prop.data.appointment_date}} - {{ prop.data.appointment_time}}
-                                        </template>
-                                    </Column>
-
-                                    <Column field="charges" header="Appointment Charges"
-                                            class="overflow-wrap-anywhere"
-                                            :sortable="true">
-                                        <template #body="prop">
-                                            ₹{{ prop.data.charges}}/-
-                                        </template>
-                                    </Column>
-
-                                    <Column field="status" header="Booking Status"
-                                            class="overflow-wrap-anywhere"
-                                            :sortable="true">
-                                        <template #body="prop">
-                                        <span v-html="
-                                            prop.data.status === 'pending'
-                                            ? '<b style=color:#3b82f6;\n>Reschedule Pending</b>'
-                                            : prop.data.status === 'cancelled'
-                                            ? (prop.data.doctor?.name
-                                                ? '<b style=color:red> Cancelled</b>'
-                                                : '<b style=color:#3b82f6>Doctor removed</b>')
-                                            : prop.data.status === 'confirmed'
-                                            ? '<b style=color:green>Confirmed</b>'
-                                            : prop.data.status
-                                        "></span>
-                                        </template>
-                                    </Column>
-
-                                    <Column field="reason_for_visit" header="Medical Concern"
-                                            class="overflow-wrap-anywhere"
-                                            :sortable="true">
-                                        <template #body="prop">
-                                            {{ prop.data.reason_for_visit }}
-                                        </template>
-                                    </Column>
-
-                                </DataTable>
-                            </div>
-                            <div class="card" v-else>
-                                <h4 style="color: #b32b23; font-size: 15px">No Booked Appointments found !</h4>
-                            </div>
-                    </TabPanel>
-
-                    <TabPanel header="Rechedule Pending">
-                        <p class="m-0">
-                            At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium
-                            voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati
-                            cupiditate non provident, similique sunt in culpa qui
-                            officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum
-                            facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio
-                            cumque nihil impedit quo minus.
-                        </p>
                     </TabPanel>
                 </TabView>
             </div>
