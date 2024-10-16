@@ -60,7 +60,18 @@ const toggleCreateMenu = (event) => {
 };
 //--------/form_menu
 
+//Dialog ----------------
+const visible = ref(false);
 
+function onUpload(event) {
+    // Handle file upload logic
+    console.log('File uploaded successfully', event);
+}
+
+function submitForm() {
+    // Logic to trigger file upload or handle form data
+    console.log('Form submitted with file upload');
+}
 </script>
 <template>
 
@@ -94,11 +105,17 @@ const toggleCreateMenu = (event) => {
                         Create
                     </Button>
 
+                    <Button @click="visible = true" >
+                        <i class="pi pi-upload mr-1"></i>
+                        Import
+                    </Button>
+
                     <Button data-testid="appointments-list-reload"
                             class="p-button-sm"
                             @click="store.getList()">
                         <i class="pi pi-refresh mr-1"></i>
                     </Button>
+
 
                     <!--form_menu-->
 
@@ -134,5 +151,33 @@ const toggleCreateMenu = (event) => {
 
     </div>
 
+<!--Dialog for import-->
+
+        <div class="card flex justify-content-center">
+            <Button label="Show" @click="visible = true" />
+            <Dialog v-model:visible="visible" header="Upload File" :style="{ width: '25rem' }">
+                <div class="flex align-items-center gap-3 mb-3">
+                    <FileUpload class="flex-auto w-full"
+                        mode="basic"
+                        name="demo[]"
+                        url="/api/upload"
+                        accept=".csv, .xlsx, .xls"
+                        :maxFileSize="1000000"
+                        @upload="onUpload"
+                        :auto="false"
+                        chooseLabel="Browse"
+                    />
+                </div>
+                <div class="flex justify-content-center  gap-2">
+                    <Button type="button" severity="success" label="Save" @click="visible = false" class="w-full"></Button>
+                </div>
+
+                <div class="text-align-center">
+                  <br>
+                    <label class="font-semibold">Download a sample CSV with format</label>
+                </div>
+
+            </Dialog>
+        </div>
 
 </template>
