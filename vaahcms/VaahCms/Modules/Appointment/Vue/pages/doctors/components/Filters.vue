@@ -3,23 +3,7 @@
 import { usedoctorStore } from '../../../stores/store-doctors'
 import VhFieldVertical from './../../../vaahvue/vue-three/primeflex/VhFieldVertical.vue'
 
-import { ref,watch } from "vue";
-
 const store = usedoctorStore();
-
-// For Charges ----------------
-const charges = ref([0, 200]); // Initial range values
-
-// For specialization ----------------
-const specialization = ref([
-    { name: "Pathology", key: "P" },
-    { name: "ENT", key: "E" },
-    { name: "Cardiology", key: "C" },
-    { name: "Neurologist", key: "N" },
-    { name: "Pediatrics", key: "P" }
-]);
-// This will hold the selected categories
-const selected_specialization = ref([]);
 
 </script>
 
@@ -77,7 +61,7 @@ const selected_specialization = ref([]);
 
                     <div class="field-radiobutton" style="display: flex ">
                         <Calendar
-                            v-model="store.query.filter.working_hours_start"
+                                v-model="store.query.filter.working_hours_start"
                             timeOnly
                             hourFormat="12"
                             showIcon
@@ -107,11 +91,14 @@ const selected_specialization = ref([]);
 
                     <div class="field-radiobutton">
                         <div class="flex flex-column gap-3">
-                            <!-- Loop through the specialization array -->
-                            <div v-for="spec in specialization" :key="spec.key" class="flex align-items-center">
-                                <!-- Bind the checkbox to the selected_specialization -->
-                                <Checkbox v-model="store.query.filter.selected_specialization" :inputId="spec.key" name="specialization" :value="spec.name" />
-                                &nbsp &nbsp <label :for="spec.key">{{ spec.name }}</label>
+                            <div v-for="spec in store.specialization" :key="spec" class="flex align-items-center">
+                                <Checkbox
+                                    v-model="store.query.filter.selected_specialization"
+                                    :inputId="spec"
+                                    name="specialization"
+                                    :value="spec"
+                                />
+                                &nbsp;&nbsp; <label :for="spec">{{ spec }}</label>
                             </div>
                         </div>
                     </div>
