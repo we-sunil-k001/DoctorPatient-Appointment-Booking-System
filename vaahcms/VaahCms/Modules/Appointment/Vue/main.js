@@ -16,6 +16,8 @@ import StyleClass from 'primevue/styleclass';
 import Toast from 'primevue/toast';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
+import Dialog from 'primevue/dialog';
+
 //-------------/PrimeVue Imports
 
 //-------------CRUD PrimeVue Imports
@@ -35,6 +37,7 @@ import Tag from "primevue/tag";
 import Calendar from "primevue/calendar";
 import Dropdown from 'primevue/dropdown';
 import InputNumber from 'primevue/inputnumber';
+import FileUpload from 'primevue/fileupload';
 
 //-------------/CRUD PrimeVue Imports
 
@@ -72,6 +75,7 @@ app.component('ConfirmDialog', ConfirmDialog);
 app.component('Menu', Menu);
 app.component('ProgressBar', ProgressBar);
 app.component('Toast', Toast);
+app.component('Dialog', Dialog);
 //-------------/PrimeVue Use
 
 // -------------CRUD PrimeVue Use
@@ -91,6 +95,7 @@ app.component('Tag', Tag);
 app.component('Calendar', Calendar);
 app.component('Dropdown',Dropdown);
 app.component('InputNumber',InputNumber);
+app.component('FileUpload',FileUpload);
 
 //-------------/CRUD PrimeVue Use
 
