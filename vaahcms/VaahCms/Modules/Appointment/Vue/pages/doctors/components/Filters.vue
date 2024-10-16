@@ -6,19 +6,21 @@ import VhFieldVertical from './../../../vaahvue/vue-three/primeflex/VhFieldVerti
 import { ref,watch } from "vue";
 
 const store = usedoctorStore();
-const categories = ref([
-    {name: "Pathology", key: "P"},
-    {name: "ENT", key: "E"},
-    {name: "Cardiology", key: "C"},
-    {name: "Neurologist", key: "N"},
-    {name: "Pediatrics", key: "P"}
+
+// For Charges ----------------
+const charges = ref([0, 200]); // Initial range values
+
+// For specialization ----------------
+const specialization = ref([
+    { name: "Pathology", key: "P" },
+    { name: "ENT", key: "E" },
+    { name: "Cardiology", key: "C" },
+    { name: "Neurologist", key: "N" },
+    { name: "Pediatrics", key: "P" }
 ]);
-// const selectedCategories = ref(['Marketing']);
-const selectedCategories = ref();
-const rangeValues = ref([0, 200]); // Initial range values
-watch(selectedCategories, (newCategories) => {
-    store.query.filter.categories.key = newCategories;
-});
+// This will hold the selected categories
+const selected_specialization = ref([]);
+
 </script>
 
 <template>
@@ -54,12 +56,45 @@ watch(selectedCategories, (newCategories) => {
 
                 <VhFieldVertical >
                     <template #label>
-                        <b>Price</b>
+                        <b>Charges</b>
                     </template>
 
                     <div class="field-radiobutton" style="display: block">
-                        <Slider v-model="rangeValues" :min="0" :max="200" range class="w-full"/>
-                        <p>{{ rangeValues[0] }} - {{ rangeValues[1] }}</p>
+                        <Slider v-model="store.query.filter.charges" :min="0" :max="200" range class="w-full"/>
+                        <!-- Validation to avoid reading undefined -->
+                        <p v-if="store.query.filter.charges && store.query.filter.charges.length > 0">
+                            ₹{{ store.query.filter.charges[0] }} - ₹{{ store.query.filter.charges[1] }}
+                        </p>
+                    </div>
+
+                </VhFieldVertical>
+
+
+                <VhFieldVertical >
+                    <template #label>
+                        <b>Working Hours</b>
+                    </template>
+
+                    <div class="field-radiobutton" style="display: flex ">
+                        <Calendar
+                            v-model="store.query.filter.working_hours_start"
+                            timeOnly
+                            hourFormat="12"
+                            showIcon
+                            placeholder="Select time"
+                            name="working_hours_start"
+                            :step-minute="5"
+                        ></Calendar>
+                        &nbsp to &nbsp
+                        <Calendar
+                            v-model="store.query.filter.working_hours_end"
+                            timeOnly
+                            hourFormat="12"
+                            showIcon
+                            placeholder="Select time"
+                            name="working_hours_start"
+                            :step-minute="5"
+                        ></Calendar>
                     </div>
 
                 </VhFieldVertical>
@@ -71,12 +106,12 @@ watch(selectedCategories, (newCategories) => {
                     </template>
 
                     <div class="field-radiobutton">
-                        <div class="card flex justify-content-center">
-                            <div class="flex flex-column gap-3">
-                                <div v-for="category of categories" :key="category.key" class="flex align-items-center">
-                                    <Checkbox v-model="selectedCategories" :inputId="category.key" name="category" :value="category.name" />
-                                    <label :for="category.key">{{ category.name }}</label>
-                                </div>
+                        <div class="flex flex-column gap-3">
+                            <!-- Loop through the specialization array -->
+                            <div v-for="spec in specialization" :key="spec.key" class="flex align-items-center">
+                                <!-- Bind the checkbox to the selected_specialization -->
+                                <Checkbox v-model="store.query.filter.selected_specialization" :inputId="spec.key" name="specialization" :value="spec.name" />
+                                &nbsp &nbsp <label :for="spec.key">{{ spec.name }}</label>
                             </div>
                         </div>
                     </div>

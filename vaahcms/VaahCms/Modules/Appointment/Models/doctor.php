@@ -308,6 +308,7 @@ class doctor extends VaahModel
         $list->isActiveFilter($request->filter);
         $list->trashedFilter($request->filter);
         $list->searchFilter($request->filter);
+        $list->chargesFilter($request->filter);
 
         // Select specific columns from the database
         $list = $list->select('id','name', 'email', 'phone_number', 'specialization','working_hours_start','working_hours_end',
@@ -996,6 +997,21 @@ class doctor extends VaahModel
         }
     }
 
+
+    //-------------------------------------------------
+    public function scopechargesFilter($query, $filter)
+    {
+        // Retrieving the charges range from the filter
+        $charges_start = isset($filter['charges'][0]) ? $filter['charges'][0] : null;
+        $charges_end = isset($filter['charges'][1]) ? $filter['charges'][1] : null;
+
+        if ($charges_start !== null && $charges_end !== null) {
+            return $query->whereBetween('charges', [$charges_start, $charges_end]);
+        }
+
+        return $query;
+
+    }
 
 
 }
