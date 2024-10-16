@@ -63,15 +63,6 @@ const toggleCreateMenu = (event) => {
 //Dialog ----------------
 const visible = ref(false);
 
-function onUpload(event) {
-    // Handle file upload logic
-    console.log('File uploaded successfully', event);
-}
-
-function submitForm() {
-    // Logic to trigger file upload or handle form data
-    console.log('Form submitted with file upload');
-}
 </script>
 <template>
 
@@ -108,6 +99,11 @@ function submitForm() {
                     <Button @click="visible = true" >
                         <i class="pi pi-upload mr-1"></i>
                         Import
+                    </Button>
+
+                    <Button @click="store.exportAppointments()" >
+                        <i class="pi pi-download mr-1"></i>
+                        Export
                     </Button>
 
                     <Button data-testid="appointments-list-reload"

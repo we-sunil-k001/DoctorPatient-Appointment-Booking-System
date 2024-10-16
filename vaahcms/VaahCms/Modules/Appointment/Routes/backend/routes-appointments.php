@@ -5,9 +5,9 @@ use VaahCms\Modules\Appointment\Http\Controllers\Backend\AppointmentsController;
 Route::group(
     [
         'prefix' => 'backend/appointment/appointments',
-        
+
         'middleware' => ['web', 'has.backend.access'],
-        
+
 ],
 function () {
     /**
@@ -15,6 +15,11 @@ function () {
      */
     Route::get('/assets', [AppointmentsController::class, 'getAssets'])
         ->name('vh.backend.appointment.appointments.assets');
+    /**
+     * Export csv
+     */
+    Route::get('/export', [AppointmentsController::class, 'exportAppointments']);
+
     /**
      * Get List
      */

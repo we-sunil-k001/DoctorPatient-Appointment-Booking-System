@@ -11,6 +11,11 @@ use WebReinvent\VaahCms\Traits\CrudWithUuidObservantTrait;
 use WebReinvent\VaahCms\Models\User;
 use WebReinvent\VaahCms\Libraries\VaahSeeder;
 use Carbon\Carbon;
+// For export csv
+use Maatwebsite\Excel\Facades\Excel;
+use App\Export\ExportAppointments;
+
+
 
 class Appointment extends VaahModel
 {
@@ -953,6 +958,11 @@ class Appointment extends VaahModel
         }
     }
 
+    //-------------------------------------------------
+    public static function exportAppointments()
+    {
+        return Excel::download(new ExportAppointments,'appointments.csv');
+    }
 
     //-------------------------------------------------
     //-------------------------------------------------
