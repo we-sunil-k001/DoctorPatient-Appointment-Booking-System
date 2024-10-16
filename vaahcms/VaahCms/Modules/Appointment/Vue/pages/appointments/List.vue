@@ -168,9 +168,12 @@ const visible = ref(false);
                     <Button type="button" severity="success" label="Save" @click="visible = false" class="w-full"></Button>
                 </div>
 
-                <div class="text-align-center">
+                <div class="text-align-center flex justify-content-center">
                   <br>
-                    <label class="font-semibold">Download a sample CSV with format</label>
+                    <label class="font-semibold mt-3" @click="store.exportAppointments()"
+                           style="cursor: pointer; color: dodgerblue"
+                    >Download a sample CSV with format</label>
+
                 </div>
 
             </Dialog>
