@@ -66,7 +66,11 @@ export const usedoctorStore = defineStore({
         item_menu_list: [],
         item_menu_state: null,
         form_menu_list: [],
-        end_time_temp: null
+        end_time_temp: null,
+
+        //Import File
+        file_to_upload: null,
+        file_date: null,
     }),
     getters: {
 
@@ -1000,8 +1004,83 @@ export const usedoctorStore = defineStore({
             // Return the updated time
             return `${updatedHours}:${formattedMinutes} ${updatedPeriod}`;
 
-        }
+        },
 
+        // Import CSV -----------------------------------------------------------
+
+        // Function to convert CSV to JSON
+        async csvToJson(csv) {
+            const lines = csv.split('\n');
+            const result = [];
+
+            // Get the headers
+            const headers = lines[0].split(',').map((header) => header.trim());
+
+            // Iterate through the rows
+            for (let i = 1; i < lines.length; i++) {
+                const obj = {};
+                const currentline = lines[i].split(',').map((value) => value.trim());
+
+                for (let j = 0; j < headers.length; j++) {
+                    obj[headers[j]] = currentline[j]; // Create key-value pairs
+                }
+
+                result.push(obj);
+            }
+
+            return result; // Return the JSON array
+        },
+
+        // Capture the file when it is selected
+        async onFileSelect(event) {
+            const file = event.files[0]; // Get the first selected file
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const text = e.target.result;
+                    const jsonData = await this.csvToJson(text); // Convert CSV to JSON
+                    this.file_date = jsonData; // Store JSON data
+                    this.file_to_upload = file; // Store the selected file
+                    console.log('Converted JSON data:', this.file_date); // Debugging log
+                };
+                reader.readAsText(file); // Read the file as text
+            }
+        },
+
+        // Trigger backend upload
+        async uploadFile() {
+            if (!this.file_to_upload) {
+                alert("Please select a file before uploading.");
+                return;
+            }
+
+            let url = this.ajax_url + '/bulk-import';
+
+            // Convert the CSV data to JSON before making the request
+            let param = this.file_date;
+
+            console.log(param);
+
+            let options = {
+                method: 'POST', // Specify the method
+                headers: {
+                    'Content-Type': 'application/json', // Ensure JSON format is sent
+                },
+                params: param,
+            };
+
+            try {
+                const response =await vaah().ajax(
+                    url,
+                    this.getItemAfter(),
+                    options
+                );
+                alert(response); // Handle the response from the server
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
 
 //---------------------------------------------------------------------
     }
