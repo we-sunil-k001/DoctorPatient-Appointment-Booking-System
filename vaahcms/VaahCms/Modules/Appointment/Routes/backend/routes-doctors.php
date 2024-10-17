@@ -5,9 +5,9 @@ use VaahCms\Modules\Appointment\Http\Controllers\Backend\doctorsController;
 Route::group(
     [
         'prefix' => 'backend/appointment/doctors',
-        
+
         'middleware' => ['web', 'has.backend.access'],
-        
+
 ],
 function () {
     /**
@@ -30,8 +30,6 @@ function () {
      */
     Route::delete('/', [doctorsController::class, 'deleteList'])
         ->name('vh.backend.appointment.doctors.list.delete');
-
-
     /**
      * Fill Form Inputs
      */
@@ -70,6 +68,12 @@ function () {
      */
     Route::any('/{id}/action/{action}', [doctorsController::class, 'itemAction'])
         ->name('vh.backend.appointment.doctors.item.action');
+
+
+    /**
+     * To Import from CSV
+     */
+    Route::post('/bulk-import', [doctorsController::class, 'uploadFile']);
 
     //---------------------------------------------------------
 
