@@ -5,12 +5,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Faker\Factory;
+use Maatwebsite\Excel\Facades\Excel;
 use WebReinvent\VaahCms\Models\VaahModel;
 use WebReinvent\VaahCms\Traits\CrudWithUuidObservantTrait;
 use WebReinvent\VaahCms\Models\User;
 use WebReinvent\VaahCms\Libraries\VaahSeeder;
 use Carbon\Carbon;
 use WebReinvent\VaahCms\Libraries\VaahMail;
+// For export File
+use Illuminate\Support\Facades\Validator;
+use App\Import\ImportDoctors;
 
 
 class doctor extends VaahModel
@@ -996,6 +1000,45 @@ class doctor extends VaahModel
             VaahMail::dispatchGenericMail($subject, $email_content_for_doctor, $doctor_email);
         }
     }
+
+    //-------------------------------------------------
+    public static function uploadFile(Request $request)
+    {
+        // Get the JSON data from the request body
+        $data = $request->json()->all();
+
+        dd($data);
+
+        // Initialize an array to hold the emails already inserted
+        $existingEmails = [];
+
+        // Initialize a counter for skipped records
+        $skippedCount = 0;
+
+        // Insert the validated data into the database
+        foreach ($data as $row) {
+            // Check if the email already exists
+            if (in_array($row['email'], $existingEmails) || Doctor::where('email', $row['email'])->exists()) {
+                // Increment skipped count and continue to the next record
+                $skippedCount++;
+                continue;
+            }
+
+            // Create the doctor record
+            Doctor::create($row);
+
+            // Add the email to the existing emails array
+            $existingEmails[] = $row['email'];
+        }
+
+        return response()->json([
+            'message' => 'File uploaded and data imported successfully.',
+            'skipped' => $skippedCount,
+        ]);
+    }
+
+
+
 
 
 
