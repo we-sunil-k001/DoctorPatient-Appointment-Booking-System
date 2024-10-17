@@ -32,8 +32,8 @@ class ExportAppointments implements FromCollection, WithHeadings
 
                 return [
                     'ID' => $appointment->id,
-                    'Patient_Name' =>  $patient['name'] ?? 'N/A',
-                    'Doctor_Name' => $doctor['name'] ?? 'N/A',
+                    'Patient Name' =>  $patient['name'] ?? 'N/A',
+                    'Doctor Name' => $doctor['name'] ?? 'N/A',
                     'Appointment Date' => Carbon::parse(self::convertDateUTCtoIST($appointment->appointment_date))->format('Y-m-d'),
                     'Appointment Time' => Carbon::parse(self::convertUTCtoIST12Hrs($appointment->appointment_time))->format('h:i A'),
                     'Reason for Visit' => $appointment->reason_for_visit,
