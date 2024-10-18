@@ -236,11 +236,14 @@ class AppointmentsController extends Controller
         }
     }
     //----------------------------------------------------------
-    //Custom Fuction
-    public function getDashboardStats(Request $request)
+    //Custom functions
+
+    //----------------------------------------------------------
+    public function getDoctorsAppoint (Request $request,$id)
     {
         try{
-            return Appointment::getDashboardStats($request);
+            return Appointment::getDoctorsAppoint($id);
+
         }catch (\Exception $e){
             $response = [];
             $response['success'] = false;

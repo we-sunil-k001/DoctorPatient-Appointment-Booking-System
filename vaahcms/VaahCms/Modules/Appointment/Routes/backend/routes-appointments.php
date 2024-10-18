@@ -44,7 +44,13 @@ function () {
     Route::post('/', [AppointmentsController::class, 'createItem'])
         ->name('vh.backend.appointment.appointments.create');
 
-    //Custom routes---------------------------------------------------------
+    /**
+     * Get Appointment details based on doctor id
+     */
+    Route::get('doctors_appoint/{id}', [AppointmentsController::class, 'getDoctorsAppoint'])
+        ->name('vh.backend.appointment.appointments.read');
+
+  //Custom routes---------------------------------------------------------
     /**
      * get Dashboard Stats
      */

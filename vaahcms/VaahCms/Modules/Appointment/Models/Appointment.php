@@ -372,14 +372,12 @@ class Appointment extends VaahModel
         $list->searchFilter($request->filter);
         $rows = config('vaahcms.per_page');
 
-        // Specify the columns you want to retrieve from the relationships
         $list->with([
-            'doctor:id,name,charges', // Replace 'name' with any other fields you need from the doctor table
-            'patient:id,name'  // Replace 'name' with any other fields you need from the patient table
+            'doctor:id,name,charges',
+            'patient:id,name'
         ]);
 
-        // Select specific columns from the database
-        $list = $list->select('id','doctor_id','patient_id','status', 'reason_for_visit','appointment_date','appointment_time',
+        $list = $list->select('id','doctor_id','patient_id','status', 'reason_for_visit','appointment_date','appointment_time'
             )
             ->withTrashed();
 
@@ -959,6 +957,42 @@ class Appointment extends VaahModel
             VaahMail::dispatchGenericMail($subject, $email_content_for_doctor, $doctor_email);
         }
     }
+
+    // Function to fetch Appointments through Doctors id
+    public static function getDoctorsAppoint($id)
+    {
+        $appointments = Appointment::where('doctor_id', $id)->get();
+
+        // If no appointments are found, return the doctor's name
+        if ($appointments->isEmpty()) {
+            $doctor = Doctor::find($id);
+            $doctor_name = $doctor ? $doctor->name : null;
+
+            return [
+                'success' => false,
+                'message' => 'No appointments found for the Doctor',
+                'data' => [
+                    'doctor_name' => $doctor_name,
+                ],
+            ];
+        }
+
+        foreach ($appointments as $appointment) {
+            $doctor = Doctor::find($appointment->doctor_id);
+            $patient = Patient::find($appointment->patient_id);
+
+            $appointment->doctor_name = $doctor ? $doctor->name : null;
+            $appointment->charges = $doctor ? $doctor->charges : null;
+            $appointment->patient_name = $patient ? $patient->name : null;
+
+            // Convert working hours from UTC to IST
+            $appointment->appointment_date = self::convertDateUTCtoIST($appointment->appointment_date);
+            $appointment->appointment_time = self::convertUTCtoIST12Hrs($appointment->appointment_time);
+        }
+
+        return $appointments;
+    }
+
 
 
     //-------------------------------------------------
