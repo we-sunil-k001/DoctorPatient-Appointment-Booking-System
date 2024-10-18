@@ -11,15 +11,14 @@ class ExportAppointments implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
-            'ID',
             "Patient's Name",
+            "Patient's Email",
             "Doctor's Name",
+            "Doctor's Email",
             'Appointment Date',
             'Appointment Time',
             'Medical Concern',
-            'Status',
-            'Created_at',
-            'Updated_at'
+
         ];
     }
     public function collection()
@@ -31,15 +30,14 @@ class ExportAppointments implements FromCollection, WithHeadings
                 $patient = Patient::find($appointment['patient_id']);
 
                 return [
-                    'ID' => $appointment->id,
                     'Patient Name' =>  $patient['name'] ?? 'N/A',
+                    'Patient Email' =>  $patient['email'] ?? 'N/A',
                     'Doctor Name' => $doctor['name'] ?? 'N/A',
+                    'Doctor Email' => $doctor['email'] ?? 'N/A',
                     'Appointment Date' => Carbon::parse(self::convertDateUTCtoIST($appointment->appointment_date))->format('Y-m-d'),
                     'Appointment Time' => Carbon::parse(self::convertUTCtoIST12Hrs($appointment->appointment_time))->format('h:i A'),
                     'Reason for Visit' => $appointment->reason_for_visit,
-                    'Status' => $appointment->status,
-                    'Created At' => Carbon::parse($appointment->created_at)->format('Y-m-d h:i:s A'),
-                    'Updated At' => Carbon::parse($appointment->updated_at)->format('Y-m-d h:i:s A'),
+
                 ];
             });
     }
