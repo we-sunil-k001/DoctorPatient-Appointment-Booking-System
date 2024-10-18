@@ -50,6 +50,13 @@ function () {
     Route::get('doctors_appoint/{id}', [AppointmentsController::class, 'getDoctorsAppoint'])
         ->name('vh.backend.appointment.appointments.read');
 
+  //Custom routes---------------------------------------------------------
+    /**
+     * get Dashboard Stats
+     */
+    Route::get('/stats', [AppointmentsController::class, 'getDashboardStats']);
+    //---------------------------------------------------------
+
     /**
      * Get Item
      */
@@ -79,5 +86,8 @@ function () {
         ->name('vh.backend.appointment.appointments.item.action');
 
     //---------------------------------------------------------
+
+
+
 
 });

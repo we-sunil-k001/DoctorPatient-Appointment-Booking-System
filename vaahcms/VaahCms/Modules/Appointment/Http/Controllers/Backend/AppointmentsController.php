@@ -236,7 +236,6 @@ class AppointmentsController extends Controller
         }
     }
     //----------------------------------------------------------
-
     //Custom functions
 
     //----------------------------------------------------------
@@ -244,6 +243,7 @@ class AppointmentsController extends Controller
     {
         try{
             return Appointment::getDoctorsAppoint($id);
+
         }catch (\Exception $e){
             $response = [];
             $response['success'] = false;
