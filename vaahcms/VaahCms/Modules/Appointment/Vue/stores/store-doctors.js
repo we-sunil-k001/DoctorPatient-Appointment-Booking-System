@@ -1059,8 +1059,6 @@ export const usedoctorStore = defineStore({
             // Convert the CSV data to JSON before making the request
             let param = this.file_date;
 
-            console.log(param);
-
             let options = {
                 method: 'POST', // Specify the method
                 headers: {
@@ -1075,7 +1073,6 @@ export const usedoctorStore = defineStore({
                     this.getItemAfter(),
                     options
                 );
-                alert(response); // Handle the response from the server
 
             } catch (error) {
                 console.error('Error:', error);

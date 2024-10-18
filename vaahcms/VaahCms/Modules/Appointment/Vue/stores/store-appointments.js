@@ -66,8 +66,18 @@ export const useAppointmentStore = defineStore({
         list_create_menu: [],
         item_menu_list: [],
         item_menu_state: null,
-        form_menu_list: []
-        // doctor_details: null
+        form_menu_list: [],
+        //Import File --------
+        file_to_upload: null,
+        file_date: null,
+        // Variables to store selected dropdown options and CSV data
+        csv_headers : [],
+        csv_data : [],
+        selected_patient_name : null,
+        selected_patient_email : null,
+        selected_doctor_name : null,
+        selected_doctor_email : null,
+        selected_appointment_date : null
 
     }),
     getters: {
@@ -985,7 +995,67 @@ export const useAppointmentStore = defineStore({
             } catch (error) {
                 console.error('Error occurred while downloading the file:', error);
             }
+        },
+
+        // Import CSV -----------------------------------------------------------
+
+        // Function to convert CSV to JSON
+        async csvToJson(csv) {
+            const lines = csv.split('\n');
+            const headers = lines[0].split(',').map((header) => header.trim());  // Extract headers
+            const data = [];
+
+            // Extract rows as objects
+            for (let i = 1; i < lines.length; i++) {
+                const currentline = lines[i].split(',').map((value) => value.trim());
+                const obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = currentline[index];
+                });
+                data.push(obj);
+            }
+
+            return { headers, data };
+        },
+
+        // Capture the file when it is selected
+        async onFileSelect(event) {
+            const file = event.files[0];
+            console.log(event);
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const text = e.target.result;
+                    const { headers, data } = await this.csvToJson(text); // Convert CSV to JSON
+                    this.csv_headers = headers.map(header => ({ label: header, value: header }));  // Map headers for dropdowns
+                    this.csv_data = data;  // Store CSV rows
+                };
+                reader.readAsText(file);
+            }
+        },
+
+        // Trigger backend upload
+        async submitData() {
+            if (!selected_patient_name.value || !selected_patient_email.value || !selected_doctor_name.value || !selected_doctor_email.value || !selected_appointment_date.value) {
+                alert("Please select all headers.");
+                return;
+            }
+
+            // Prepare data to submit by mapping selected headers to CSV rows
+            const submissionData = csv_data.value.map(row => ({
+                patient_name: row[selected_patient_name.value],
+                patient_email: row[selected_patient_email.value],
+                doctor_name: row[selected_doctor_name.value],
+                doctor_email: row[selected_doctor_email.value],
+                appointment_date: row[selected_appointment_date.value]
+            }));
+
+            // POST request to send data to the server
+            console.log('Submission Data:', submissionData);
+            // You can replace the above line with an Axios POST request to your API:
+            // axios.post('/api/appointments', submissionData).then(...).catch(...);
         }
+
 
 
     }
