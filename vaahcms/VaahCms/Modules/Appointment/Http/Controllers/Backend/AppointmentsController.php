@@ -238,12 +238,13 @@ class AppointmentsController extends Controller
     //----------------------------------------------------------
     //Custom functions
 
+    // Custom function --------------------------------------------
+
     //----------------------------------------------------------
     public function getDoctorsAppoint (Request $request,$id)
     {
         try{
             return Appointment::getDoctorsAppoint($id);
-
         }catch (\Exception $e){
             $response = [];
             $response['success'] = false;
@@ -256,5 +257,6 @@ class AppointmentsController extends Controller
             return $response;
         }
     }
+    //----------------------------------------------------------
 
 }

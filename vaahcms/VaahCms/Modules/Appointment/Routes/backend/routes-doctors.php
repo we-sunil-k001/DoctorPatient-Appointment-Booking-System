@@ -5,9 +5,9 @@ use VaahCms\Modules\Appointment\Http\Controllers\Backend\doctorsController;
 Route::group(
     [
         'prefix' => 'backend/appointment/doctors',
-        
+
         'middleware' => ['web', 'has.backend.access'],
-        
+
 ],
 function () {
     /**
@@ -15,6 +15,12 @@ function () {
      */
     Route::get('/assets', [doctorsController::class, 'getAssets'])
         ->name('vh.backend.appointment.doctors.assets');
+    /**
+     * Get Filter parameters
+     */
+    Route::get('/filter', [doctorsController::class, 'getDoctorFilterParameter']);
+
+    /**
     /**
      * Get List
      */

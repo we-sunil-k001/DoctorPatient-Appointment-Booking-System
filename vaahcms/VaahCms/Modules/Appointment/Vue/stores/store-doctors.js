@@ -1,4 +1,4 @@
-import {watch} from 'vue'
+import {watch,ref} from 'vue'
 import {acceptHMRUpdate, defineStore} from 'pinia'
 import qs from 'qs'
 import {vaah} from '../vaahvue/pinia/vaah'
@@ -18,6 +18,7 @@ let empty_states = {
             is_active: null,
             trashed: null,
             sort: null,
+            charges: null,
         },
     },
     action: {
@@ -67,6 +68,12 @@ export const usedoctorStore = defineStore({
         item_menu_state: null,
         form_menu_list: [],
         end_time_temp: null,
+        //addional filters
+        charges: [],
+        specialization: [],
+        selected_specialization: [],
+        filter_parameter: [],
+
         //sidebar
         visible: false,
         // to get appointment data
@@ -98,6 +105,10 @@ export const usedoctorStore = defineStore({
              * Update query state with the query parameters of url
              */
             await this.updateQueryFromUrl(route);
+            /**
+             * get Parameter such as specialization, price and time
+             */
+            await this.fetchDoctorFilterParameter();
         },
         //---------------------------------------------------------------------
         setRowClass(data){
@@ -1008,6 +1019,12 @@ export const usedoctorStore = defineStore({
         },
 
         // Get all Appointments related to particular doctor
+        async fetchDoctorFilterParameter() {
+
+            const response = await vaah().ajax(ajax_url+'/filter');
+            this.specialization = response.data.specializations; // Extract unique specializations
+            this.changes = [0,response.data.max_charges];
+        },
         async fetchDoctorAppointments(doctor_id) {
             this.selected_doctor = doctor_id;
             this.visible = true;

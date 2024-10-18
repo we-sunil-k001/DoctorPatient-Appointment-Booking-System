@@ -37,7 +37,77 @@ const store = usedoctorStore();
 
                 </template>
 
-            <VhFieldVertical >
+
+                <VhFieldVertical >
+                    <template #label>
+                        <b>Charges</b>
+                    </template>
+
+                    <div class="field-radiobutton" style="display: block">
+                        <Slider v-model="store.query.filter.charges" :min="0" :max="200" range class="w-full"/>
+                        <!-- Validation to avoid reading undefined -->
+                        <p v-if="store.query.filter.charges && store.query.filter.charges.length > 0">
+                            ₹{{ store.query.filter.charges[0] }} - ₹{{ store.query.filter.charges[1] }}
+                        </p>
+                    </div>
+
+                </VhFieldVertical>
+
+
+                <VhFieldVertical >
+                    <template #label>
+                        <b>Working Hours</b>
+                    </template>
+
+                    <div class="field-radiobutton" style="display: flex ">
+                        <Calendar
+                                v-model="store.query.filter.working_hours_start"
+                            timeOnly
+                            hourFormat="12"
+                            showIcon
+                            placeholder="Select time"
+                            name="working_hours_start"
+                            :step-minute="5"
+                        ></Calendar>
+                        &nbsp to &nbsp
+                        <Calendar
+                            v-model="store.query.filter.working_hours_end"
+                            timeOnly
+                            hourFormat="12"
+                            showIcon
+                            placeholder="Select time"
+                            name="working_hours_start"
+                            :step-minute="5"
+                        ></Calendar>
+                    </div>
+
+                </VhFieldVertical>
+
+
+                <VhFieldVertical >
+                    <template #label>
+                        <b>Specialization</b>
+                    </template>
+
+                    <div class="field-radiobutton">
+                        <div class="flex flex-column gap-3">
+                            <div v-for="spec in store.specialization" :key="spec" class="flex align-items-center">
+                                <Checkbox
+                                    v-model="store.query.filter.selected_specialization"
+                                    :inputId="spec"
+                                    name="specialization"
+                                    :value="spec"
+                                />
+                                &nbsp;&nbsp; <label :for="spec">{{ spec }}</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </VhFieldVertical>
+
+                <Divider/>
+
+                <VhFieldVertical >
                 <template #label>
                     <b>Sort By:</b>
                 </template>

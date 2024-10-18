@@ -243,7 +243,6 @@ class doctor extends VaahModel
     //-------------------------------------------------
     public function scopeIsActiveFilter($query, $filter)
     {
-
         if(!isset($filter['is_active'])
             || is_null($filter['is_active'])
             || $filter['is_active'] === 'null'
@@ -309,6 +308,9 @@ class doctor extends VaahModel
         $list->isActiveFilter($request->filter);
         $list->trashedFilter($request->filter);
         $list->searchFilter($request->filter);
+        $list->chargesFilter($request->filter);
+        $list->workingHoursFilter($request->filter);
+        $list->specializationFilter($request->filter);
 
         // Select specific columns from the database
         $list = $list->select('id','name', 'email', 'phone_number', 'specialization','working_hours_start','working_hours_end',
@@ -998,6 +1000,77 @@ class doctor extends VaahModel
         {
             VaahMail::dispatchGenericMail($subject, $email_content_for_doctor, $doctor_email);
         }
+    }
+
+    //-------------------------------------------------
+    public static function getDoctorFilterParameter()
+    {
+        $specializations = self::select('specialization')
+            ->distinct()
+            ->pluck('specialization');
+
+        // Fetch the maximum charges
+        $maxCharges = self::max('charges');
+
+        return [
+            'specializations' => $specializations,
+            'max_charges' => $maxCharges,
+        ];
+    }
+
+
+    //-------------------------------------------------
+    public function scopechargesFilter($query, $filter)
+    {
+        // Retrieving the charges range from the filter
+        $charges_start = isset($filter['charges'][0]) ? $filter['charges'][0] : null;
+        $charges_end = isset($filter['charges'][1]) ? $filter['charges'][1] : null;
+
+        if ($charges_start !== null && $charges_end !== null) {
+            return $query->whereBetween('charges', [$charges_start, $charges_end]);
+        }
+
+        return $query;
+
+    }
+
+
+    //-------------------------------------------------
+    public function scopeworkingHoursFilter($query, $filter)
+    {
+        $working_hours_start = isset($filter['working_hours_start']) ? $filter['working_hours_start'] : null;
+        $working_hours_end = isset($filter['working_hours_end']) ? $filter['working_hours_end'] : null;
+
+        $formatted_start = $working_hours_start ? date('H:i:00', strtotime($working_hours_start)) : null;
+        $formatted_end = $working_hours_end ? date('H:i:00', strtotime($working_hours_end)) : null;
+
+        // Case 1: If both start and end are provided
+        if ($formatted_start && $formatted_end) {
+            $query->whereTime('working_hours_start', '>=', $formatted_start)
+                ->whereTime('working_hours_end', '<=', $formatted_end);
+        }
+        // Case 2: If only start time is provided
+        elseif ($formatted_start) {
+            $query->whereTime('working_hours_start', '>=', $formatted_start);
+        }
+        // Case 3: If only end time is provided
+        elseif ($formatted_end) {
+            $query->whereTime('working_hours_end', '<=', $formatted_end);
+        }
+
+        return $query;
+    }
+
+
+    //-------------------------------------------------
+    public function scopespecializationFilter($query, $filter)
+    {
+        // Check if 'selected_specialization' exists and is an array
+        if (isset($filter['selected_specialization']) && is_array($filter['selected_specialization'])) {
+            $query->whereIn('specialization', $filter['selected_specialization']);
+        }
+
+        return $query;
     }
 
 
