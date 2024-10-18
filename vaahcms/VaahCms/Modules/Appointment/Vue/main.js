@@ -17,6 +17,8 @@ import Toast from 'primevue/toast';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 import Dialog from 'primevue/dialog';
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
 
 //-------------/PrimeVue Imports
 
@@ -76,6 +78,8 @@ app.component('Menu', Menu);
 app.component('ProgressBar', ProgressBar);
 app.component('Toast', Toast);
 app.component('Dialog', Dialog);
+app.component('TabView', TabView);
+app.component('TabPanel', TabPanel);
 //-------------/PrimeVue Use
 
 // -------------CRUD PrimeVue Use
