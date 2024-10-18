@@ -3,6 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="4c206a1b-eb6b-4ab8-8c0b-29a9685b2b10" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vaahcms/VaahCms/Modules/Appointment/Models/doctor.php" beforeDir="false" afterPath="$PROJECT_DIR$/vaahcms/VaahCms/Modules/Appointment/Models/doctor.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vaahcms/VaahCms/Modules/Appointment/Vue/pages/dashboard/Dashboard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/vaahcms/VaahCms/Modules/Appointment/Vue/pages/dashboard/Dashboard.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vaahcms/VaahCms/Modules/Appointment/Vue/routes/vue-routes-dashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/vaahcms/VaahCms/Modules/Appointment/Vue/routes/vue-routes-dashboard.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -184,7 +187,25 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RunManager">
+    <configuration name="dev-appointment" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/vaahcms/VaahCms/Modules/Appointment/Vue/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev-appointment" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.dev-appointment" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -198,6 +219,7 @@
       <workItem from="1727146494075" duration="25000" />
       <workItem from="1727669081867" duration="23000" />
       <workItem from="1727669116983" duration="7000" />
+      <workItem from="1728605147642" duration="564000" />
     </task>
     <servers />
   </component>

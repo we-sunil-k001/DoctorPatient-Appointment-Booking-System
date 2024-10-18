@@ -38,6 +38,13 @@ import Tag from "primevue/tag";
 import Calendar from "primevue/calendar";
 import Dropdown from 'primevue/dropdown';
 import InputNumber from 'primevue/inputnumber';
+import Card from 'primevue/card';
+import Chart from 'primevue/chart';
+import Sidebar from 'primevue/sidebar';
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
+
+
 
 //-------------/CRUD PrimeVue Imports
 
@@ -96,6 +103,12 @@ app.component('Tag', Tag);
 app.component('Calendar', Calendar);
 app.component('Dropdown',Dropdown);
 app.component('InputNumber',InputNumber);
+app.component('Card',Card);
+app.component('Chart',Chart);
+app.component('Sidebar',Sidebar);
+app.component('TabView',TabView);
+app.component('TabPanel',TabPanel);
+
 
 //-------------/CRUD PrimeVue Use
 

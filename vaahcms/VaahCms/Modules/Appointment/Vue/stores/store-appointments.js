@@ -944,6 +944,7 @@ export const useAppointmentStore = defineStore({
 
         //-------------------------------------------------------------
         //Custom functions below
+
         // async fetchDoctorDetails(event)
         // {
         //     alert("hello");
@@ -962,6 +963,14 @@ export const useAppointmentStore = defineStore({
         //         doctor_details.value = null; // Reset if no doctor is selected
         //     }
         // },
+
+        async getDashboardStats() {
+            const response = await vaah().ajax(
+                ajax_url + '/stats'
+            );
+            this.getItemAfter(response);
+        },
+
         //---------------------------------------------------------------------
     }
 });

@@ -72,8 +72,13 @@ export const usedoctorStore = defineStore({
         charges: [],
         specialization: [],
         selected_specialization: [],
-        filter_parameter: []
+        filter_parameter: [],
 
+        //sidebar
+        visible: false,
+        // to get appointment data
+        selected_doctor: [],
+        appointments: []
     }),
     getters: {
 
@@ -1019,6 +1024,12 @@ export const usedoctorStore = defineStore({
             const response = await vaah().ajax(ajax_url+'/filter');
             this.specialization = response.data.specializations; // Extract unique specializations
             this.changes = [0,response.data.max_charges];
+        },
+        async fetchDoctorAppointments(doctor_id) {
+            this.selected_doctor = doctor_id;
+            this.visible = true;
+            const response = await vaah().ajax('backend/appointment/appointments/doctors_appoint/' + this.selected_doctor);
+            this.appointments = response;
         }
 
 

@@ -236,10 +236,12 @@ class AppointmentsController extends Controller
         }
     }
     //----------------------------------------------------------
+    //Custom functions
 
     // Custom function --------------------------------------------
-    //-----------------------------------------------------------
-    public function getDoctorsAppoint(Request $request, $id)
+
+    //----------------------------------------------------------
+    public function getDoctorsAppoint (Request $request,$id)
     {
         try{
             return Appointment::getDoctorsAppoint($id);
@@ -256,4 +258,5 @@ class AppointmentsController extends Controller
         }
     }
     //----------------------------------------------------------
+
 }
