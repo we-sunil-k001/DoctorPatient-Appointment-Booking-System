@@ -11,10 +11,10 @@ class ExportAppointments implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
-            "Patient's Name",
-            "Patient's Email",
-            "Doctor's Name",
-            "Doctor's Email",
+            "Patient Name",
+            "Patient Email",
+            "Doctor Name",
+            "Doctor Email",
             'Appointment Date',
             'Appointment Time',
             'Medical Concern',
