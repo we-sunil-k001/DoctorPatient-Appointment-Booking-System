@@ -67,6 +67,12 @@ export const useAppointmentStore = defineStore({
         item_menu_list: [],
         item_menu_state: null,
         form_menu_list: [],
+        //Tab View --------------
+        visible: false,
+        activeTabIndex : 0,
+        tabs: [{ header: 'Bulk Import', disabled: false },
+            { header: 'Column Mapping', disabled: true },
+            { header: 'Successfully Imported', disabled: true }],
         //Import File --------
         file_to_upload: null,
         file_date: null,
@@ -77,7 +83,9 @@ export const useAppointmentStore = defineStore({
         selected_patient_email : null,
         selected_doctor_name : null,
         selected_doctor_email : null,
-        selected_appointment_date : null
+        selected_medical_concern : null,
+        selected_appointment_date : null,
+        selected_appointment_time : null
 
     }),
     getters: {
@@ -253,8 +261,9 @@ export const useAppointmentStore = defineStore({
             if(data)
             {
                 this.item = data;
+                this.end_time_temp = data.working_hours_end;
             }else{
-                this.$router.push({name: 'appointments.index',query:this.query});
+                this.$router.push({name: 'doctors.index',query:this.query});
             }
             await this.getItemMenu();
             await this.getFormMenu();
@@ -450,12 +459,12 @@ export const useAppointmentStore = defineStore({
                 case 'create-and-close':
                 case 'save-and-close':
                     this.setActiveItemAsEmpty();
-                    this.$router.push({name: 'appointments.index',query:this.query});
+                    this.$router.push({name: 'doctors.index',query:this.query});
                     break;
                 case 'save-and-clone':
                 case 'create-and-clone':
                     this.item.id = null;
-                    this.$router.push({name: 'appointments.form',query:this.query,params: { id: null }});
+                    this.$router.push({name: 'doctors.form',query:this.query,params: { id: null }});
                     await this.getFormMenu();
                     break;
                 case 'trash':
@@ -630,21 +639,20 @@ export const useAppointmentStore = defineStore({
         //---------------------------------------------------------------------
         closeForm()
         {
-            this.$router.push({name: 'appointments.index',query:this.query})
+            this.$router.push({name: 'doctors.index',query:this.query})
         },
         //---------------------------------------------------------------------
         toList()
         {
             this.item = vaah().clone(this.assets.empty_item);
-            this.$router.push({name: 'appointments.index',query:this.query})
+            this.$router.push({name: 'doctors.index',query:this.query})
         },
-
         //---------------------------------------------------------------------
         toForm()
         {
             this.item = vaah().clone(this.assets.empty_item);
             this.getFormMenu();
-            this.$router.push({name: 'appointments.form',query:this.query})
+            this.$router.push({name: 'doctors.form',query:this.query})
         },
         //---------------------------------------------------------------------
         toView(item)
@@ -652,7 +660,7 @@ export const useAppointmentStore = defineStore({
             if(!this.item || !this.item.id || this.item.id !== item.id){
                 this.item = vaah().clone(item);
             }
-            this.$router.push({name: 'appointments.view', params:{id:item.id},query:this.query})
+            this.$router.push({name: 'doctors.view', params:{id:item.id},query:this.query})
         },
         //---------------------------------------------------------------------
         toEdit(item)
@@ -660,7 +668,7 @@ export const useAppointmentStore = defineStore({
             if(!this.item || !this.item.id || this.item.id !== item.id){
                 this.item = vaah().clone(item);
             }
-            this.$router.push({name: 'appointments.form', params:{id:item.id},query:this.query})
+            this.$router.push({name: 'doctors.form', params:{id:item.id},query:this.query})
         },
         //---------------------------------------------------------------------
         isViewLarge()
@@ -688,13 +696,7 @@ export const useAppointmentStore = defineStore({
 
             return text;
         },
-
         //---------------------------------------------------------------------
-        hasPermission(permissions, slug) {
-            return vaah().hasPermission(permissions, slug);
-        },
-        //---------------------------------------------------------------------
-
         async getListSelectedMenu()
         {
             this.list_selected_menu = [
@@ -951,28 +953,147 @@ export const useAppointmentStore = defineStore({
 
         },
 
+        //Custom function ------------------------------------
 
-        //-------------------------------------------------------------
-        //Custom functions below
-        // async fetchDoctorDetails(event)
-        // {
-        //     alert("hello");
-        //     return "hello";
-        //     const selectedDoctorId = event.value; // Get the selected doctor ID
-        //     if (selectedDoctorId) {
-        //         try {
-        //             // Fetch doctor details from your API or data source
-        //             const response = await axios.get(`backend/appointment/doctors/${selectedDoctorId}`);
-        //             doctor_details.value = response.data; // Store the fetched data
-        //         } catch (error) {
-        //             console.error('Error fetching doctor details:', error);
-        //             doctor_details.value = null; // Reset if there's an error
-        //         }
-        //     } else {
-        //         doctor_details.value = null; // Reset if no doctor is selected
-        //     }
-        // },
-        //---------------------------------------------------------------------
+        //Convert to 12-Hour Format
+        formatTime(dateString) {
+            const date = new Date(dateString);
+            let hours = date.getHours();
+            const minutes = date.getMinutes();
+
+            const period = hours >= 12 ? 'pm' : 'am';
+            hours = hours % 12 || 12; // Convert to 12-hour format
+            const formattedMinutes = minutes < 10 ? '0' + minutes : minutes; // Add leading zero if needed
+
+            return `${hours}:${formattedMinutes} ${period}`;
+        },
+
+        //Function to Convert time like 10:00 am to UTC
+        convertToUTC(timeString) {
+            const date = new Date();
+            const [time, period] = timeString.split(' ');
+            let [hours, minutes] = time.split(':').map(Number);
+
+            // Convert to 24-hour format
+            if (period.toLowerCase() === 'pm' && hours !== 12) hours += 12;
+            if (period.toLowerCase() === 'am' && hours === 12) hours = 0;
+
+            // Set the current date with the converted time
+            date.setHours(hours, minutes, 0, 0);
+
+            return date.toISOString(); // Return UTC in ISO format
+        },
+
+        // Add minutes in the existing time
+        addMinutesToTime(time, minutesToAdd) {
+
+            //Split the time into hours, minutes, and period (AM/PM)
+            const [timePart, period] = time.split(' ');
+            let [hours, minutes] = timePart.split(':').map(Number);
+
+
+            // Convert to 24-hour format for easier calculations
+            if (period === 'pm' && hours !== 12) hours += 12;
+            if (period === 'am' && hours === 12) hours = 0;
+
+            // Create a new Date object and set the time
+            const date = new Date();
+            date.setHours(hours);
+            date.setMinutes(minutes);
+
+
+            // Add the specified minutes
+            date.setMinutes(date.getMinutes() + minutesToAdd);
+
+            // Get the updated hours and minutes
+            let updatedHours = date.getHours();
+            const updatedMinutes = date.getMinutes();
+
+
+            // Convert back to 12-hour format
+            const updatedPeriod = updatedHours >= 12 ? 'pm' : 'am';
+            updatedHours = updatedHours % 12 || 12; // Convert 0 hour to 12
+
+            // Format minutes to always have two digits
+            const formattedMinutes = updatedMinutes < 10 ? '0' + updatedMinutes : updatedMinutes;
+
+            // Return the updated time
+            return `${updatedHours}:${formattedMinutes} ${updatedPeriod}`;
+
+        },
+
+        // Import CSV -----------------------------------------------------------
+
+        // Function to convert CSV to JSON
+        async csvToJson(csv) {
+            const lines = csv.split('\n');
+            const result = [];
+
+            // Get the headers
+            const headers = lines[0].split(',').map((header) => header.trim());
+
+            // Iterate through the rows
+            for (let i = 1; i < lines.length; i++) {
+                const obj = {};
+                const currentline = lines[i].split(',').map((value) => value.trim());
+
+                for (let j = 0; j < headers.length; j++) {
+                    obj[headers[j]] = currentline[j]; // Create key-value pairs
+                }
+
+                result.push(obj);
+            }
+
+            return result; // Return the JSON array
+        },
+
+        // Capture the file when it is selected
+        async onFileSelect(event) {
+            const file = event.files[0]; // Get the first selected file
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const text = e.target.result;
+                    const jsonData = await this.csvToJson(text); // Convert CSV to JSON
+                    this.file_date = jsonData; // Store JSON data
+                    this.file_to_upload = file; // Store the selected file
+                    console.log('Converted JSON data:', this.file_date); // Debugging log
+                };
+                reader.readAsText(file); // Read the file as text
+            }
+        },
+
+        // Trigger backend upload
+        async uploadFile() {
+            if (!this.file_to_upload) {
+                alert("Please select a file before uploading.");
+                return;
+            }
+
+            let url = this.ajax_url + '/bulk-import';
+
+            // Convert the CSV data to JSON before making the request
+            let param = this.file_date;
+
+            let options = {
+                method: 'POST', // Specify the method
+                headers: {
+                    'Content-Type': 'application/json', // Ensure JSON format is sent
+                },
+                params: param,
+            };
+
+            try {
+                const response =await vaah().ajax(
+                    url,
+                    this.getItemAfter(),
+                    options
+                );
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        },
 
         async exportAppointments() {
             try {
@@ -997,17 +1118,54 @@ export const useAppointmentStore = defineStore({
             }
         },
 
+        // Tab View back and next functions --------------------
+        moveToMappingTab(){
+            this.tabs[0].disabled = true;
+            this.tabs[1].disabled = false;
+            this.activeTabIndex = 1;
+        },
+
+        moveToSuccess(){
+            this.tabs[1].disabled = true;
+            this.tabs[2].disabled = false;
+            this.activeTabIndex = 2;
+        },
+
+        moveToUpload(){
+            this.tabs[0].disabled = true;
+            this.tabs[1].disabled = false;
+            this.activeTabIndex = 0;
+        },
+
+        closeMoveToImport(){
+            // Reset tabs to initial state
+            this.tabs[0].disabled = false;
+            this.tabs[1].disabled = true;
+            this.tabs[2].disabled = true;
+
+            // Set the active tab back to the first tab
+            this.activeTabIndex = 0;
+
+            // Close the dialog
+            this.visible = false;
+        },
+
+        onTabChange(e){
+            this.activeTabIndex = e.index;
+        },
+
         // Import CSV -----------------------------------------------------------
 
         // Function to convert CSV to JSON
         async csvToJson(csv) {
             const lines = csv.split('\n');
-            const headers = lines[0].split(',').map((header) => header.trim());  // Extract headers
+            const headers = lines[0].split(',').map((header) => header.trim().replace(/^"|"$/g, ''));  // Remove quotes from headers
+
             const data = [];
 
             // Extract rows as objects
             for (let i = 1; i < lines.length; i++) {
-                const currentline = lines[i].split(',').map((value) => value.trim());
+                const currentline = lines[i].split(',').map((value) => value.trim().replace(/^"|"$/g, '')); // Remove quotes from values
                 const obj = {};
                 headers.forEach((header, index) => {
                     obj[header] = currentline[index];
@@ -1021,7 +1179,6 @@ export const useAppointmentStore = defineStore({
         // Capture the file when it is selected
         async onFileSelect(event) {
             const file = event.files[0];
-            console.log(event);
             if (file) {
                 const reader = new FileReader();
                 reader.onload = async (e) => {
@@ -1034,30 +1191,59 @@ export const useAppointmentStore = defineStore({
             }
         },
 
-        // Trigger backend upload
-        async submitData() {
-            if (!selected_patient_name.value || !selected_patient_email.value || !selected_doctor_name.value || !selected_doctor_email.value || !selected_appointment_date.value) {
+        async uploadFile() {
+
+            this.moveToMappingTab(); // Tab Change to mapping
+
+            if (!this.selected_patient_name || !this.selected_patient_email || !this.selected_doctor_name || !this.selected_doctor_email || !this.selected_appointment_date) {
                 alert("Please select all headers.");
-                return;
             }
 
-            // Prepare data to submit by mapping selected headers to CSV rows
-            const submissionData = csv_data.value.map(row => ({
-                patient_name: row[selected_patient_name.value],
-                patient_email: row[selected_patient_email.value],
-                doctor_name: row[selected_doctor_name.value],
-                doctor_email: row[selected_doctor_email.value],
-                appointment_date: row[selected_appointment_date.value]
-            }));
+        },
 
-            // POST request to send data to the server
-            console.log('Submission Data:', submissionData);
-            // You can replace the above line with an Axios POST request to your API:
-            // axios.post('/api/appointments', submissionData).then(...).catch(...);
+        async getDataForHeader(selected_header) {
+
+            if (!selected_header){
+                alert("Please select all columns");
+            }
+            console.log(selected_header);
+
+            let result =[];
+            for (let i = 0; i < this.csv_data.length; i++) {
+                const row = this.csv_data[i];
+                // Ensure that the header exists in the row before accessing it
+                if (row[selected_header] !== undefined) {
+                    result.push(row[selected_header]);
+                }
+            }
+            return result;
+            console.log(result);
+        },
+
+        async submitData() {
+
+            const patient_name = this.getDataForHeader(this.selected_patient_name['label']);
+            const patient_email = this.getDataForHeader(this.selected_patient_email['label']);
+            const doctor_name = this.getDataForHeader(this.selected_doctor_name['label']);
+            const doctor_email = this.getDataForHeader(this.selected_doctor_email['label']);
+            const medical_concern = this.getDataForHeader(this.selected_medical_concern['label']);
+            const appointment_date = this.getDataForHeader(this.selected_appointment_date['label']);
+            const appointment_time = this.getDataForHeader(this.selected_appointment_time['label']);
+
+            const form_data = {
+                patient_name,
+                patient_email,
+                doctor_name,
+                doctor_email,
+                medical_concern,
+                appointment_date,
+                appointment_time,
+            };
+
+            // console.log(form_data);
         }
 
-
-
+    // end of action---------------------------------------------------------------------
     }
 });
 

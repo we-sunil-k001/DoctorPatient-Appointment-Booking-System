@@ -169,9 +169,9 @@ const toggleCreateMenu = (event) => {
                                 chooseLabel="Browse"
                             />
                         </div>
-<!--                        <div class="flex justify-content-center  gap-2">-->
-<!--                            <Button type="button" severity="success" label="Save" @click="store.uploadFile"  class="w-full"></Button>-->
-<!--                        </div>-->
+                        <!--                        <div class="flex justify-content-center  gap-2">-->
+                        <!--                            <Button type="button" severity="success" label="Save" @click="store.uploadFile"  class="w-full"></Button>-->
+                        <!--                        </div>-->
 
                         <div class="text-align-center flex justify-content-center">
                             <br>
@@ -190,50 +190,65 @@ const toggleCreateMenu = (event) => {
                     <!-- Mapping Tab -->
                     <TabPanel :header="store.tabs[1].header" :disabled="store.tabs[1].disabled">
                         <div class="card p-fluid">
-                            <div class="grid">
+                            <div class="grid">{{store.csv_data}}
 
                                 <div class="col-12 md:col-2 mb-2 flex align-items-center justify-content-start">
-                                    <label for="dropdown1" class="font-bold">Patient Name</label>
+                                    <label class="font-bold">Patient Name</label>
                                 </div>
                                 <div class="col-12 md:col-4 mb-2">
                                     <Dropdown id="dropdown1"
-                                              v-model="store.selectedPatientName"
+                                              v-model="store.selected_patient_name"
                                               :options="store.csv_headers"
-                                       
-                                    placeholder="Select Header" class="w-full" />
+                                              optionLabel="label"
+                                              name="patient_name"
+                                              placeholder="Select Header" class="w-full" />
                                 </div>
 
                                 <div class="col-12 md:col-2 mb-2 flex align-items-center justify-content-start">
-                                    <label for="dropdown2" class="font-bold">Patient Email</label>
+                                    <label  class="font-bold">Patient Email</label>
                                 </div>
                                 <div class="col-12 md:col-4 mb-2">
-                                    <Dropdown id="dropdown2" v-model="store.selectedPatientEmail" :options="store.csv_headers" placeholder="Select Header" class="w-full" />
+                                    <Dropdown id="dropdown2" v-model="store.selected_patient_email" :options="store.csv_headers" optionLabel="label" name="patient_email" placeholder="Select Header" class="w-full" />
                                 </div>
 
                                 <div class="col-12 md:col-2 mb-2 flex align-items-center justify-content-start">
-                                    <label for="dropdown3" class="font-bold">Doctor Name</label>
+                                    <label  class="font-bold">Doctor Name</label>
                                 </div>
                                 <div class="col-12 md:col-4 mb-2">
-                                    <Dropdown id="dropdown3" v-model="store.selectedDoctorName" :options="store.csv_headers" placeholder="Select Header" class="w-full" />
+                                    <Dropdown id="dropdown3" v-model="store.selected_doctor_name" :options="store.csv_headers" optionLabel="label" name="doctor_name" placeholder="Select Header" class="w-full" />
                                 </div>
 
                                 <div class="col-12 md:col-2 mb-2 flex align-items-center justify-content-start">
-                                    <label for="dropdown4" class="font-bold">Doctor Email</label>
+                                    <label  class="font-bold">Doctor Email</label>
                                 </div>
                                 <div class="col-12 md:col-4 mb-2">
-                                    <Dropdown id="dropdown4" v-model="store.selectedDoctorEmail" :options="store.csv_headers" placeholder="Select Header" class="w-full" />
+                                    <Dropdown id="dropdown4" v-model="store.selected_doctor_email" :options="store.csv_headers" optionLabel="label" name="doctor_email" placeholder="Select Header" class="w-full" />
                                 </div>
 
                                 <div class="col-12 md:col-2 mb-2 flex align-items-center justify-content-start">
-                                    <label for="dropdown5" class="font-bold">Appointment Date</label>
+                                    <label  class="font-bold">Medical Concern</label>
                                 </div>
                                 <div class="col-12 md:col-4 mb-2">
-                                    <Dropdown id="dropdown5" v-model="store.selectedAppointmentDate" :options="store.csv_headers" placeholder="Select Header" class="w-full" />
+                                    <Dropdown id="dropdown4" v-model="store.selected_medical_concern" :options="store.csv_headers" optionLabel="label" name="medical_concern" placeholder="Select Header" class="w-full" />
                                 </div>
 
-<!--                                <div class="col-12 md:col-4">-->
-<!--                                    <Button label="Submit" @click="submitData" />-->
-<!--                                </div>-->
+                                <div class="col-12 md:col-2 mb-2 flex align-items-center justify-content-start">
+                                    <label class="font-bold">Appointment Date</label>
+                                </div>
+                                <div class="col-12 md:col-4 mb-2">
+                                    <Dropdown id="dropdown5" v-model="store.selected_appointment_date" :options="store.csv_headers" optionLabel="label" name="appointment_date" placeholder="Select Header" class="w-full" />
+                                </div>
+
+                                <div class="col-12 md:col-2 mb-2 flex align-items-center justify-content-start">
+                                    <label class="font-bold">Appointment Time</label>
+                                </div>
+                                <div class="col-12 md:col-4 mb-2">
+                                    <Dropdown v-model="store.selected_appointment_time" :options="store.csv_headers" optionLabel="label" name="appointment_time" placeholder="Select Header" class="w-full" />
+                                </div>
+
+                                <div class="col-12 md:col-4 w-full">
+                                    <Button label="Submit" class="w-full" @click="store.submitData" />
+                                </div>
                             </div>
                         </div>
 
