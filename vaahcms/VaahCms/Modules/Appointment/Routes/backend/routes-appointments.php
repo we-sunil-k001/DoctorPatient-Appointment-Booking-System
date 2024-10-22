@@ -76,6 +76,11 @@ function () {
     Route::any('/{id}/action/{action}', [AppointmentsController::class, 'itemAction'])
         ->name('vh.backend.appointment.appointments.item.action');
 
+    /**
+     * Publish bulk Imported data
+     */
+    Route::post('/publish-imported-data', [AppointmentsController::class, 'publishImport']);
+
     //---------------------------------------------------------
 
 });
