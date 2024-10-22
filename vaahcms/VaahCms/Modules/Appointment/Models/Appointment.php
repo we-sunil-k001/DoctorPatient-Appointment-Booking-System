@@ -965,6 +965,150 @@ class Appointment extends VaahModel
     }
 
     //-------------------------------------------------
+    public static function publishImport(Request $request)
+    {
+        $inputs = $request->all();
+        $responses = [];
+        $validRecords = []; // Array to hold valid records
+
+        // Check if the input arrays are set and are valid arrays
+        if (!isset($inputs['patient_email']) || !is_array($inputs['patient_email']) || empty($inputs['patient_email'])) {
+            $responses[] = ['message' => 'Patient email cannot be empty.'];
+        }
+
+        if (!isset($inputs['doctor_email']) || !is_array($inputs['doctor_email']) || empty($inputs['doctor_email'])) {
+            $responses[] = ['message' => 'Doctor email cannot be empty.'];
+        }
+
+        if (!isset($inputs['appointment_date']) || !is_array($inputs['appointment_date']) || empty($inputs['appointment_date'])) {
+            $responses[] = ['message' => 'Appointment date cannot be empty.'];
+        }
+
+        if (!isset($inputs['appointment_time']) || !is_array($inputs['appointment_time']) || empty($inputs['appointment_time'])) {
+            $responses[] = ['message' => 'Appointment time cannot be empty.'];
+        }
+
+        // If there are any responses from the empty checks, return them
+        if (!empty($responses)) {
+            return response()->json([
+                'success' => true,
+                'error' => $responses,
+            ]);
+        }
+
+        // Loop through the input data to validate each record individually
+        foreach ($inputs['patient_email'] as $index => $email) {
+            // Create a new validator for each record
+            $validator = \Validator::make([
+                'patient_email' => $email,
+                'doctor_email' => $inputs['doctor_email'][$index] ?? null,
+                'appointment_date' => $inputs['appointment_date'][$index] ?? null,
+                'appointment_time' => $inputs['appointment_time'][$index] ?? null,
+            ], [
+                'patient_email' => 'required|email',
+                'doctor_email' => 'required|email',
+                'appointment_date' => 'required|date',
+                'appointment_time' => 'required|date_format:h:i A',
+            ]);
+
+            // Check if validation fails
+            if ($validator->fails()) {
+                // Store the error message and corresponding emails
+                $responses[] = [
+                    'patient_email' => $email,
+                    'doctor_email' => $inputs['doctor_email'][$index] ?? null,
+                    'error' => $validator->errors()->all(),
+                ];
+            } else {
+                // Store valid records for further processing
+                $validRecords[] = [
+                    'patient_email' => $email,
+                    'doctor_email' => $inputs['doctor_email'][$index] ?? null,
+                    'appointment_date' => $inputs['appointment_date'][$index] ?? null,
+                    'appointment_time' => $inputs['appointment_time'][$index] ?? null,
+                    'reason_for_visit' => $inputs['reason_for_visit'][$index] ?? null, // Added reason for visit
+                ];
+            }
+        }
+
+        // Proceed to process valid records
+        foreach ($validRecords as $record) {
+            // Convert appointment date and time
+            $appointmentDate = Carbon::parse($record['appointment_date'])->toDateString();  // Extract date part
+            $appointmentTime = Carbon::parse($record['appointment_time'])->format('H:i:00');  // Format as HH:MM
+
+            // Assuming doctor_email is provided in the inputs
+            $doctor = Doctor::where('email', $record['doctor_email'])->first();
+            if (!$doctor) {
+                $responses[] = [
+                    'patient_email' => $record['patient_email'],
+                    'doctor_email' => $record['doctor_email'],
+                    'error' => ['Doctor not found in the system.']
+                ];
+                continue; // Skip to the next record
+            }
+
+            // Assuming patient_email is provided in the inputs
+            $patient = Patient::where('email', $record['patient_email'])->first();
+            if (!$patient) {
+                $responses[] = [
+                    'patient_email' => $record['patient_email'],
+                    'doctor_email' => $record['doctor_email'],
+                    'error' => ['Patient not found in the system.']
+                ];
+                continue; // Skip to the next record
+            }
+
+            // Fetch existing working hours and convert to IST
+            $existingWorkingHoursStart = Carbon::parse($doctor->working_hours_start)->setTimezone('Asia/Kolkata')->format('H:i:00');
+            $existingWorkingHoursEnd = Carbon::parse($doctor->working_hours_end)->setTimezone('Asia/Kolkata')->format('H:i:00');
+
+            // Check if appointment time is within working hours
+            if ($appointmentTime < $existingWorkingHoursStart || $appointmentTime > $existingWorkingHoursEnd) {
+                $responses[] = [
+                    'patient_email' => $record['patient_email'],
+                    'doctor_email' => $record['doctor_email'],
+                    'error' => ["Doctor is not available at this time!"]
+                ];
+                continue; // Skip to the next record
+            }
+
+            // Check for existing appointments
+            $existingAppointment = self::where('appointment_date', $appointmentDate)
+                ->where('appointment_time', $appointmentTime)
+                ->where('doctor_id', $doctor->id)
+                ->first();
+
+            if ($existingAppointment) {
+                $responses[] = [
+                    'patient_email' => $record['patient_email'],
+                    'doctor_email' => $record['doctor_email'],
+                    'error' => ['Requested time slot is not available with Dr. ' . $doctor->name . '! Choose any other slot.']
+                ];
+                continue;
+            }
+
+            // If everything is valid, save the appointment
+            Appointment::create([
+                'patient_id' => $patient->id,
+                'doctor_id' => $doctor->id,
+                'appointment_date' => $appointmentDate,
+                'appointment_time' => $appointmentTime,
+                'reason_for_visit' => $record['reason_for_visit'] ?? null, // Ensure reason for visit is captured
+                'status' => 'confirmed'
+            ]);
+        }
+
+        // Return final response
+        return response()->json([
+            'success' => true,
+            'error' => $responses,
+        ]);
+    }
+
+
+
+    //-------------------------------------------------
     //-------------------------------------------------
     //-------------------------------------------------
 
