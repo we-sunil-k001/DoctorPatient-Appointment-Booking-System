@@ -201,8 +201,7 @@ watch(doctor_details, (newVal) => {
                     </div>
 
                 </Message>
-                <div class="new_details"
-                     v-if="store.item.status !== 'pending'" >
+                <div class="new_details">
                     <VhField label="Doctor">
                         <div class="p-inputgroup">
                             <Dropdown  v-model="store.item.doctor_id"

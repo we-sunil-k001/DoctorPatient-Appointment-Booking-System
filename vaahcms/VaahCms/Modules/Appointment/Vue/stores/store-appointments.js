@@ -268,7 +268,7 @@ export const useAppointmentStore = defineStore({
                 this.item = data;
                 this.end_time_temp = data.working_hours_end;
             }else{
-                this.$router.push({name: 'doctors.index',query:this.query});
+                this.$router.push({name: 'appointments.index',query:this.query});
             }
             await this.getItemMenu();
             await this.getFormMenu();
@@ -464,12 +464,12 @@ export const useAppointmentStore = defineStore({
                 case 'create-and-close':
                 case 'save-and-close':
                     this.setActiveItemAsEmpty();
-                    this.$router.push({name: 'doctors.index',query:this.query});
+                    this.$router.push({name: 'appointments.index',query:this.query});
                     break;
                 case 'save-and-clone':
                 case 'create-and-clone':
                     this.item.id = null;
-                    this.$router.push({name: 'doctors.form',query:this.query,params: { id: null }});
+                    this.$router.push({name: 'appointments.form',query:this.query,params: { id: null }});
                     await this.getFormMenu();
                     break;
                 case 'trash':
@@ -644,20 +644,20 @@ export const useAppointmentStore = defineStore({
         //---------------------------------------------------------------------
         closeForm()
         {
-            this.$router.push({name: 'doctors.index',query:this.query})
+            this.$router.push({name: 'appointments.index',query:this.query})
         },
         //---------------------------------------------------------------------
         toList()
         {
             this.item = vaah().clone(this.assets.empty_item);
-            this.$router.push({name: 'doctors.index',query:this.query})
+            this.$router.push({name: 'appointments.index',query:this.query})
         },
         //---------------------------------------------------------------------
         toForm()
         {
             this.item = vaah().clone(this.assets.empty_item);
             this.getFormMenu();
-            this.$router.push({name: 'doctors.form',query:this.query})
+            this.$router.push({name: 'appointments.form',query:this.query})
         },
         //---------------------------------------------------------------------
         toView(item)
@@ -665,7 +665,7 @@ export const useAppointmentStore = defineStore({
             if(!this.item || !this.item.id || this.item.id !== item.id){
                 this.item = vaah().clone(item);
             }
-            this.$router.push({name: 'doctors.view', params:{id:item.id},query:this.query})
+            this.$router.push({name: 'appointments.view', params:{id:item.id},query:this.query})
         },
         //---------------------------------------------------------------------
         toEdit(item)
@@ -673,7 +673,7 @@ export const useAppointmentStore = defineStore({
             if(!this.item || !this.item.id || this.item.id !== item.id){
                 this.item = vaah().clone(item);
             }
-            this.$router.push({name: 'doctors.form', params:{id:item.id},query:this.query})
+            this.$router.push({name: 'appointments.form', params:{id:item.id},query:this.query})
         },
         //---------------------------------------------------------------------
         isViewLarge()

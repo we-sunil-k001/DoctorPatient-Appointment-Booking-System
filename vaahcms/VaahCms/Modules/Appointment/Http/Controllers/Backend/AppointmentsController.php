@@ -21,12 +21,19 @@ class AppointmentsController extends Controller
 
     public function getAssets(Request $request)
     {
+        if (!\Auth::user()->hasPermission('appointment-has-access-of-doctors-section') &&
+            !\Auth::user()->hasPermission('appointment-has-access-of-patient-section')) {
 
+            $response['success'] = false;
+            $response['errors'][] = trans("vaahcms::messages.permission_denied");
+
+            return response()->json($response);
+        }
         try{
 
             $data = [];
 
-            $data['permissions'] = \Auth::user()->permissions(true);
+            $data['permission'] = \Auth::user()->permissions(true);
             $data['rows'] = config('vaahcms.per_page');
 
             $data['fillable']['columns'] = Appointment::getFillableColumns();
