@@ -190,8 +190,7 @@ const toggleCreateMenu = (event) => {
                     <!-- Mapping Tab -->
                     <TabPanel :header="store.tabs[1].header" :disabled="store.tabs[1].disabled">
                         <div class="card p-fluid">
-                            <div class="grid">{{store.csv_data}}
-
+                            <div class="grid">
                                 <div class="col-12 md:col-2 mb-2 flex align-items-center justify-content-start">
                                     <label class="font-bold">Patient Name</label>
                                 </div>
@@ -246,29 +245,72 @@ const toggleCreateMenu = (event) => {
                                     <Dropdown v-model="store.selected_appointment_time" :options="store.csv_headers" optionLabel="label" name="appointment_time" placeholder="Select Header" class="w-full" />
                                 </div>
 
-                                <div class="col-12 md:col-4 w-full">
-                                    <Button label="Submit" class="w-full" @click="store.submitData" />
-                                </div>
                             </div>
                         </div>
 
                         <div class="flex justify-content-between gap-2">
                             <Button type="button" severity="secondary" label="Back" @click="store.moveToUpload"
                                     class=""></Button>
-                            <Button type="button" severity="primary" label="Next" @click="store.moveToSuccess"
+                            <Button type="button" severity="primary" label="Next" @click="store.submitData"
                                     class=""></Button>
                         </div>
                     </TabPanel>
 
                     <!-- Success Tab -->
                     <TabPanel :header="store.tabs[2].header" :disabled="store.tabs[2].disabled">
-                        <h3>Appointments Imported Successfully.</h3>
-                        <br>
-                        <div class="flex justify-content-between gap-2">
-                            <Button type="button" severity="secondary" label="Back" @click=""
-                                    class=""></Button>
-                            <Button type="button" severity="danger" label="Close" @click="store.closeMoveToImport"
-                                    class=""></Button>
+                        <div v-if="store.response_errors.length">
+                            <h4>Below rows are having issues: </h4>
+                            <ol>
+                                <li v-for="(error, index) in store.response_errors" :key="index">
+                                    <span v-if="error.patient_email">Patient Email: {{ error.patient_email }} - </span>
+                                    <span v-if="error.doctor_email">Doctor Email: {{ error.doctor_email }} - </span>
+
+                                    <!-- Handle 'errors' array if it exists -->
+                                    <span v-if="error.errors" style="font-weight: bold">
+                                        {{ error.errors.join(', ') }}
+                                    </span>
+
+                                    <!-- Handle 'error' array if it exists -->
+                                    <span v-if="error.error" style="font-weight: bold">
+                                        {{ error.error.join(', ') }}
+                                    </span>
+
+                                    <!-- Handle the 'message' field if it exists -->
+                                    <span v-if="error.message" style="font-weight: bold">
+                                        No records are inserted! {{ error.message }}
+                                    </span>
+                                </li>
+                            </ol>
+                            <div class="flex justify-content-end gap-2">
+
+                                <Button type="button" severity="danger" label="Close" @click="store.closeMoveToImport"
+                                        class=""></Button>
+                            </div>
+                        </div>
+                        <div v-else>
+                            <div class="flex justify-content-between gap-2">
+                                <h3>Preview of Columns selected</h3 >
+                                <Button type="button" severity="primary" label="Publish" @click="store.publishData"
+                                        class="mb-4"></Button>
+                            </div>
+                            <div>
+                                <DataTable :value="store.table_data" class="p-datatable-striped">
+                                    <Column field="patient_name" header="Patient Name" />
+                                    <Column field="patient_email" header="Patient Email" />
+                                    <Column field="doctor_name" header="Doctor Name" />
+                                    <Column field="doctor_email" header="Doctor Email" />
+                                    <Column field="reason_for_visit" header="Medical Concern" />
+                                    <Column field="appointment_date" header="Appointment Date" />
+                                    <Column field="appointment_time" header="Appointment Time" />
+                                </DataTable>
+                            </div>
+                            <br>
+                            <div class="flex justify-content-between gap-2">
+                                <Button type="button" severity="secondary" label="Back" @click="store.moveToMappingTab"
+                                        class=""></Button>
+                                <Button type="button" severity="danger" label="Close" @click="store.closeMoveToImport"
+                                        class=""></Button>
+                            </div>
                         </div>
                     </TabPanel>
                 </TabView>
