@@ -1095,6 +1095,7 @@ class Appointment extends VaahModel
                 'appointment_date' => $appointmentDate,
                 'appointment_time' => $appointmentTime,
                 'reason_for_visit' => $record['reason_for_visit'] ?? null, // Ensure reason for visit is captured
+                'is_active ' => 1,
                 'status' => 'confirmed'
             ]);
         }
