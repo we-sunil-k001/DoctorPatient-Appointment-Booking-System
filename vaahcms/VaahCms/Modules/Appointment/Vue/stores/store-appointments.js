@@ -70,9 +70,9 @@ export const useAppointmentStore = defineStore({
         //Tab View --------------
         visible: false,
         activeTabIndex : 0,
-        tabs: [{ header: 'Bulk Import', disabled: false },
-            { header: 'Column Mapping', disabled: true },
-            { header: 'Successfully Imported', disabled: true }],
+        tabs: [{ header: 'Upload File', disabled: false },
+            { header: 'Mapping', disabled: true },
+            { header: 'Publish Data', disabled: true }],
         //Import File --------
         file_to_upload: null,
         file_date: null,
@@ -85,7 +85,11 @@ export const useAppointmentStore = defineStore({
         selected_doctor_email : null,
         selected_medical_concern : null,
         selected_appointment_date : null,
-        selected_appointment_time : null
+        selected_appointment_time : null,
+        form_data : [],
+        table_data : [],
+        response_errors : []
+
 
     }),
     getters: {
@@ -258,6 +262,7 @@ export const useAppointmentStore = defineStore({
         //---------------------------------------------------------------------
         async getItemAfter(data, res)
         {
+            console.log(data);
             if(data)
             {
                 this.item = data;
@@ -1128,6 +1133,7 @@ export const useAppointmentStore = defineStore({
         moveToSuccess(){
             this.tabs[1].disabled = true;
             this.tabs[2].disabled = false;
+            this.mapFormDataToRows();
             this.activeTabIndex = 2;
         },
 
@@ -1143,6 +1149,11 @@ export const useAppointmentStore = defineStore({
             this.tabs[1].disabled = true;
             this.tabs[2].disabled = true;
 
+            //varible setting to null
+            form_data = [];
+            table_data = [];
+            response_errors = [];
+
             // Set the active tab back to the first tab
             this.activeTabIndex = 0;
 
@@ -1155,6 +1166,52 @@ export const useAppointmentStore = defineStore({
         },
 
         // Import CSV -----------------------------------------------------------
+
+        getDataForHeader(header_selected) {
+            if (header_selected) {
+                let selected_header = header_selected['label'];
+
+                let result = [];
+                for (let i = 0; i < this.csv_data.length; i++) {
+                    const row = this.csv_data[i];
+                    if (row[selected_header] !== undefined) {
+                        result.push(row[selected_header]);
+                    }
+                }
+                return result.length > 0 ? result : null;
+            }
+            return null;
+        },
+
+
+        mapFormDataToRows() {
+
+            this.table_data = []; // Empty the array to remove previous records
+
+            // Determine the maximum number of rows from all selected fields
+            const num_rows = Math.max(
+                this.form_data.patient_name?.length || 0,
+                this.form_data.patient_email?.length || 0,
+                this.form_data.doctor_name?.length || 0,
+                this.form_data.doctor_email?.length || 0,
+                this.form_data.reason_for_visit?.length || 0,
+                this.form_data.appointment_date?.length || 0,
+                this.form_data.appointment_time?.length || 0
+            );
+
+            // Loop over the maximum number of rows and fill the table data
+            for (let i = 0; i < num_rows; i++) {
+                this.table_data.push({
+                    patient_name: this.form_data.patient_name?.[i] || '', // Fallback to empty string if not selected
+                    patient_email: this.form_data.patient_email?.[i] || '',
+                    doctor_name: this.form_data.doctor_name?.[i] || '',
+                    doctor_email: this.form_data.doctor_email?.[i] || '',
+                    reason_for_visit: this.form_data.reason_for_visit?.[i] || '',
+                    appointment_date: this.form_data.appointment_date?.[i] || '',
+                    appointment_time: this.form_data.appointment_time?.[i] || '',
+                });
+            }
+        },
 
         // Function to convert CSV to JSON
         async csvToJson(csv) {
@@ -1192,58 +1249,63 @@ export const useAppointmentStore = defineStore({
         },
 
         async uploadFile() {
-
-            this.moveToMappingTab(); // Tab Change to mapping
-
-            if (!this.selected_patient_name || !this.selected_patient_email || !this.selected_doctor_name || !this.selected_doctor_email || !this.selected_appointment_date) {
-                alert("Please select all headers.");
-            }
-
-        },
-
-        async getDataForHeader(selected_header) {
-
-            if (!selected_header){
-                alert("Please select all columns");
-            }
-            console.log(selected_header);
-
-            let result =[];
-            for (let i = 0; i < this.csv_data.length; i++) {
-                const row = this.csv_data[i];
-                // Ensure that the header exists in the row before accessing it
-                if (row[selected_header] !== undefined) {
-                    result.push(row[selected_header]);
-                }
-            }
-            return result;
-            console.log(result);
+            this.moveToMappingTab();
         },
 
         async submitData() {
 
-            const patient_name = this.getDataForHeader(this.selected_patient_name['label']);
-            const patient_email = this.getDataForHeader(this.selected_patient_email['label']);
-            const doctor_name = this.getDataForHeader(this.selected_doctor_name['label']);
-            const doctor_email = this.getDataForHeader(this.selected_doctor_email['label']);
-            const medical_concern = this.getDataForHeader(this.selected_medical_concern['label']);
-            const appointment_date = this.getDataForHeader(this.selected_appointment_date['label']);
-            const appointment_time = this.getDataForHeader(this.selected_appointment_time['label']);
+            const patient_name = this.getDataForHeader(this.selected_patient_name);
+            const patient_email = this.getDataForHeader(this.selected_patient_email);
+            const doctor_name = this.getDataForHeader(this.selected_doctor_name);
+            const doctor_email = this.getDataForHeader(this.selected_doctor_email);
+            const reason_for_visit = this.getDataForHeader(this.selected_medical_concern);
+            const appointment_date = this.getDataForHeader(this.selected_appointment_date);
+            const appointment_time = this.getDataForHeader(this.selected_appointment_time);
 
-            const form_data = {
+            this.form_data = {
                 patient_name,
                 patient_email,
                 doctor_name,
                 doctor_email,
-                medical_concern,
+                reason_for_visit,
                 appointment_date,
                 appointment_time,
             };
+            this.moveToSuccess();
 
-            // console.log(form_data);
+        },
+
+        async publishData()
+        {
+            let url = this.ajax_url + '/publish-imported-data';
+
+            // Convert the CSV data to JSON before making the request
+            let param = this.form_data;
+
+            let options = {
+                method: 'POST', // Specify the method
+                headers: {
+                    'Content-Type': 'application/json', // Ensure JSON format is sent
+                },
+                params: param,
+            };
+
+            try {
+                const response =await vaah().ajax(
+                    url,
+                    null,
+                    options
+                );
+                this.response_errors = [];
+                this.response_errors = response.data.error;
+                console.log(response.data.error);
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
 
-    // end of action---------------------------------------------------------------------
+        // end of action---------------------------------------------------------------------
     }
 });
 
