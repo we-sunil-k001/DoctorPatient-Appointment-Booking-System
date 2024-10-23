@@ -142,3 +142,15 @@ const store = useAppointmentStore();
 
     </div>
 </template>
+
+<style scoped>
+@media screen and (max-width: 960px) {
+
+    .col-3 {
+        width: 100% !important;
+    }
+
+
+
+}
+</style>

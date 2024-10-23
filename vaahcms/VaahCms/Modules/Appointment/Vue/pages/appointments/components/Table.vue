@@ -18,7 +18,7 @@ const useVaah = vaah();
                    :nullSortOrder="-1"
                    v-model:selection="store.action.items"
                    stripedRows
-                   responsiveLayout="scroll">
+                   responsiveLayout="stack">
 
             <Column selectionMode="multiple"
                     v-if="store.isViewLarge()"
@@ -193,13 +193,3 @@ const useVaah = vaah();
 </template>
 
 
-<style scoped>
-.button-group {
-    display: flex;
-    align-items: center;
-}
-
-button{
-    margin: 1px;
-}
-</style>

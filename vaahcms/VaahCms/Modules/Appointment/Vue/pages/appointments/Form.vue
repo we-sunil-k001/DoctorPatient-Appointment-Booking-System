@@ -324,3 +324,13 @@ watch(doctor_details, (newVal) => {
     </div>
 
 </template>
+
+<style scoped>
+@media screen and (max-width: 960px) {
+
+    .col-6 {
+        width: 100% !important;
+    }
+
+}
+</style>
