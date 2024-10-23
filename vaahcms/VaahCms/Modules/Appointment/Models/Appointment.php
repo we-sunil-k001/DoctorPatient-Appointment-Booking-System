@@ -1035,7 +1035,9 @@ class Appointment extends VaahModel
         foreach ($validRecords as $record) {
             // Convert appointment date and time
             $appointmentDate = Carbon::parse($record['appointment_date'])->toDateString();  // Extract date part
-            $appointmentTime = Carbon::parse($record['appointment_time'])->format('H:i:00');  // Format as HH:MM
+            $appointmentTime = Carbon::parse($record['appointment_time'], 'Asia/Kolkata')
+                ->setTimezone('UTC')  // Convert it to UTC
+                ->format('H:i:00');
 
             // Assuming doctor_email is provided in the inputs
             $doctor = Doctor::where('email', $record['doctor_email'])->first();
