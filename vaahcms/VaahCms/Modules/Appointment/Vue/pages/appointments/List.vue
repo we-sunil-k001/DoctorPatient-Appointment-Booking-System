@@ -136,3 +136,88 @@ const toggleCreateMenu = (event) => {
 
 
 </template>
+
+
+
+<style scoped>
+.button-group {
+    display: flex;
+    align-items: center;
+}
+
+button{
+    margin: 1px;
+}
+
+
+@media screen and (max-width: 960px) {
+    ::v-deep(.p-datatable-tbody > tr > td .p-column-title) {
+        display: inline-block;
+        font-weight: bold;
+        margin-right: 0.5rem;
+    }
+
+    .p-datatable.p-datatable-sm .p-datatable-thead > tr > th {
+        display: none !important;
+    }
+
+    .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td {
+        text-align: left;
+        display: block;
+        width: 100%;
+        float: left;
+        clear: left;
+        border: 0 none;
+    }
+
+    .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td:last-child {
+        border-bottom: 1px solid var(--surface-d);
+    }
+
+    .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td .p-column-title {
+        padding: 0.4rem;
+        min-width: 30%;
+        display: inline-block;
+        margin: -0.4em 1em -0.4em -0.4rem;
+        font-weight: bold;
+    }
+
+    .p-datatable.p-datatable-sm .p-datatable-tbody > tr {
+        border-bottom: 1px solid var(--surface-d);
+    }
+
+    .button-group {
+        justify-content: flex-start;
+    }
+    .col-9{
+        width: 100%;
+    }
+
+    .col-6{
+        width: 100%;
+    }
+
+    .col-6:first-child {
+        order: 2; /* Move the first .col-6 to the second position */
+    }
+
+    .col-6:last-child {
+        order: 1; /* Move the last .col-6 to the first position */
+    }
+
+
+    .col-9:first-child {
+        order: 2; /* Move the first .col-6 to the second position */
+    }
+
+    .col-3:last-child {
+        order: 1; /* Move the last .col-6 to the first position */
+    }
+
+    .overflow-wrap-anywhere{
+        display: flex;
+        justify-content: space-between;
+    }
+}
+
+</style>
