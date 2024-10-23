@@ -184,16 +184,11 @@ const setChartOptions = () => {
 }
 h4{
     font-size: 40px;
-    color: green;
-    background-color: #c4ffc4;
     width: fit-content;
     padding: 20px;
     border-radius: 50px;
 }
 
-h5{
-    color: #ef4444;
-}
 .chart .row1{
     display: flex;
     justify-content: center;
