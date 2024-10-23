@@ -192,4 +192,26 @@ const useVaah = vaah();
 
 </template>
 
+<style scoped>
+@media screen and (max-width: 960px) {
 
+    button-group{
+        display: block;
+    }
+    button{
+        zoom: 70%!important;
+        padding: 0px 200px;
+    }
+
+    td {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between!important;
+        text-align: end!important;
+    }
+    td span{
+        text-align: left!important;
+    }
+}
+</style>
