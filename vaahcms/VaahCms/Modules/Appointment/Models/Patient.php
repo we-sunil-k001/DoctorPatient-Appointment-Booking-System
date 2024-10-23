@@ -9,6 +9,8 @@ use WebReinvent\VaahCms\Models\VaahModel;
 use WebReinvent\VaahCms\Traits\CrudWithUuidObservantTrait;
 use WebReinvent\VaahCms\Models\User;
 use WebReinvent\VaahCms\Libraries\VaahSeeder;
+use App\Jobs\BulkRecordPatient;
+
 
 class Patient extends VaahModel
 {
@@ -601,21 +603,7 @@ class Patient extends VaahModel
     //-------------------------------------------------
     public static function seedSampleItems($records=100)
     {
-
-        $i = 0;
-
-        while($i < $records)
-        {
-            $inputs = self::fillItem(false);
-
-            $item =  new self();
-            $item->fill($inputs);
-            $item->save();
-
-            $i++;
-
-        }
-
+        BulkRecordPatient::dispatch($records);
     }
 
 
