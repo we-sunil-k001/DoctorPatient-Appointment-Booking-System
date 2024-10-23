@@ -167,9 +167,6 @@ class doctor extends VaahModel
             return $validation;
         }
 
-        dd($inputs['working_hours_start'], $inputs['working_hours_end']);
-
-
         // Validate working hours
         $validatedTime = $request->validate([
             'working_hours_start' => 'required',
@@ -180,7 +177,6 @@ class doctor extends VaahModel
         ], [
             'working_hours_end.after' => 'The working hours end must be after the start time.',
         ]);
-
 
         // Extract hour and minute part, ignoring seconds
         $inputs['working_hours_start'] = Carbon::parse($inputs['working_hours_start'])->format('H:i:00');  // Format as HH:MM
@@ -624,7 +620,7 @@ class doctor extends VaahModel
         // Check if the date string matches the UTC format
         if (preg_match('/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}\.\d{3})Z$/', $dateString)) {
             // Try to create a DateTime object from the string
-            $dateTime = DateTime::createFromFormat(DateTime::RFC3339, $dateString);
+            $dateTime = \DateTime::createFromFormat(\DateTime::RFC3339, $dateString);
 
             // Check if the created DateTime object is valid
             return $dateTime !== false && !array_sum($dateTime->getLastErrors());
@@ -663,23 +659,26 @@ class doctor extends VaahModel
         echo $inputs['working_hours_start']." ".$inputs['working_hours_end'];
 
         //---------------------------------------------------------
-        // Check the inputs
+        // Check the Working hours is in UTC
         if (!self::isValidUTC($inputs['working_hours_start'])) {
-            $inputs['working_hours_start'] = self::convertToUTC("11:50 am");
 
-            echo $inputs['working_hours_start'];
+            $inputs['working_hours_start'] = Carbon::parse($inputs['working_hours_start'], 'Asia/Kolkata')
+                ->setTimezone('UTC')  // Convert it to UTC
+                ->format('H:i:00');
+//            echo $inputs['working_hours_start'];
+
         }
 
         if (!self::isValidUTC($inputs['working_hours_end'])) {
-            $inputs['working_hours_end'] = self::convertToUTC("03:50 pm");
 
-            echo $inputs['working_hours_end'];
+            $inputs['working_hours_end'] = Carbon::parse($inputs['working_hours_end'], 'Asia/Kolkata')
+                ->setTimezone('UTC')  // Convert it to UTC
+                ->format('H:i:00');
+//            echo $inputs['working_hours_end'];
+
         }
 
         //------------------------------------------------------------
-
-        dd($inputs['working_hours_start'],$inputs['working_hours_end']);
-
 
         // Validate working hours
         $validatedTime = $request->validate([
