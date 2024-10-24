@@ -180,13 +180,17 @@ const toggleCreateMenu = (event) => {
 
                         <div class="text-align-center flex justify-content-center">
                             <br>
-                            <label class="font-semibold mt-3" @click="store.exportAppointments"
+                            <label class="font-semibold mt-3" @click="store.exportHeadersOnly"
                                    style="cursor: pointer; color: dodgerblue"
                             >Download a sample CSV with format</label>
 
+
                         </div>
 
-                        <div class="flex justify-content-end gap-2">
+                        <div class="flex justify-content-between gap-2">
+                            <Button type="button" severity="danger" label="Close" @click="store.closeMoveToImport"
+                                    class=""></Button>
+
                             <Button type="button" severity="primary" label="Next" @click="store.uploadFile"
                                     class=""></Button>
                         </div>

@@ -22,6 +22,11 @@ function () {
     Route::get('/export', [AppointmentsController::class, 'exportAppointments']);
 
     /**
+     * Export csv exportHeadersOnly
+     */
+    Route::get('/exportAppointmentsHeadersOnly', [AppointmentsController::class, 'exportAppointmentsHeadersOnly']);
+
+    /**
      * Get List
      */
     Route::get('/', [AppointmentsController::class, 'getList'])

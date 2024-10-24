@@ -8,6 +8,14 @@ use Carbon\Carbon;
 use VaahCms\Modules\Appointment\Models\Patient;
 class ExportAppointments implements FromCollection, WithHeadings
 {
+
+    protected $headers_only;
+
+    public function __construct($headers_only = false)
+    {
+        $this->headers_only  = $headers_only;
+    }
+
     public function headings(): array
     {
         return [
@@ -23,7 +31,11 @@ class ExportAppointments implements FromCollection, WithHeadings
     }
     public function collection()
     {
-        return Appointment::whereNull('deleted_at') // Exclude trashed records
+        if ($this->headers_only) {
+            return collect([]);
+        }
+
+        return Appointment::whereNull('deleted_at')
         ->get()
             ->map(function ($appointment) {
                 $doctor = Doctor::find($appointment['doctor_id']);

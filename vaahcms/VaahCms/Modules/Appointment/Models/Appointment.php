@@ -1012,7 +1012,13 @@ class Appointment extends VaahModel
     //-------------------------------------------------
     public static function exportAppointments()
     {
-        return Excel::download(new ExportAppointments,'sample-appointments.csv');
+        return Excel::download(new ExportAppointments,'appointments.csv');
+    }
+    //-------------------------------------------------
+    public static function exportAppointmentsHeadersOnly()
+    {
+        return Excel::download(new ExportAppointments(true), 'sample-appointments.csv');
+
     }
 
     //-------------------------------------------------

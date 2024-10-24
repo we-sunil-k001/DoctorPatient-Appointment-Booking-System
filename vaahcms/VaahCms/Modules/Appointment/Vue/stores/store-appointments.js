@@ -1158,6 +1158,28 @@ export const useAppointmentStore = defineStore({
                 console.error('Error occurred while downloading the file:', error);
             }
         },
+        async exportHeadersOnly() {
+            try {
+                // Fetch file data
+                const res = await vaah().ajax(ajax_url + '/exportAppointmentsHeadersOnly');
+
+                const blob = new Blob([res.data]);
+                const url = window.URL.createObjectURL(blob);
+
+                // Create a link and trigger the download
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'sample-appointments.csv'; // Set the download attribute
+                document.body.appendChild(link);
+                link.click();
+
+                // Cleanup
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error occurred while downloading the file:', error);
+            }
+        },
 
         // Tab View back and next functions --------------------
         moveToMappingTab(){
