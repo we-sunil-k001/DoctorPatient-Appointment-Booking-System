@@ -659,8 +659,6 @@ class doctor extends VaahModel
             return $validation;
         }
 
-        echo $inputs['working_hours_start']." ".$inputs['working_hours_end'];
-
         //---------------------------------------------------------
         // Check the Working hours is in UTC
         if (!self::isValidUTC($inputs['working_hours_start'])) {
@@ -763,7 +761,7 @@ class doctor extends VaahModel
                         $email_content_for_doctor = "";
                         $doctor_email = "";
 
-//                        self::appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email);
+                        self::appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email);
                         //-----------------------------------------------------------------
 
                     }

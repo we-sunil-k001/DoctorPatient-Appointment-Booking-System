@@ -264,7 +264,7 @@ class Appointment extends VaahModel
         $doctor_email = $doctor->email;
         $patient_email = $patient->email;
 
-//        self::appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email);
+        self::appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email);
 
         //-----------------------------------------------------------------
 
