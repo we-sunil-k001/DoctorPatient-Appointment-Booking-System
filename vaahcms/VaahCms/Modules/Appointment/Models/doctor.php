@@ -43,6 +43,7 @@ class doctor extends VaahModel
         'experience',
         'gender',
         'no_of_slot',
+        'charges',
         'is_active',
         'created_by',
         'updated_by',
