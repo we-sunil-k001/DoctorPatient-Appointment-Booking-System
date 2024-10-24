@@ -150,14 +150,14 @@ const useVaah = vaah();
                                 v-tooltip.top="'Restore'"
                                 icon="pi pi-replay" />
 
-                        <Button class="p-button-tiny p-button-danger p-button-text"
-                                data-testid="doctors-table-action-trash"
-                                v-if="store.isViewLarge() && !prop.data.deleted_at
-                                && !store.hasPermission(store.assets.permissions, 'appointment-has-access-of-patient-section')
-                                && !store.hasPermission(store.assets.permissions, 'appointment-has-access-of-doctors-section')"
-                                @click="store.itemAction('trash', prop.data)"
-                                v-tooltip.top="'Trash'"
-                                icon="pi pi-trash" />
+<!--                        <Button class="p-button-tiny p-button-danger p-button-text"-->
+<!--                                data-testid="doctors-table-action-trash"-->
+<!--                                v-if="store.isViewLarge() && !prop.data.deleted_at-->
+<!--                                && !store.hasPermission(store.assets.permissions, 'appointment-has-access-of-patient-section')-->
+<!--                                && !store.hasPermission(store.assets.permissions, 'appointment-has-access-of-doctors-section')"-->
+<!--                                @click="store.itemAction('trash', prop.data)"-->
+<!--                                v-tooltip.top="'Trash'"-->
+<!--                                icon="pi pi-trash" />-->
 
 
                     </div>
