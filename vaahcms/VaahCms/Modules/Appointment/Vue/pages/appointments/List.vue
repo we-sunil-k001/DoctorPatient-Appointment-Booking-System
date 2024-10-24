@@ -94,13 +94,6 @@ const toggleCreateMenu = (event) => {
                         Create
                     </Button>
 
-                        <Button data-testid="appointments-list-create"
-                                class="p-button-sm"
-                                @click="store.toForm()">
-                            <i class="pi pi-plus mr-1"></i>
-                            Create
-                        </Button>
-
                         <Button @click="store.visible = true">
                             <i class="pi pi-upload mr-1"></i>
                             Import
@@ -358,33 +351,9 @@ button{
         margin-right: 0.5rem;
     }
 
-    .p-datatable.p-datatable-sm .p-datatable-thead > tr > th {
-        display: none !important;
-    }
 
-    .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td {
-        text-align: left;
+    ::v-deep(.p-panel-header) {
         display: block;
-        width: 100%;
-        float: left;
-        clear: left;
-        border: 0 none;
-    }
-
-    .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td:last-child {
-        border-bottom: 1px solid var(--surface-d);
-    }
-
-    .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td .p-column-title {
-        padding: 0.4rem;
-        min-width: 30%;
-        display: inline-block;
-        margin: -0.4em 1em -0.4em -0.4rem;
-        font-weight: bold;
-    }
-
-    .p-datatable.p-datatable-sm .p-datatable-tbody > tr {
-        border-bottom: 1px solid var(--surface-d);
     }
 
     .button-group {
@@ -415,10 +384,6 @@ button{
         order: 1; /* Move the last .col-6 to the first position */
     }
 
-    .overflow-wrap-anywhere{
-        display: flex;
-        justify-content: space-between;
-    }
 }
 
 </style>

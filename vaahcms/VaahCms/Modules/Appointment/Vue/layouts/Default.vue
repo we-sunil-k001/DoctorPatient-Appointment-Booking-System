@@ -23,3 +23,14 @@ onMounted(async () => {
   </div>
 
 </template>
+
+<style scoped>
+
+@media screen and (max-width: 960px) {
+
+    ::v-deep(.col) {
+        max-width: 100% !important;
+    }
+
+}
+</style>

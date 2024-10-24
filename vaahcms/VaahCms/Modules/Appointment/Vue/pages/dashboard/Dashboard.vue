@@ -108,7 +108,7 @@ const setChartOptions = () => {
 
       <div class="container">
           <div class="row" >
-              <div class="card">
+              <div class="stats_card">
                   <Card>
                       <template #header>
                           <h4 v-if="store.item">
@@ -119,7 +119,7 @@ const setChartOptions = () => {
                       <template #icons> <i class="pi pi-refresh"></i> </template>
                   </Card>
               </div>
-              <div class="card">
+              <div class="stats_card">
                   <Card>
                       <template #header>
                           <h4 v-if="store.item">
@@ -130,7 +130,7 @@ const setChartOptions = () => {
 
                   </Card>
               </div>
-              <div class="card">
+              <div class="stats_card">
                   <Card>
                       <template #header>
                           <h4 v-if="store.item">
@@ -141,7 +141,7 @@ const setChartOptions = () => {
 
                   </Card>
               </div>
-              <div class="card">
+              <div class="stats_card">
                   <Card>
                       <template #header>
                           <h4 v-if="store.item">
@@ -176,10 +176,10 @@ const setChartOptions = () => {
     width: 100%;
     margin-bottom: 20px;
 }
-.card{
+.stats_card{
     width: 25%;
 }
-.row .card .p-card-content{
+.row .stats_card .p-card-content{
     display: none;
 }
 h4{
