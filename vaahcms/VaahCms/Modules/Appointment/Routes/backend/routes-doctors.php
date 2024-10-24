@@ -77,6 +77,13 @@ function () {
     Route::any('/{id}/action/{action}', [doctorsController::class, 'itemAction'])
         ->name('vh.backend.appointment.doctors.item.action');
 
+
+    /**
+     * To Import from CSV
+     */
+    Route::post('/bulk-import', [doctorsController::class, 'uploadFile']);
+
+
     //---------------------------------------------------------
 
 });

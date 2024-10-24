@@ -11,7 +11,9 @@ use WebReinvent\VaahCms\Models\User;
 use WebReinvent\VaahCms\Libraries\VaahSeeder;
 use Carbon\Carbon;
 use WebReinvent\VaahCms\Libraries\VaahMail;
-
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Validator;
+use App\Import\ImportDoctors;
 
 class doctor extends VaahModel
 {
@@ -976,10 +978,6 @@ class doctor extends VaahModel
         return $response;
     }
 
-    //-------------------------------------------------
-    //-------------------------------------------------
-    //-------------------------------------------------
-
 
     // Relation with Appointments
     public function appointments()
@@ -1072,6 +1070,46 @@ class doctor extends VaahModel
         return $query;
     }
 
+    //-------------------------------------------------
+    public static function uploadFile(Request $request)
+    {
+        // Get the JSON data from the request body
+        $data = $request->json()->all();
+
+        dd($data);
+
+        // Initialize an array to hold the emails already inserted
+        $existingEmails = [];
+
+        // Initialize a counter for skipped records
+        $skippedCount = 0;
+
+        // Insert the validated data into the database
+        foreach ($data as $row) {
+            // Check if the email already exists
+            if (in_array($row['email'], $existingEmails) || Doctor::where('email', $row['email'])->exists()) {
+                // Increment skipped count and continue to the next record
+                $skippedCount++;
+                continue;
+            }
+
+            // Create the doctor record
+            Doctor::create($row);
+
+            // Add the email to the existing emails array
+            $existingEmails[] = $row['email'];
+        }
+
+        return response()->json([
+            'message' => 'File uploaded and data imported successfully.',
+            'skipped' => $skippedCount,
+        ]);
+    }
+
+
+    //-------------------------------------------------
+    //-------------------------------------------------
+    //-------------------------------------------------
 
 
 }
