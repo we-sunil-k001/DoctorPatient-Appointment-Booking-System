@@ -170,7 +170,6 @@ class Appointment extends VaahModel
             ->setTimezone('Asia/Kolkata')
             ->format('h:i A');
 
-        // Concatenate both values
         return $appointmentDate . ', ' . $appointmentTime;
     }
 
@@ -195,11 +194,11 @@ class Appointment extends VaahModel
             $doctor = doctor::where('id', $inputs['doctor_id'])->first();
 
             $existing_working_hours_start = Carbon::parse($doctor->working_hours_start)->setTimezone('Asia/Kolkata')->format('H:i:00');
+
             $existing_working_hours_end = Carbon::parse($doctor->working_hours_end)->setTimezone('Asia/Kolkata')->format('H:i:00');
 
             // convert appointment time in IST
             $appointment_time = Carbon::parse($inputs['appointment_time'])->setTimezone('Asia/Kolkata')->format('H:i:00');
-
 
             if ($appointment_time < $existing_working_hours_start || $appointment_time > $existing_working_hours_end) {
                 $response['success'] = false;
@@ -208,13 +207,11 @@ class Appointment extends VaahModel
             }
 
         //------------------------------------------------------------
-
         // Compare if there is an existing booking at same time and date
 
             $inputAppointmentDate = Carbon::parse($inputs['appointment_date'])->toDateString();  // Extract date part
             $inputAppointmentTime = Carbon::parse($inputs['appointment_time'])->toTimeString();  // Extract time part
 
-            // Fetch doctor's name with doctor_id
             $doctor = Doctor::find($inputs['doctor_id']);
 
             $existingAppointment = self::where('appointment_date', $inputAppointmentDate)
@@ -235,7 +232,7 @@ class Appointment extends VaahModel
 
 
         //----------------------------------------------------------------
-        //Calling Email to Notify Booking confirm
+        //Call Email to Notify Booking confirm
         $subject = 'Appointment Confirmed';
         $doctor = Doctor::find($inputs['doctor_id']);
         $patient = Patient::find($inputs['patient_id']);
@@ -392,7 +389,6 @@ class Appointment extends VaahModel
         $list = $list->paginate($rows);
 
         // Convert working hours from UTC to IST
-        // Loop through the list and convert working hours to IST
         foreach ($list as $item) {
             $item->appointment_date = self::convertDateUTCtoIST($item->appointment_date);
             $item->appointment_time = self::convertUTCtoIST12Hrs($item->appointment_time);
@@ -611,7 +607,6 @@ class Appointment extends VaahModel
             return null;
         }
 
-        // Create a Carbon instance in UTC timezone
         $utc_time = Carbon::createFromTimeString($time, 'UTC');
 
         // Convert to Asia/Kolkata timezone
@@ -658,7 +653,6 @@ class Appointment extends VaahModel
         $item->save();
 
         //----------------------------------------------------------------
-        //Calling Email to Notify Booking confirm
         $subject = 'Appointment Rescheduled';
         $doctor = Doctor::find($inputs['doctor_id']);
         $patient = Patient::find($inputs['patient_id']);
@@ -927,10 +921,6 @@ class Appointment extends VaahModel
     }
 
 
-    // ----------------------------------------------------------------------------
-    //  Custom function
-    // ----------------------------------------------------------------------------
-
     //-------------------------------------------------
     //  Relation with Doctor
     public function doctor()
@@ -948,7 +938,7 @@ class Appointment extends VaahModel
 
 
     //-------------------------------------------------
-    // Single Function for all kind of emails for Doctor and Patient
+    // Single Function all emails of Doctor and Patient
     public static function appointmentMail($email_content_for_patient,$email_content_for_doctor,$subject,$doctor_email,$patient_email)
     {
         if ($email_content_for_patient !== "")
@@ -1049,7 +1039,6 @@ class Appointment extends VaahModel
             $responses[] = ['message' => 'Appointment time cannot be empty.'];
         }
 
-        // If there are any responses from the empty checks, return them
         if (!empty($responses)) {
             return response()->json([
                 'success' => true,
@@ -1057,9 +1046,7 @@ class Appointment extends VaahModel
             ]);
         }
 
-        // Loop through the input data to validate each record individually
         foreach ($inputs['patient_email'] as $index => $email) {
-            // Create a new validator for each record
             $validator = \Validator::make([
                 'patient_email' => $email,
                 'doctor_email' => $inputs['doctor_email'][$index] ?? null,
@@ -1092,7 +1079,7 @@ class Appointment extends VaahModel
             }
         }
 
-        // Proceed to process valid records
+        // Process valid records
         foreach ($validRecords as $record) {
             // Convert appointment date and time
             $appointmentDate = Carbon::parse($record['appointment_date'])->toDateString();  // Extract date part
@@ -1100,7 +1087,6 @@ class Appointment extends VaahModel
                 ->setTimezone('UTC')  // Convert it to UTC
                 ->format('H:i:00');
 
-            // Assuming doctor_email is provided in the inputs
             $doctor = Doctor::where('email', $record['doctor_email'])->first();
             if (!$doctor) {
                 $responses[] = [
@@ -1108,10 +1094,9 @@ class Appointment extends VaahModel
                     'doctor_email' => $record['doctor_email'],
                     'error' => ['Doctor not found in the system.']
                 ];
-                continue; // Skip to the next record
+                continue;
             }
 
-            // Assuming patient_email is provided in the inputs
             $patient = Patient::where('email', $record['patient_email'])->first();
             if (!$patient) {
                 $responses[] = [
@@ -1119,7 +1104,7 @@ class Appointment extends VaahModel
                     'doctor_email' => $record['doctor_email'],
                     'error' => ['Patient not found in the system.']
                 ];
-                continue; // Skip to the next record
+                continue;
             }
 
             // Fetch existing working hours and convert to IST
@@ -1133,7 +1118,7 @@ class Appointment extends VaahModel
                     'doctor_email' => $record['doctor_email'],
                     'error' => ["Doctor is not available at this time!"]
                 ];
-                continue; // Skip to the next record
+                continue;
             }
 
             // Check for existing appointments
@@ -1151,7 +1136,6 @@ class Appointment extends VaahModel
                 continue;
             }
 
-            // If everything is valid, save the appointment
             Appointment::create([
                 'patient_id' => $patient->id,
                 'doctor_id' => $doctor->id,
@@ -1163,7 +1147,6 @@ class Appointment extends VaahModel
             ]);
         }
 
-        // Return final response
         return response()->json([
             'success' => true,
             'error' => $responses,

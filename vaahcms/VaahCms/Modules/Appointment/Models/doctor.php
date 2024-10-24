@@ -175,7 +175,7 @@ class doctor extends VaahModel
             'working_hours_start' => 'required',
             'working_hours_end' => [
                 'required',
-                'after:working_hours_start', // This ensures that working_hours_end is after working_hours_start
+                'after:working_hours_start',
             ],
         ], [
             'working_hours_end.after' => 'The working hours end must be after the start time.',
@@ -343,14 +343,13 @@ class doctor extends VaahModel
     }
 
     //-------------------------------------------------
-    // Helper function to convert time from UTC to IST and return in 12-hour format
+    // Function to convert time from UTC to IST and return in 12-hour format
     public static function convertUTCtoIST12Hrs($time)
     {
         if (!$time) {
             return null;
         }
 
-        // Create a Carbon instance in UTC timezone
         $utc_time = Carbon::createFromTimeString($time, 'UTC');
 
         // Convert to Asia/Kolkata timezone
@@ -454,12 +453,10 @@ class doctor extends VaahModel
 
                     foreach ($appointments as $appointment) {
 
-                        //update status with "Pending"-----------------------------------
                         Appointment::where('id', $appointment->id)
                             ->update(['status' => 'cancelled']);
 
                         //----------------------------------------------------------------
-                        //Calling Email to Notify Booking confirm
                         $subject = 'Appointment Cancelled';
                         $doctor = Doctor::find($appointment->doctor_id);
                         $patient = Patient::find($appointment->patient_id);
@@ -481,7 +478,7 @@ class doctor extends VaahModel
                             $patient->name,
                             $doctor->name,
                             $formatted_date_time,
-                            vh_get_assets_base_url().'/backend/appointments#/appointments' // URL for the button
+                            vh_get_assets_base_url().'/backend/appointments#/appointments'
                         );
 
 
@@ -622,7 +619,6 @@ class doctor extends VaahModel
     public static function isValidUTC($dateString) {
         // Check if the date string matches the UTC format
         if (preg_match('/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}\.\d{3})Z$/', $dateString)) {
-            // Try to create a DateTime object from the string
             $dateTime = \DateTime::createFromFormat(\DateTime::RFC3339, $dateString);
 
             // Check if the created DateTime object is valid
@@ -637,8 +633,6 @@ class doctor extends VaahModel
         // Get the local timezone from environment configuration
         $localTimezone = config('app.timezone'); // Assuming 'app.timezone' is set in your .env file
 
-        // Create a Carbon instance from the time string, assuming it's in the local timezone
-        // Use the current date to create the full datetime
         $currentDate = Carbon::now()->toDateString();
 
         // Create the datetime in local timezone
@@ -666,7 +660,6 @@ class doctor extends VaahModel
             $inputs['working_hours_start'] = Carbon::parse($inputs['working_hours_start'], 'Asia/Kolkata')
                 ->setTimezone('UTC')  // Convert it to UTC
                 ->format('H:i:00');
-//            echo $inputs['working_hours_start'];
 
         }
 
@@ -675,7 +668,6 @@ class doctor extends VaahModel
             $inputs['working_hours_end'] = Carbon::parse($inputs['working_hours_end'], 'Asia/Kolkata')
                 ->setTimezone('UTC')  // Convert it to UTC
                 ->format('H:i:00');
-//            echo $inputs['working_hours_end'];
 
         }
 
@@ -686,7 +678,7 @@ class doctor extends VaahModel
             'working_hours_start' => 'required',
             'working_hours_end' => [
                 'required',
-                'after:working_hours_start', // This ensures that working_hours_end is after working_hours_start
+                'after:working_hours_start',
             ],
         ], [
             'working_hours_end.after' => 'The working hours end must be after the start time.',
@@ -726,7 +718,6 @@ class doctor extends VaahModel
 
                     if ($appointment_time < $new_working_hours_start || $appointment_time > $new_working_hours_end){
 
-                        //update status with "Pending"-----------------------------------
                         Appointment::where('id', $appointment->id)
                             ->update(['status' => 'pending']);
 
@@ -831,12 +822,10 @@ class doctor extends VaahModel
 
                     foreach ($appointments as $appointment) {
 
-                        //update status with "Pending"-----------------------------------
                             Appointment::where('id', $appointment->id)
                                 ->update(['status' => 'cancelled']);
 
                             //----------------------------------------------------------------
-                            //Calling Email to Notify Booking confirm
                             $subject = 'Appointment Cancelled';
                             $doctor = Doctor::find($appointment->doctor_id);
                             $patient = Patient::find($appointment->patient_id);

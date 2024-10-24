@@ -246,8 +246,6 @@ class AppointmentsController extends Controller
     //----------------------------------------------------------
     //Custom functions
 
-    // Custom function --------------------------------------------
-
     //----------------------------------------------------------
     public function getDoctorsAppoint (Request $request,$id)
     {
