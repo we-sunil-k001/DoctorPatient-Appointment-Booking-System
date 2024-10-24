@@ -264,7 +264,7 @@ const toggleCreateMenu = (event) => {
                     <!-- Success Tab -->
                     <TabPanel :header="store.tabs[2].header" :disabled="store.tabs[2].disabled">
                         <div v-if="store.response_errors.length">
-                            <h4>Below rows are having issues: </h4>
+                            <h3>Below rows are having issues: </h3>
                             <ol>
                                 <li v-for="(error, index) in store.response_errors" :key="index">
                                     <span v-if="error.patient_email">Patient Email: {{ error.patient_email }} - </span>
@@ -286,8 +286,10 @@ const toggleCreateMenu = (event) => {
                                     </span>
                                 </li>
                             </ol>
-                            <div class="flex justify-content-end gap-2">
+                            <div class="flex justify-content-between gap-2">
 
+                                <Button type="button" severity="primary" label="Upload more" @click="store.uploadMore"
+                                        class=""></Button>
                                 <Button type="button" severity="danger" label="Close" @click="store.closeMoveToImport"
                                         class=""></Button>
                             </div>

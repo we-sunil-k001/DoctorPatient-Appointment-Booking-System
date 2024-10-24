@@ -1186,15 +1186,35 @@ export const useAppointmentStore = defineStore({
             this.tabs[2].disabled = true;
 
             //varible setting to null
-            form_data = [];
-            table_data = [];
-            response_errors = [];
+            this.csv_headers = [];
+            this.csv_data = [];
+            this.form_data = [];
+            this.table_data = [];
+            this.response_errors = [];
 
             // Set the active tab back to the first tab
             this.activeTabIndex = 0;
 
             // Close the dialog
             this.visible = false;
+        },
+
+        uploadMore()
+        {
+            // Reset tabs to initial state
+            this.tabs[0].disabled = false;
+            this.tabs[1].disabled = true;
+            this.tabs[2].disabled = true;
+
+            //varible setting to null
+            this.csv_headers = [];
+            this.csv_data = [];
+            this.form_data = [];
+            this.table_data = [];
+            this.response_errors = [];
+
+            // Set the active tab back to the first tab
+            this.activeTabIndex = 0;
         },
 
         onTabChange(e){
@@ -1285,7 +1305,11 @@ export const useAppointmentStore = defineStore({
         },
 
         async uploadFile() {
-            this.moveToMappingTab();
+            if (this.csv_data && this.csv_data.length > 0) {
+                this.moveToMappingTab();
+            } else {
+                alert("Please select file!");
+            }
         },
 
         async submitData() {
