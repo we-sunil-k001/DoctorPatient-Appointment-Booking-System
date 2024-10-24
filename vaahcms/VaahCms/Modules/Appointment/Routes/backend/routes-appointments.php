@@ -15,6 +15,12 @@ function () {
      */
     Route::get('/assets', [AppointmentsController::class, 'getAssets'])
         ->name('vh.backend.appointment.appointments.assets');
+
+    /**
+     * Export csv
+     */
+    Route::get('/export', [AppointmentsController::class, 'exportAppointments']);
+
     /**
      * Get List
      */
@@ -84,6 +90,12 @@ function () {
      */
     Route::any('/{id}/action/{action}', [AppointmentsController::class, 'itemAction'])
         ->name('vh.backend.appointment.appointments.item.action');
+
+
+    /**
+     * Publish bulk Imported data
+     */
+    Route::post('/publish-imported-data', [AppointmentsController::class, 'publishImport']);
 
     //---------------------------------------------------------
 

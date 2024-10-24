@@ -18,7 +18,9 @@ import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 import Checkbox from 'primevue/checkbox';
 import Slider from 'primevue/slider';
-
+import Dialog from 'primevue/dialog';
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
 //-------------/PrimeVue Imports
 
 //-------------CRUD PrimeVue Imports
@@ -41,8 +43,7 @@ import InputNumber from 'primevue/inputnumber';
 import Card from 'primevue/card';
 import Chart from 'primevue/chart';
 import Sidebar from 'primevue/sidebar';
-import TabView from 'primevue/tabview';
-import TabPanel from 'primevue/tabpanel';
+import FileUpload from 'primevue/fileupload';
 
 
 
@@ -84,6 +85,9 @@ app.component('ProgressBar', ProgressBar);
 app.component('Toast', Toast);
 app.component('Checkbox', Checkbox);
 app.component('Slider', Slider);
+app.component('Dialog', Dialog);
+app.component('TabView', TabView);
+app.component('TabPanel', TabPanel);
 //-------------/PrimeVue Use
 
 // -------------CRUD PrimeVue Use
@@ -106,8 +110,7 @@ app.component('InputNumber',InputNumber);
 app.component('Card',Card);
 app.component('Chart',Chart);
 app.component('Sidebar',Sidebar);
-app.component('TabView',TabView);
-app.component('TabPanel',TabPanel);
+app.component('FileUpload',FileUpload);
 
 
 //-------------/CRUD PrimeVue Use

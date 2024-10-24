@@ -21,12 +21,20 @@ class AppointmentsController extends Controller
 
     public function getAssets(Request $request)
     {
+        if (!\Auth::user()->hasPermission('appointment-has-access-of-doctors-section') &&
+            !\Auth::user()->hasPermission('appointment-has-access-of-patient-section')) {
+
+            $response['success'] = false;
+            $response['errors'][] = trans("vaahcms::messages.permission_denied");
+
+            return response()->json($response);
+        }
 
         try{
 
             $data = [];
 
-            $data['permissions'] = \Auth::user()->permissions(true);
+            $data['permission'] = \Auth::user()->permissions(true);
             $data['rows'] = config('vaahcms.per_page');
 
             $data['fillable']['columns'] = Appointment::getFillableColumns();
@@ -276,4 +284,38 @@ class AppointmentsController extends Controller
     }
     //----------------------------------------------------------
 
+    public function exportAppointments()
+    {
+        try{
+            return Appointment::exportAppointments();
+        }catch (\Exception $e){
+            $response = [];
+            $response['success'] = false;
+            if(env('APP_DEBUG')){
+                $response['errors'][] = $e->getMessage();
+                $response['hint'] = $e->getTrace();
+            } else{
+                $response['errors'][] = trans("vaahcms-general.something_went_wrong");
+            }
+            return $response;
+        }
+    }
+    //----------------------------------------------------------
+
+    public function publishImport(Request $request)
+    {
+        try{
+            return Appointment::publishImport($request);
+        }catch (\Exception $e){
+            $response = [];
+            $response['success'] = false;
+            if(env('APP_DEBUG')){
+                $response['errors'][] = $e->getMessage();
+                $response['hint'] = $e->getTrace();
+            } else{
+                $response['errors'][] = trans("vaahcms-general.something_went_wrong");
+            }
+            return $response;
+        }
+    }
 }

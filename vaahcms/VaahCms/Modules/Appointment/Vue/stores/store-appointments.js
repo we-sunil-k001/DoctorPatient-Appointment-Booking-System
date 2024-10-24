@@ -66,8 +66,31 @@ export const useAppointmentStore = defineStore({
         list_create_menu: [],
         item_menu_list: [],
         item_menu_state: null,
-        form_menu_list: []
+        form_menu_list: [],
         // doctor_details: null
+
+        //Tab View --------------
+        visible: false,
+        activeTabIndex : 0,
+        tabs: [{ header: 'Upload File', disabled: false },
+            { header: 'Mapping', disabled: true },
+            { header: 'Publish Data', disabled: true }],
+        //Import File --------
+        file_to_upload: null,
+        file_date: null,
+        // Variables to store selected dropdown options and CSV data
+        csv_headers : [],
+        csv_data : [],
+        selected_patient_name : null,
+        selected_patient_email : null,
+        selected_doctor_name : null,
+        selected_doctor_email : null,
+        selected_medical_concern : null,
+        selected_appointment_date : null,
+        selected_appointment_time : null,
+        form_data : [],
+        table_data : [],
+        response_errors : []
 
     }),
     getters: {
@@ -243,6 +266,7 @@ export const useAppointmentStore = defineStore({
             if(data)
             {
                 this.item = data;
+                this.end_time_temp = data.working_hours_end;
             }else{
                 this.$router.push({name: 'appointments.index',query:this.query});
             }
@@ -970,6 +994,353 @@ export const useAppointmentStore = defineStore({
             );
             this.getItemAfter(response);
         },
+
+
+        //Convert to 12-Hour Format
+        formatTime(dateString) {
+            const date = new Date(dateString);
+            let hours = date.getHours();
+            const minutes = date.getMinutes();
+
+            const period = hours >= 12 ? 'pm' : 'am';
+            hours = hours % 12 || 12; // Convert to 12-hour format
+            const formattedMinutes = minutes < 10 ? '0' + minutes : minutes; // Add leading zero if needed
+
+            return `${hours}:${formattedMinutes} ${period}`;
+        },
+
+        //Function to Convert time like 10:00 am to UTC
+        convertToUTC(timeString) {
+            const date = new Date();
+            const [time, period] = timeString.split(' ');
+            let [hours, minutes] = time.split(':').map(Number);
+
+            // Convert to 24-hour format
+            if (period.toLowerCase() === 'pm' && hours !== 12) hours += 12;
+            if (period.toLowerCase() === 'am' && hours === 12) hours = 0;
+
+            // Set the current date with the converted time
+            date.setHours(hours, minutes, 0, 0);
+
+            return date.toISOString(); // Return UTC in ISO format
+        },
+
+        // Add minutes in the existing time
+        addMinutesToTime(time, minutesToAdd) {
+
+            //Split the time into hours, minutes, and period (AM/PM)
+            const [timePart, period] = time.split(' ');
+            let [hours, minutes] = timePart.split(':').map(Number);
+
+
+            // Convert to 24-hour format for easier calculations
+            if (period === 'pm' && hours !== 12) hours += 12;
+            if (period === 'am' && hours === 12) hours = 0;
+
+            // Create a new Date object and set the time
+            const date = new Date();
+            date.setHours(hours);
+            date.setMinutes(minutes);
+
+
+            // Add the specified minutes
+            date.setMinutes(date.getMinutes() + minutesToAdd);
+
+            // Get the updated hours and minutes
+            let updatedHours = date.getHours();
+            const updatedMinutes = date.getMinutes();
+
+
+            // Convert back to 12-hour format
+            const updatedPeriod = updatedHours >= 12 ? 'pm' : 'am';
+            updatedHours = updatedHours % 12 || 12; // Convert 0 hour to 12
+
+            // Format minutes to always have two digits
+            const formattedMinutes = updatedMinutes < 10 ? '0' + updatedMinutes : updatedMinutes;
+
+            // Return the updated time
+            return `${updatedHours}:${formattedMinutes} ${updatedPeriod}`;
+
+        },
+
+        // Import CSV -----------------------------------------------------------
+
+        // Function to convert CSV to JSON
+        async csvToJson(csv) {
+            const lines = csv.split('\n');
+            const result = [];
+
+            // Get the headers
+            const headers = lines[0].split(',').map((header) => header.trim());
+
+            // Iterate through the rows
+            for (let i = 1; i < lines.length; i++) {
+                const obj = {};
+                const currentline = lines[i].split(',').map((value) => value.trim());
+
+                for (let j = 0; j < headers.length; j++) {
+                    obj[headers[j]] = currentline[j]; // Create key-value pairs
+                }
+
+                result.push(obj);
+            }
+
+            return result; // Return the JSON array
+        },
+
+        // Capture the file when it is selected
+        async onFileSelect(event) {
+            const file = event.files[0]; // Get the first selected file
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const text = e.target.result;
+                    const jsonData = await this.csvToJson(text); // Convert CSV to JSON
+                    this.file_date = jsonData; // Store JSON data
+                    this.file_to_upload = file; // Store the selected file
+                    console.log('Converted JSON data:', this.file_date); // Debugging log
+                };
+                reader.readAsText(file); // Read the file as text
+            }
+        },
+
+        // Trigger backend upload
+        async uploadFile() {
+            if (!this.file_to_upload) {
+                alert("Please select a file before uploading.");
+                return;
+            }
+
+            let url = this.ajax_url + '/bulk-import';
+
+            // Convert the CSV data to JSON before making the request
+            let param = this.file_date;
+
+            let options = {
+                method: 'POST', // Specify the method
+                headers: {
+                    'Content-Type': 'application/json', // Ensure JSON format is sent
+                },
+                params: param,
+            };
+
+            try {
+                const response =await vaah().ajax(
+                    url,
+                    this.getItemAfter(),
+                    options
+                );
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        },
+
+        async exportAppointments() {
+            try {
+                // Fetch file data
+                const res = await vaah().ajax(ajax_url + '/export');
+
+                const blob = new Blob([res.data]);
+                const url = window.URL.createObjectURL(blob);
+
+                // Create a link and trigger the download
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'sample-appointments.csv'; // Set the download attribute
+                document.body.appendChild(link);
+                link.click();
+
+                // Cleanup
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error occurred while downloading the file:', error);
+            }
+        },
+
+        // Tab View back and next functions --------------------
+        moveToMappingTab(){
+            this.tabs[0].disabled = true;
+            this.tabs[1].disabled = false;
+            this.activeTabIndex = 1;
+        },
+
+        moveToSuccess(){
+            this.tabs[1].disabled = true;
+            this.tabs[2].disabled = false;
+            this.mapFormDataToRows();
+            this.activeTabIndex = 2;
+        },
+
+        moveToUpload(){
+            this.tabs[0].disabled = true;
+            this.tabs[1].disabled = false;
+            this.activeTabIndex = 0;
+        },
+
+        closeMoveToImport(){
+            // Reset tabs to initial state
+            this.tabs[0].disabled = false;
+            this.tabs[1].disabled = true;
+            this.tabs[2].disabled = true;
+
+            //varible setting to null
+            form_data = [];
+            table_data = [];
+            response_errors = [];
+
+            // Set the active tab back to the first tab
+            this.activeTabIndex = 0;
+
+            // Close the dialog
+            this.visible = false;
+        },
+
+        onTabChange(e){
+            this.activeTabIndex = e.index;
+        },
+
+        // Import CSV -----------------------------------------------------------
+
+        getDataForHeader(header_selected) {
+            if (header_selected) {
+                let selected_header = header_selected['label'];
+
+                let result = [];
+                for (let i = 0; i < this.csv_data.length; i++) {
+                    const row = this.csv_data[i];
+                    if (row[selected_header] !== undefined) {
+                        result.push(row[selected_header]);
+                    }
+                }
+                return result.length > 0 ? result : null;
+            }
+            return null;
+        },
+
+
+        mapFormDataToRows() {
+
+            this.table_data = []; // Empty the array to remove previous records
+
+            // Determine the maximum number of rows from all selected fields
+            const num_rows = Math.max(
+                this.form_data.patient_name?.length || 0,
+                this.form_data.patient_email?.length || 0,
+                this.form_data.doctor_name?.length || 0,
+                this.form_data.doctor_email?.length || 0,
+                this.form_data.reason_for_visit?.length || 0,
+                this.form_data.appointment_date?.length || 0,
+                this.form_data.appointment_time?.length || 0
+            );
+
+            // Loop over the maximum number of rows and fill the table data
+            for (let i = 0; i < num_rows; i++) {
+                this.table_data.push({
+                    patient_name: this.form_data.patient_name?.[i] || '', // Fallback to empty string if not selected
+                    patient_email: this.form_data.patient_email?.[i] || '',
+                    doctor_name: this.form_data.doctor_name?.[i] || '',
+                    doctor_email: this.form_data.doctor_email?.[i] || '',
+                    reason_for_visit: this.form_data.reason_for_visit?.[i] || '',
+                    appointment_date: this.form_data.appointment_date?.[i] || '',
+                    appointment_time: this.form_data.appointment_time?.[i] || '',
+                });
+            }
+        },
+
+        // Function to convert CSV to JSON
+        async csvToJson(csv) {
+            const lines = csv.split('\n');
+            const headers = lines[0].split(',').map((header) => header.trim().replace(/^"|"$/g, ''));  // Remove quotes from headers
+
+            const data = [];
+
+            // Extract rows as objects
+            for (let i = 1; i < lines.length; i++) {
+                const currentline = lines[i].split(',').map((value) => value.trim().replace(/^"|"$/g, '')); // Remove quotes from values
+                const obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = currentline[index];
+                });
+                data.push(obj);
+            }
+
+            return { headers, data };
+        },
+
+        // Capture the file when it is selected
+        async onFileSelect(event) {
+            const file = event.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const text = e.target.result;
+                    const { headers, data } = await this.csvToJson(text); // Convert CSV to JSON
+                    this.csv_headers = headers.map(header => ({ label: header, value: header }));  // Map headers for dropdowns
+                    this.csv_data = data;  // Store CSV rows
+                };
+                reader.readAsText(file);
+            }
+        },
+
+        async uploadFile() {
+            this.moveToMappingTab();
+        },
+
+        async submitData() {
+
+            const patient_name = this.getDataForHeader(this.selected_patient_name);
+            const patient_email = this.getDataForHeader(this.selected_patient_email);
+            const doctor_name = this.getDataForHeader(this.selected_doctor_name);
+            const doctor_email = this.getDataForHeader(this.selected_doctor_email);
+            const reason_for_visit = this.getDataForHeader(this.selected_medical_concern);
+            const appointment_date = this.getDataForHeader(this.selected_appointment_date);
+            const appointment_time = this.getDataForHeader(this.selected_appointment_time);
+
+            this.form_data = {
+                patient_name,
+                patient_email,
+                doctor_name,
+                doctor_email,
+                reason_for_visit,
+                appointment_date,
+                appointment_time,
+            };
+            this.moveToSuccess();
+
+        },
+
+        async publishData()
+        {
+            let url = this.ajax_url + '/publish-imported-data';
+
+            // Convert the CSV data to JSON before making the request
+            let param = this.form_data;
+
+            let options = {
+                method: 'POST', // Specify the method
+                headers: {
+                    'Content-Type': 'application/json', // Ensure JSON format is sent
+                },
+                params: param,
+            };
+
+            try {
+                const response =await vaah().ajax(
+                    url,
+                    null,
+                    options
+                );
+                this.response_errors = [];
+                this.response_errors = response.data.error;
+                console.log(response.data.error);
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
 
         //---------------------------------------------------------------------
     }

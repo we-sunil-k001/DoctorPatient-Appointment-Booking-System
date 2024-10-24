@@ -60,6 +60,8 @@ const toggleCreateMenu = (event) => {
 };
 //--------/form_menu
 
+const visible = ref(false);
+
 
 </script>
 <template>
@@ -94,7 +96,13 @@ const toggleCreateMenu = (event) => {
                         Create
                     </Button>
 
-                    <Button data-testid="doctors-list-reload"
+                        <Button @click="visible = true" >
+                            <i class="pi pi-upload mr-1"></i>
+                            Import
+                        </Button>
+
+
+                        <Button data-testid="doctors-list-reload"
                             class="p-button-sm"
                             @click="store.getList()">
                         <i class="pi pi-refresh mr-1"></i>
@@ -132,6 +140,36 @@ const toggleCreateMenu = (event) => {
 
         <RouterView/>
 
+    </div>
+
+
+    <!--Dialog for import-->
+
+    <div class="card flex justify-content-center">
+        <Dialog v-model:visible="visible" header="Upload File" :style="{ width: '25rem' }">
+            <div class="flex align-items-center gap-3 mb-3">
+                <FileUpload
+                    class="flex-auto w-full"
+                    mode="basic"
+                    name="file"
+                    accept=".csv, .xlsx, .xls"
+                    :maxFileSize="1000000"
+                    :customUpload="true"
+                    @select="store.onFileSelect"
+                    chooseLabel="Browse"
+                />
+            </div>
+            <div class="flex justify-content-center  gap-2">
+                <Button type="button" severity="success" label="Save" @click="store.uploadFile" class="w-full"></Button>
+            </div>
+            <div class="text-align-center flex justify-content-center">
+                <br>
+                <label class="font-semibold mt-3" @click="downloadSample"
+                       style="cursor: pointer; color: dodgerblue">
+                    Download a sample CSV with format
+                </label>
+            </div>
+        </Dialog>
     </div>
 
 
