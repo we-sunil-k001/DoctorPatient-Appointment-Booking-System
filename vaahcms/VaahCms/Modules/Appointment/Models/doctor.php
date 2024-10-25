@@ -989,9 +989,18 @@ class doctor extends VaahModel
     //-------------------------------------------------
     public static function getDoctorFilterParameter()
     {
+        // Get specializations with the no. of doctors in each
         $specializations = self::select('specialization')
+            ->selectRaw('COUNT(*) as doctor_count')
+            ->groupBy('specialization')
             ->distinct()
-            ->pluck('specialization');
+            ->get()
+            ->map(function($item) {
+                return [
+                    'specialization' => $item->specialization,
+                    'doctor_count' => $item->doctor_count,
+                ];
+            });
 
         // Fetch the maximum charges
         $maxCharges = self::max('charges');

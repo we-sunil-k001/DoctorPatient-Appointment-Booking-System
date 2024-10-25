@@ -93,11 +93,10 @@ const store = usedoctorStore();
                             <div v-for="spec in store.specialization" :key="spec" class="flex align-items-center">
                                 <Checkbox
                                     v-model="store.query.filter.selected_specialization"
-                                    :inputId="spec"
                                     name="specialization"
-                                    :value="spec"
+                                    :value="spec.specialization"
                                 />
-                                &nbsp;&nbsp; <label :for="spec">{{ spec }}</label>
+                                &nbsp;&nbsp; <label :for="spec"><span>{{ spec.specialization }}</span> <sup class="bg-primary py-1 px-2 border-circle">{{ spec.doctor_count }}</sup></label>
                             </div>
                         </div>
                     </div>
