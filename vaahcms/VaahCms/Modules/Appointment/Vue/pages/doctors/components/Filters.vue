@@ -96,7 +96,7 @@ const store = usedoctorStore();
                                     name="specialization"
                                     :value="spec.specialization"
                                 />
-                                &nbsp;&nbsp; <label :for="spec"><span>{{ spec.specialization }}</span> <sup class="bg-primary py-1 px-2 border-circle">{{ spec.doctor_count }}</sup></label>
+                                &nbsp;&nbsp; <label :for="spec"><span>{{ spec.specialization }}</span> <sup><Badge class="border-circle" v-tooltip.top="'Doctors'">{{ spec.doctor_count }}</Badge></sup></label>
                             </div>
                         </div>
                     </div>

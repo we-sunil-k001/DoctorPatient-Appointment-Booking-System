@@ -37,7 +37,7 @@ const useVaah = vaah();
 
                     <span @click="store.fetchDoctorAppointments(prop.data.id)" class="doctors_name">
                         {{ prop.data.name }}
-                        <sup><Badge value="4" size="" severity="info">{{ prop.data.appointments_count }}</Badge></sup>
+                        <sup><Badge class="border-circle" v-tooltip.top="'Appointments'">{{ prop.data.appointments_count }}</Badge></sup>
                     </span>
 
                 </template>
@@ -431,8 +431,6 @@ const useVaah = vaah();
 
 <style scoped>
 .doctors_name {
-    color: cornflowerblue;
-    font-weight: 600;
     cursor: pointer;
 }
 
