@@ -42,9 +42,8 @@ const store = usedoctorStore();
                     <template #label>
                         <b>Charges</b>
                     </template>
-
                     <div class="field-radiobutton" style="display: block">
-                        <Slider v-model="store.query.filter.charges" :min="0" :max="200" range class="w-full"/>
+                        <Slider v-model="store.query.filter.charges" :min="store.charges[0]" :max="store.charges[1]" range class="w-full"/>
                         <!-- Validation to avoid reading undefined -->
                         <p v-if="store.query.filter.charges && store.query.filter.charges.length > 0">
                             ₹{{ store.query.filter.charges[0] }} - ₹{{ store.query.filter.charges[1] }}

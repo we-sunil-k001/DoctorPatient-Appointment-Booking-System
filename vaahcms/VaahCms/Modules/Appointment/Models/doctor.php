@@ -314,7 +314,6 @@ class doctor extends VaahModel
         // Select specific columns from the database
         $list = $list->select('id','name', 'email', 'phone_number', 'specialization','working_hours_start','working_hours_end',
             'no_of_slot','charges','updated_at','is_active')
-        ->withTrashed()
         ->withCount(['appointments']);
 
         // Count all appointments

@@ -242,6 +242,7 @@ export const usedoctorStore = defineStore({
             if(data)
             {
                 this.list = data;
+                this.fetchDoctorFilterParameter();
             }
         },
         //---------------------------------------------------------------------
@@ -444,6 +445,8 @@ export const usedoctorStore = defineStore({
                 await this.formActionAfter(data);
                 this.getItemMenu();
                 this.getFormMenu();
+                this.fetchDoctorFilterParameter();
+
             }
         },
         //---------------------------------------------------------------------
@@ -1021,13 +1024,14 @@ export const usedoctorStore = defineStore({
 
         },
 
-        // Get all Appointments related to particular doctor
         async fetchDoctorFilterParameter() {
 
             const response = await vaah().ajax(ajax_url+'/filter');
             this.specialization = response.data.specializations; // Extract unique specializations
-            this.changes = [0,response.data.max_charges];
+            this.charges = [0,response.data.max_charges];
         },
+
+        // Get all Appointments related to particular doctor
         async fetchDoctorAppointments(doctor_id) {
             this.selected_doctor = doctor_id;
             this.visible = true;
