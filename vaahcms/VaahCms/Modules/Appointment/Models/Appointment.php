@@ -992,19 +992,21 @@ class Appointment extends VaahModel
     // get Dashboard stats.
     public static function getDashboardStats()
     {
-        $totalDoctors = Doctor::count();
-        $totalPatients = Patient::count();
-        $totalAppointments = Appointment::count();
-        $cancelledAppointments = Appointment::where('status', 'cancelled')->count();
+        $total_doctors = Doctor::count();
+        $total_patients = Patient::count();
+        $total_appointments = Appointment::count();
+        $cancelled_appointments = Appointment::where('status', 'cancelled')->count();
         $reschedule_pending = Appointment::where('status', 'pending')->count();
+        $confirm_appointments = Appointment::where('status', 'confirmed')->count();
 
 
         return response()->json([
-            'total_doctors' => $totalDoctors,
-            'total_patients' => $totalPatients,
-            'total_appointments' => $totalAppointments,
-            'cancelled_appointments' => $cancelledAppointments,
+            'total_doctors' => $total_doctors,
+            'total_patients' => $total_patients,
+            'total_appointments' => $total_appointments,
+            'cancelled_appointments' => $cancelled_appointments,
             'reschedule_pending' => $reschedule_pending,
+            'confirm_appointments' => $confirm_appointments,
         ]);
     }
 
