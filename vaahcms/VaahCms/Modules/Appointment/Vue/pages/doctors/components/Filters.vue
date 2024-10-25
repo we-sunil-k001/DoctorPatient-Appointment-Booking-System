@@ -58,17 +58,16 @@ const store = usedoctorStore();
                         <b>Working Hours</b>
                     </template>
 
-                    <div class="field-radiobutton" style="display: flex ">
-                        <Calendar
-                                v-model="store.query.filter.working_hours_start"
-                            timeOnly
-                            hourFormat="12"
-                            showIcon
-                            placeholder="Select time"
-                            name="working_hours_start"
-                            :step-minute="5"
-                        ></Calendar>
-                        &nbsp to &nbsp
+<!--                        <Calendar-->
+<!--                                v-model="store.query.filter.working_hours_start"-->
+<!--                            timeOnly-->
+<!--                            hourFormat="12"-->
+<!--                            showIcon-->
+<!--                            placeholder="Select time"-->
+<!--                            name="working_hours_start"-->
+<!--                            :step-minute="5"-->
+<!--                        ></Calendar>-->
+<!--&lt;!&ndash;                        &nbsp to &nbsp&ndash;&gt;-->
                         <Calendar
                             v-model="store.query.filter.working_hours_end"
                             timeOnly
@@ -78,7 +77,16 @@ const store = usedoctorStore();
                             name="working_hours_start"
                             :step-minute="5"
                         ></Calendar>
-                    </div>
+
+                        <div class="field-radiobutton" v-for="(hours, index) in store.working_hours" :key="index">
+                            <RadioButton
+                                v-model="store.query.filter.selected_working_hours"
+                                name="working_hours"
+                                :value="hours.value"
+                            />
+                            <label :for="hours.value" class="cursor-pointer">{{ hours.header }}</label>
+                        </div>
+
 
                 </VhFieldVertical>
 

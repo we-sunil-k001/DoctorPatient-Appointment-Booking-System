@@ -73,7 +73,10 @@ export const usedoctorStore = defineStore({
         specialization: [],
         selected_specialization: [],
         filter_parameter: [],
-
+        working_hours: [{ header: '09:00 AM to 12:00 PM', value: "03:30:00-06:30:00" },
+            { header: '12:00 PM to 03:00 PM', value: "06:30:00-09:30:00" },
+            { header: '03:00 PM to 06:00 PM', value: "09:30:00-12:30:00" }],
+        selected_working_hours:[],
         //sidebar
         visible: false,
         // to get appointment data

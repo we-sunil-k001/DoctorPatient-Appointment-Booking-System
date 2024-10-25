@@ -1031,25 +1031,20 @@ class doctor extends VaahModel
     //-------------------------------------------------
     public function scopeworkingHoursFilter($query, $filter)
     {
-        $working_hours_start = isset($filter['working_hours_start']) ? $filter['working_hours_start'] : null;
-        $working_hours_end = isset($filter['working_hours_end']) ? $filter['working_hours_end'] : null;
+        dd($filter);
+        // Check if 'working_hours' is set and not null
+        if (!isset($filter['working_hours']) || empty($filter['working_hours'])) {
+            return $query; // No filter to apply, so return the original query
+        }
 
-        $formatted_start = $working_hours_start ? date('H:i:00', strtotime($working_hours_start)) : null;
-        $formatted_end = $working_hours_end ? date('H:i:00', strtotime($working_hours_end)) : null;
+        // Split the filter string by "-"
+        list($working_hours_start, $working_hours_end) = explode('-', $filter['working_hours']);
 
-        // Case 1: If both start and end are provided
-        if ($formatted_start && $formatted_end) {
-            $query->whereTime('working_hours_start', '>=', $formatted_start)
+        $formatted_start = $working_hours_start;
+        $formatted_end = $working_hours_end;
+
+        $query->whereTime('working_hours_start', '>=', $formatted_start)
                 ->whereTime('working_hours_end', '<=', $formatted_end);
-        }
-        // Case 2: If only start time is provided
-        elseif ($formatted_start) {
-            $query->whereTime('working_hours_start', '>=', $formatted_start);
-        }
-        // Case 3: If only end time is provided
-        elseif ($formatted_end) {
-            $query->whereTime('working_hours_end', '<=', $formatted_end);
-        }
 
         return $query;
     }
