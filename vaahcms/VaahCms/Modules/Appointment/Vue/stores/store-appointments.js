@@ -1336,6 +1336,16 @@ export const useAppointmentStore = defineStore({
 
         async submitData() {
 
+            // Check if any of the mandatory fields are null or undefined
+            if (!this.selected_patient_email ||
+                !this.selected_doctor_email ||
+                !this.selected_appointment_date ||
+                !this.selected_appointment_time) {
+
+                alert('Please select all the required fields!');
+                return;
+            }
+
             const patient_name = this.getDataForHeader(this.selected_patient_name);
             const patient_email = this.getDataForHeader(this.selected_patient_email);
             const doctor_name = this.getDataForHeader(this.selected_doctor_name);
@@ -1353,6 +1363,7 @@ export const useAppointmentStore = defineStore({
                 appointment_date,
                 appointment_time,
             };
+
             this.moveToSuccess();
 
         },
