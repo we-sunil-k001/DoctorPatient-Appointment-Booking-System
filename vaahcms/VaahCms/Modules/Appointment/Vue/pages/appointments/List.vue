@@ -213,7 +213,7 @@ const toggleCreateMenu = (event) => {
                                 </div>
 
                                 <div class="col-12 md:col-2 mb-2 flex align-items-center justify-content-start">
-                                    <label  class="font-bold">Patient Email</label>
+                                    <label  class="font-bold">Patient Email<sup class="text-danger text-lg">*</sup></label>
                                 </div>
                                 <div class="col-12 md:col-4 mb-2">
                                     <Dropdown id="dropdown2" v-model="store.selected_patient_email" :options="store.csv_headers" optionLabel="label" name="patient_email" placeholder="Select Header" class="w-full" />
@@ -227,7 +227,7 @@ const toggleCreateMenu = (event) => {
                                 </div>
 
                                 <div class="col-12 md:col-2 mb-2 flex align-items-center justify-content-start">
-                                    <label  class="font-bold">Doctor Email</label>
+                                    <label  class="font-bold">Doctor Email<sup class="text-danger text-lg">*</sup></label>
                                 </div>
                                 <div class="col-12 md:col-4 mb-2">
                                     <Dropdown id="dropdown4" v-model="store.selected_doctor_email" :options="store.csv_headers" optionLabel="label" name="doctor_email" placeholder="Select Header" class="w-full" />
@@ -241,14 +241,14 @@ const toggleCreateMenu = (event) => {
                                 </div>
 
                                 <div class="col-12 md:col-2 mb-2 flex align-items-center justify-content-start">
-                                    <label class="font-bold">Appointment Date</label>
+                                    <label class="font-bold">Appointment Date<sup class="text-danger text-lg">*</sup></label>
                                 </div>
                                 <div class="col-12 md:col-4 mb-2">
                                     <Dropdown id="dropdown5" v-model="store.selected_appointment_date" :options="store.csv_headers" optionLabel="label" name="appointment_date" placeholder="Select Header" class="w-full" />
                                 </div>
 
                                 <div class="col-12 md:col-2 mb-2 flex align-items-center justify-content-start">
-                                    <label class="font-bold">Appointment Time</label>
+                                    <label class="font-bold">Appointment Time<sup class="text-danger text-lg">*</sup></label>
                                 </div>
                                 <div class="col-12 md:col-4 mb-2">
                                     <Dropdown v-model="store.selected_appointment_time" :options="store.csv_headers" optionLabel="label" name="appointment_time" placeholder="Select Header" class="w-full" />
