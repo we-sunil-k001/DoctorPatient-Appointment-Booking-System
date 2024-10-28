@@ -954,6 +954,7 @@ class doctor extends VaahModel
         $inputs['email'] = $faker->email;
         $inputs['phone_number'] = sprintf('%010d', random_int(0, 9999999999)); // Generates a 10-digit number
         $inputs['specialization'] = 'ENT';
+        $inputs['charges'] = 200;
         $inputs['is_active'] = 1;
 
         if(!$is_response_return){
@@ -1031,7 +1032,6 @@ class doctor extends VaahModel
     //-------------------------------------------------
     public function scopeworkingHoursFilter($query, $filter)
     {
-        dd($filter);
         // Check if 'working_hours' is set and not null
         if (!isset($filter['working_hours']) || empty($filter['working_hours'])) {
             return $query; // No filter to apply, so return the original query
@@ -1043,10 +1043,13 @@ class doctor extends VaahModel
         $formatted_start = $working_hours_start;
         $formatted_end = $working_hours_end;
 
-        $query->whereTime('working_hours_start', '>=', $formatted_start)
-                ->whereTime('working_hours_end', '<=', $formatted_end);
+        $query->where(function ($q) use ($formatted_start, $formatted_end) {
+            $q->where('working_hours_start', '<=', $formatted_end)
+                ->where('working_hours_end', '>=', $formatted_start);
+        });
 
         return $query;
+
     }
 
 
