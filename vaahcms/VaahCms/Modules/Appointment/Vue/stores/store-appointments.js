@@ -1319,7 +1319,8 @@ export const useAppointmentStore = defineStore({
                 reader.onload = async (e) => {
                     const text = e.target.result;
                     const { headers, data } = await this.csvToJson(text); // Convert CSV to JSON
-                    this.csv_headers = headers.map(header => ({ label: header, value: header }));  // Map headers for dropdowns
+                    // this.csv_headers = headers.map(header => ({ label: header, value: header }));  // Map headers for dropdowns
+                    this.csv_headers = [{ label: "Select option", value: null }, ...headers.map(header => ({ label: header, value: header }))];
                     this.csv_data = data;  // Store CSV rows
                 };
                 reader.readAsText(file);
@@ -1336,13 +1337,23 @@ export const useAppointmentStore = defineStore({
 
         async submitData() {
 
+            console.log(this.selected_patient_email);
             // Check if any of the mandatory fields are null or undefined
             if (!this.selected_patient_email ||
                 !this.selected_doctor_email ||
                 !this.selected_appointment_date ||
                 !this.selected_appointment_time) {
 
-                alert('Please select all the required fields!');
+                alert('Please select all mandatory fields!');
+                return;
+            }
+            // Check if any of the mandatory fields are null or undefined after select Default option
+            if (!this.selected_patient_email.value ||
+                !this.selected_doctor_email.value ||
+                !this.selected_appointment_date.value ||
+                !this.selected_appointment_time.value) {
+
+                alert('Please select all mandatory fields!');
                 return;
             }
 

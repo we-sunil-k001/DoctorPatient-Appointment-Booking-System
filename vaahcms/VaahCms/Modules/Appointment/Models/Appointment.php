@@ -160,17 +160,17 @@ class Appointment extends VaahModel
     public static function convertToISTEmailFormat($inputs)
     {
         // Convert 'appointment_date' from UTC to Asia/Kolkata
-        $appointmentDate = Carbon::parse($inputs['appointment_date'])
+        $appointment_date = Carbon::parse($inputs['appointment_date'])
             ->setTimezone('Asia/Kolkata')
             ->addDay()
             ->format('M. d Y');
 
         // Convert 'appointment_time' from UTC to Asia/Kolkata
-        $appointmentTime = Carbon::parse($inputs['appointment_time'])
+        $appointment_time = Carbon::parse($inputs['appointment_time'])
             ->setTimezone('Asia/Kolkata')
             ->format('h:i A');
 
-        return $appointmentDate . ', ' . $appointmentTime;
+        return $appointment_date . ', ' . $appointment_time;
     }
 
 
@@ -1028,7 +1028,7 @@ class Appointment extends VaahModel
     {
         $inputs = $request->all();
         $responses = [];
-        $validRecords = []; // Array to hold valid records
+        $valid_records = []; // Array to hold valid records
 
         // Check if the input arrays are set and are valid arrays
         if (!isset($inputs['patient_email']) || !is_array($inputs['patient_email']) || empty($inputs['patient_email'])) {
@@ -1077,7 +1077,7 @@ class Appointment extends VaahModel
                 ];
             } else {
                 // Store valid records for further processing
-                $validRecords[] = [
+                $valid_records[] = [
                     'patient_email' => $email,
                     'doctor_email' => $inputs['doctor_email'][$index] ?? null,
                     'appointment_date' => $inputs['appointment_date'][$index] ?? null,
@@ -1088,10 +1088,14 @@ class Appointment extends VaahModel
         }
 
         // Process valid records
-        foreach ($validRecords as $record) {
+        foreach ($valid_records as $record) {
+
             // Convert appointment date and time
-            $appointmentDate = Carbon::parse($record['appointment_date'])->toDateString();  // Extract date part
-            $appointmentTime = Carbon::parse($record['appointment_time'], 'Asia/Kolkata')
+            $appointment_date = Carbon::parse($record['appointment_date'], 'Asia/Kolkata')
+                ->setTimezone('UTC')   // Convert it to UTC
+                ->toDateString();
+
+            $appointment_time = Carbon::parse($record['appointment_time'], 'Asia/Kolkata')
                 ->setTimezone('UTC')  // Convert it to UTC
                 ->format('H:i:00');
 
@@ -1116,11 +1120,11 @@ class Appointment extends VaahModel
             }
 
             // Fetch existing working hours and convert to IST
-            $existingWorkingHoursStart = Carbon::parse($doctor->working_hours_start)->setTimezone('Asia/Kolkata')->format('H:i:00');
-            $existingWorkingHoursEnd = Carbon::parse($doctor->working_hours_end)->setTimezone('Asia/Kolkata')->format('H:i:00');
+            $existing_working_hours_start = Carbon::parse($doctor->working_hours_start)->format('H:i:00');
+            $existing_working_hours_end = Carbon::parse($doctor->working_hours_end)->format('H:i:00');
 
             // Check if appointment time is within working hours
-            if ($appointmentTime < $existingWorkingHoursStart || $appointmentTime > $existingWorkingHoursEnd) {
+            if ($appointment_time < $existing_working_hours_start || $appointment_time > $existing_working_hours_end) {
                 $responses[] = [
                     'patient_email' => $record['patient_email'],
                     'doctor_email' => $record['doctor_email'],
@@ -1129,9 +1133,10 @@ class Appointment extends VaahModel
                 continue;
             }
 
-            // Check for existing appointments
-            $existingAppointment = self::where('appointment_date', $appointmentDate)
-                ->where('appointment_time', $appointmentTime)
+
+            // Check for existing appointments ------------------------------
+            $existingAppointment = self::where('appointment_date', $appointment_date)
+                ->where('appointment_time', $appointment_time)
                 ->where('doctor_id', $doctor->id)
                 ->first();
 
@@ -1147,8 +1152,8 @@ class Appointment extends VaahModel
             Appointment::create([
                 'patient_id' => $patient->id,
                 'doctor_id' => $doctor->id,
-                'appointment_date' => $appointmentDate,
-                'appointment_time' => $appointmentTime,
+                'appointment_date' => $appointment_date,
+                'appointment_time' => $appointment_time,
                 'reason_for_visit' => $record['reason_for_visit'] ?? null, // Ensure reason for visit is captured
                 'is_active ' => 1,
                 'status' => 'confirmed'
