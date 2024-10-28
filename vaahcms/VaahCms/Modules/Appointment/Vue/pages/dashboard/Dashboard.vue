@@ -150,17 +150,18 @@ const setpieOptions = () => {
             </div>
             <div class="col-12 md:col-6 lg:col-3">
                 <div class="p-4 py-5 border-round-sm shadow-2 bg-white font-bold">
-                    <h4 class="text-6xl pt-2" v-if="store.item">
-                        {{ store.item.data.total_doctors }}
+                    <h4 class="text-6xl pt-2 flex align-items-center justify-content-between" v-if="store.item">
+                        <span>{{ store.item.data.total_doctors }}</span>
+                        <span><i class="pi pi-user-plus" style="font-size: 2rem"></i></span>
                     </h4>
                     <h5 class="pt-5 text-xl font-normal">Associated Doctors</h5>
                 </div>
             </div>
             <div class="col-12 md:col-6 lg:col-3">
                 <div class="p-4 py-5 border-round-sm shadow-2 bg-white font-bold">
-
-                    <h4 class="text-6xl pt-2" v-if="store.item">
-                        {{ store.item.data.total_patients }}
+                    <h4 class="text-6xl pt-2 flex align-items-center justify-content-between" v-if="store.item">
+                        <span>{{ store.item.data.total_patients }}</span>
+                        <span><i class="pi pi-users" style="font-size: 2rem"></i></span>
                     </h4>
 
                     <h5 class="pt-5 text-xl font-normal">Registered Patients</h5>
@@ -168,16 +169,18 @@ const setpieOptions = () => {
             </div>
             <div class="col-12 md:col-6 lg:col-3">
                 <div class="p-4 py-5 border-round-sm shadow-2 bg-white font-bold">
-                    <h4 class="text-6xl pt-2" v-if="store.item">
-                        {{ store.item.data.cancelled_appointments }} / {{ store.item.data.total_appointments }}
+                    <h4 class="text-6xl pt-2 flex align-items-center justify-content-between" v-if="store.item">
+                        <span>{{ store.item.data.cancelled_appointments }} / {{ store.item.data.total_appointments }}</span>
+                        <span><i class="pi pi-calendar-times" style="font-size: 2rem"></i></span>
                     </h4>
                     <h5 class="pt-5 text-xl font-normal">Appointments Cancelled</h5>
                 </div>
             </div>
             <div class="col-12 md:col-6 lg:col-3">
                 <div class="p-4 py-5 border-round-sm shadow-2 bg-white font-bold">
-                    <h4 class="text-6xl pt-2" v-if="store.item">
-                        {{ store.item.data.reschedule_pending }} / {{ store.item.data.total_appointments }}
+                    <h4 class="text-6xl pt-2 flex align-items-center justify-content-between" v-if="store.item">
+                        <span> {{ store.item.data.reschedule_pending }} / {{ store.item.data.total_appointments }}</span>
+                        <span><i class="pi pi-calendar-minus" style="font-size: 2rem"></i></span>
                     </h4>
                     <h5 class="pt-5 text-xl font-normal">Appointments Reschedule-Pending</h5>
                 </div>
@@ -187,12 +190,12 @@ const setpieOptions = () => {
 
         <div class="container mt-5">
             <div class="grid">
-                <div class="col-12 md:col-6 lg:col-6">
+                <div class="col-12 md:col-6 lg:col-6 ">
                         <Chart type="bar" :data="chart_data" :options="chart_options"/>
                     <h3 class="font-normal text-center pt-5">Associated Doctors and Register Patients</h3>
                 </div>
 
-                <div class="col-12 md:col-6 lg:col-6 d-flex ">
+                <div class="col-12 md:col-6 lg:col-6 flex justify-content-center ">
                     <div class="text-center">
                         <Chart type="doughnut" :data="pie_data" :options="pie_options" class="pie w-full md:w-30rem" />
                         <h3 class="font-normal pt-5">Appointments Count with Status</h3>
