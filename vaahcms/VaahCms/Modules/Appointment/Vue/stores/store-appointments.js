@@ -124,10 +124,7 @@ export const useAppointmentStore = defineStore({
              */
             await this.updateQueryFromUrl(route);
 
-            /**
-             * Fucntion to restrict selecting past dates
-             */
-            this.restrictPastDates();
+
         },
         //---------------------------------------------------------------------
         setRowClass(data){
@@ -238,6 +235,11 @@ export const useAppointmentStore = defineStore({
                 if(this.route.params && !this.route.params.id){
                     this.item = vaah().clone(data.empty_item);
                 }
+
+                /**
+                 * Fucntion to restrict selecting past dates
+                 */
+                this.restrictPastDates();
 
             }
         },
@@ -1422,16 +1424,17 @@ export const useAppointmentStore = defineStore({
         // Fucntion to restrict selecting Past dates
 
         restrictPastDates(){
+            const appointment_slot_available_for_days_including_today = this.assets.appointment_slot_available_for_days_including_today;
             // Get today's date
             const today = new Date();
 
             // Set tomorrow's date
             const tomorrow = new Date();
-            tomorrow.setDate(today.getDate() + 1);
+            tomorrow.setDate(today.getDate() + (appointment_slot_available_for_days_including_today - 1));
 
             // Set up reactive variables
-            this.min_date = ref(today);
-            this.max_date = ref(tomorrow);
+            this.min_date = today;
+            this.max_date = tomorrow;
         }
 
 
