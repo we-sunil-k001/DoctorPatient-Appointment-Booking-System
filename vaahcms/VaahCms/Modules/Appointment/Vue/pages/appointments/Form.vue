@@ -284,7 +284,7 @@ watch(doctor_details, (newVal) => {
                 <VhField label="Appointment Date">
                     <div class="p-inputgroup">
                         <Calendar v-model="store.item.appointment_date" :minDate="store.min_date" :maxDate="store.max_date" :manualInput="false"
-                                  placeholder="Select Date" name="appointment_date">
+                                  placeholder="Select Date" name="appointment_date" required>
                         </Calendar>
                     </div>
                 </VhField>

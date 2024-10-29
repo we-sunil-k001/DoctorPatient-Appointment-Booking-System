@@ -40,6 +40,8 @@ class AppointmentsController extends Controller
             $data['fillable']['columns'] = Appointment::getFillableColumns();
             $data['fillable']['except'] = Appointment::getUnFillableColumns();
             $data['empty_item'] = Appointment::getEmptyItem();
+            //pass data from confing.php
+            $data['appointment_slot_available_for_days_including_today'] = config('appointment.appointment_slot_available_for_days_including_today');
 
             // Fetching data from Doctor - after making relation
             $data['doctor'] = Doctor::where('is_active',1)->select('id','name','email','phone_number')->get();
