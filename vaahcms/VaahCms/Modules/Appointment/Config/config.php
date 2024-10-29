@@ -18,5 +18,8 @@ return [
     "providers"=> [
         "\\VaahCms\\Modules\\Appointment\\Providers\\AppointmentServiceProvider"
     ],
-    "aside-menu-order"=> null
+    "aside-menu-order"=> null,
+    "currency" => "₹",
+    "appointment_duration" => 30,
+    "appointment_slot_available_for_days_including_today" => 2
 ];

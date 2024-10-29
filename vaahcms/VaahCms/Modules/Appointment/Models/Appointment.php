@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Export\ExportAppointments;
 
+
 class Appointment extends VaahModel
 {
 
@@ -1090,6 +1091,38 @@ class Appointment extends VaahModel
         // Process valid records
         foreach ($valid_records as $record) {
 
+            //-------------------------------------------------------------------------------------
+            //Check if requested time slot is outdated and expire
+
+                // Get variable from config.php
+                $appointment_slot_available_for_days_including_today = config('appointment.appointment_slot_available_for_days_including_today');
+
+                $appointment_date_time = Carbon::createFromFormat('Y-m-d h:i A', $record['appointment_date'] . ' ' . $record['appointment_time']);
+                $current_date_time = Carbon::now();
+                $max_date_time = $current_date_time->copy()->addDays($appointment_slot_available_for_days_including_today);
+
+
+                if ($appointment_date_time->lessThan($current_date_time)) {
+                    $responses[] = [
+                        'patient_email' => $record['patient_email'],
+                        'doctor_email' => $record['doctor_email'],
+                        'error' => ["Requested Time slot is Expired, please choose from available Time slots."]
+                    ];
+                    continue;
+                }
+
+
+                // Check if appointment time exceeds today + config('appointment.appointment_slot_available_for_days_including_today')
+                if ($appointment_date_time->greaterThan($max_date_time)) {
+                    $responses[] = [
+                        'patient_email' => $record['patient_email'],
+                        'doctor_email' => $record['doctor_email'],
+                        'error' => ["Requested Time slot is not yet available for booking! please choose from available Time slots."]
+                    ];
+                    continue;
+                }
+
+
             // Convert appointment date and time
             $appointment_date = Carbon::parse($record['appointment_date'], 'Asia/Kolkata')
                 ->setTimezone('UTC')   // Convert it to UTC
@@ -1123,7 +1156,9 @@ class Appointment extends VaahModel
             $existing_working_hours_start = Carbon::parse($doctor->working_hours_start)->format('H:i:00');
             $existing_working_hours_end = Carbon::parse($doctor->working_hours_end)->format('H:i:00');
 
-            // Check if appointment time is within working hours
+
+
+            // Check if appointment time is within working hours ---------------------------
             if ($appointment_time < $existing_working_hours_start || $appointment_time > $existing_working_hours_end) {
                 $responses[] = [
                     'patient_email' => $record['patient_email'],
@@ -1132,6 +1167,34 @@ class Appointment extends VaahModel
                 ];
                 continue;
             }
+
+            //------------------------------------------------------------------------------
+            // Check $appointment_time should be at Appointment duration - Time slot interval
+
+                //Get APPOINTMENT_DURATION from env
+                $appointment_duration = (int) env('APPOINTMENT_DURATION');
+
+                $working_hours_start = Carbon::parse($doctor->working_hours_start);     // Had to create these variable again earlier already setting them to string
+                $working_hours_end = Carbon::parse($doctor->working_hours_end);
+
+                // Generate valid time slots based on the appointment duration
+                $valid_time_slots = [];
+                $currentSlot = $working_hours_start->copy();
+
+                while ($currentSlot <= $working_hours_end) {
+                    $valid_time_slots[] = $currentSlot->format('H:i:s');
+                    $currentSlot->addMinutes($appointment_duration);
+                }
+
+                if (!in_array($appointment_time, $valid_time_slots)) {
+                    $responses[] = [
+                        'patient_email' => $record['patient_email'],
+                        'doctor_email' => $record['doctor_email'],
+                        'error' => ["Time Slot is not Valid!"]
+                    ];
+                    continue;
+                }
+
 
 
             // Check for existing appointments ------------------------------
@@ -1144,10 +1207,11 @@ class Appointment extends VaahModel
                 $responses[] = [
                     'patient_email' => $record['patient_email'],
                     'doctor_email' => $record['doctor_email'],
-                    'error' => ['Requested time slot is not available with Dr. ' . $doctor->name . '! Choose any other slot.']
+                    'error' => ['Requested time slot with Dr. ' . $doctor->name . ' is already booked! Choose any other slot.']
                 ];
                 continue;
             }
+
 
             Appointment::create([
                 'patient_id' => $patient->id,
@@ -1155,10 +1219,11 @@ class Appointment extends VaahModel
                 'appointment_date' => $appointment_date,
                 'appointment_time' => $appointment_time,
                 'reason_for_visit' => $record['reason_for_visit'] ?? null, // Ensure reason for visit is captured
-                'is_active ' => 1,
+                'is_active' => 1,
                 'status' => 'confirmed'
             ]);
         }
+
 
         return response()->json([
             'success' => true,
