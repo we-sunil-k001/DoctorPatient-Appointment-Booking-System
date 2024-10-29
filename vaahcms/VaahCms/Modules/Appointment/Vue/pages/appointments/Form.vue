@@ -283,23 +283,11 @@ watch(doctor_details, (newVal) => {
 
                 <VhField label="Appointment Date">
                     <div class="p-inputgroup">
-                        <Calendar v-model="store.item.appointment_date"
+                        <Calendar v-model="store.item.appointment_date" :minDate="store.min_date" :maxDate="store.max_date" :manualInput="false"
                                   placeholder="Select Date" name="appointment_date">
                         </Calendar>
                     </div>
                 </VhField>
-
-<!--                <VhField label="Appointment Time">-->
-<!--                    <div class="p-inputgroup">-->
-<!--                        <Calendar v-model="store.item.appointment_time" timeOnly hourFormat="12" showIcon-->
-<!--                                  placeholder="Select time"-->
-<!--                                  name="appointment_time"-->
-<!--                                 >-->
-<!--                        </Calendar>-->
-<!--                    </div>-->
-<!--                </VhField>-->
-
-
 
 
                 <VhField label="Appointment Time">

@@ -90,7 +90,12 @@ export const useAppointmentStore = defineStore({
         selected_appointment_time : null,
         form_data : [],
         table_data : [],
-        response_errors : []
+        response_errors : [],
+
+        // Restrict selecting past dates
+        min_date : null,
+        max_date: null
+
 
     }),
     getters: {
@@ -118,6 +123,11 @@ export const useAppointmentStore = defineStore({
              * Update query state with the query parameters of url
              */
             await this.updateQueryFromUrl(route);
+
+            /**
+             * Fucntion to restrict selecting past dates
+             */
+            this.restrictPastDates();
         },
         //---------------------------------------------------------------------
         setRowClass(data){
@@ -1407,6 +1417,21 @@ export const useAppointmentStore = defineStore({
             } catch (error) {
                 console.error('Error:', error);
             }
+        },
+
+        // Fucntion to restrict selecting Past dates
+
+        restrictPastDates(){
+            // Get today's date
+            const today = new Date();
+
+            // Set tomorrow's date
+            const tomorrow = new Date();
+            tomorrow.setDate(today.getDate() + 1);
+
+            // Set up reactive variables
+            this.min_date = ref(today);
+            this.max_date = ref(tomorrow);
         }
 
 
