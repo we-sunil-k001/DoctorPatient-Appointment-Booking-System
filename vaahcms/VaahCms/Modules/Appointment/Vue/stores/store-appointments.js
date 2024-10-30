@@ -94,7 +94,15 @@ export const useAppointmentStore = defineStore({
 
         // Restrict selecting past dates
         min_date : null,
-        max_date: null
+        max_date: null,
+
+        //Apooint. duration and currency to variables
+        appointment_duration: null,
+        currency: null,
+
+        //variable to hold doctor details
+        doctor_details: null,
+        time_slots: []
 
 
     }),
@@ -195,7 +203,14 @@ export const useAppointmentStore = defineStore({
                 {
                     this.delayedSearch();
                 },{deep: true}
-            )
+            ),
+            watch(this.doctor_details, (newVal,oldVal) => {
+                console.log("hello");
+                if (newVal && newVal.data) {
+                    generateTimeSlots();
+                }
+            })
+
         },
         //---------------------------------------------------------------------
          watchItem(name)
@@ -208,6 +223,7 @@ export const useAppointmentStore = defineStore({
                   this.item.slug = name;
               }
           },
+
         //---------------------------------------------------------------------
         async getAssets() {
 
@@ -236,10 +252,12 @@ export const useAppointmentStore = defineStore({
                     this.item = vaah().clone(data.empty_item);
                 }
 
-                /**
-                 * Fucntion to restrict selecting past dates
-                 */
+                //Fucntion to restrict selecting past dates
                 this.restrictPastDates();
+
+                // Assign duration and currency to variables
+                this.appointment_duration = this.assets.appointment_duration;
+                this.currency = this.assets.currency;
 
             }
         },
@@ -981,24 +999,57 @@ export const useAppointmentStore = defineStore({
         //-------------------------------------------------------------
         //Custom functions below
 
-        // async fetchDoctorDetails(event)
-        // {
-        //     alert("hello");
-        //     return "hello";
-        //     const selectedDoctorId = event.value; // Get the selected doctor ID
-        //     if (selectedDoctorId) {
-        //         try {
-        //             // Fetch doctor details from your API or data source
-        //             const response = await axios.get(`backend/appointment/doctors/${selectedDoctorId}`);
-        //             doctor_details.value = response.data; // Store the fetched data
-        //         } catch (error) {
-        //             console.error('Error fetching doctor details:', error);
-        //             doctor_details.value = null; // Reset if there's an error
-        //         }
-        //     } else {
-        //         doctor_details.value = null; // Reset if no doctor is selected
-        //     }
-        // },
+        async fetchDoctorDetails(event)
+        {
+            const selectedDoctorId = event.value; // Get the selected doctor ID
+
+            if (selectedDoctorId) {
+                try {
+                        const response = await vaah().ajax(
+                            base_url + '/appointment/doctors/'+selectedDoctorId
+                        );
+                    this.doctor_details = response.data;
+                    this.generateTimeSlots();
+                } catch (error) {
+                    console.error('Error fetching doctor details:', error);
+                    doctor_details.value = null; // Reset if there's an error
+                }
+            } else {
+                doctor_details.value = null; // Reset if no doctor is selected
+            }
+        },
+
+        // Function to generate time slots every given appointment_duration minutes
+        generateTimeSlots(){
+            if (this.doctor_details) {
+                const start_time = this.doctor_details.data.working_hours_start;
+                const end_time = this.doctor_details.data.working_hours_end;
+
+                const start = this.parseTime(start_time);
+                const end = this.parseTime(end_time);
+
+                this.time_slots = [];
+
+                while (start < end) {
+                    const formatted_time = start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+
+                    const utcTime = new Date(start).toISOString(); // Convert to UTC format
+                    this.time_slots.push({ name: formatted_time, value: utcTime });
+                    start.setMinutes(start.getMinutes() + this.assets.appointment_duration); // Increment by given appointment_duration minutes
+                }
+            }
+        },
+        parseTime(time_str){
+            const [time, modifier] = time_str.split(' ');
+            let [hours, minutes] = time.split(':');
+            hours = parseInt(hours);
+            if (modifier === 'PM' && hours < 12) {
+                hours += 12; // Convert PM hour to 24-hour format
+            } else if (modifier === 'AM' && hours === 12) {
+                hours = 0; // Convert 12 AM to 0 hours
+            }
+            return new Date(1970, 0, 1, hours, minutes); // Use a fixed date for time calculations
+        },
 
         async getDashboardStats() {
             const response = await vaah().ajax(
@@ -1437,6 +1488,14 @@ export const useAppointmentStore = defineStore({
             this.max_date = tomorrow;
         }
 
+
+        // Function to fetch doctor details on dropdown selection
+        // async fetchDoctorDetails(event) {
+        //     const response = await vaah().ajax(
+        //         base_url + 'appointment/doctors/${selectedDoctorId}'
+        //     );
+        //     this.getItemAfter(response);
+        // },
 
         //---------------------------------------------------------------------
     }
