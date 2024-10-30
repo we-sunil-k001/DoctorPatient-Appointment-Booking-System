@@ -30,71 +30,6 @@ const toggleFormMenu = (event) => {
     form_menu.value.toggle(event);
 };
 
-// Reactive variable to hold doctor details
-const doctor_details = ref(null);
-
-// Function to fetch doctor details on dropdown selection
-const fetchDoctorDetails = async (event) => {
-    const selectedDoctorId = event.value; // Get the selected doctor ID
-    if (selectedDoctorId) {
-        try {
-            // Fetch doctor details from your API or data source
-            const response = await axios.get(`backend/appointment/doctors/${selectedDoctorId}`);
-            doctor_details.value = response.data; // Store the fetched data
-            console.log(doctor_details.value);
-        } catch (error) {
-            console.error('Error fetching doctor details:', error);
-            doctor_details.value = null; // Reset if there's an error
-        }
-    } else {
-        doctor_details.value = null; // Reset if no doctor is selected
-    }
-};
-
-
-
-// TO calculate and display 30min dropdown
-const time_slots = ref([]); // Reactive variable to hold the time slots
-
-// Helper function to convert "HH:MM AM/PM" to a Date object
-const parseTime = (timeStr) => {
-    const [time, modifier] = timeStr.split(' ');
-    let [hours, minutes] = time.split(':');
-    hours = parseInt(hours);
-    if (modifier === 'PM' && hours < 12) {
-        hours += 12; // Convert PM hour to 24-hour format
-    } else if (modifier === 'AM' && hours === 12) {
-        hours = 0; // Convert 12 AM to 0 hours
-    }
-    return new Date(1970, 0, 1, hours, minutes); // Use a fixed date for time calculations
-};
-
-// Function to generate time slots every 30 minutes
-const generateTimeSlots = () => {
-    if (doctor_details.value) {
-        const startTime = doctor_details.value.data.working_hours_start;
-        const endTime = doctor_details.value.data.working_hours_end;
-
-        const start = parseTime(startTime);
-        const end = parseTime(endTime);
-
-        time_slots.value = [];
-
-        while (start < end) {
-            const formattedTime = start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-            const utcTime = new Date(start).toISOString(); // Convert to UTC format
-            time_slots.value.push({ name: formattedTime, value: utcTime });
-            start.setMinutes(start.getMinutes() + 30); // Increment by 30 minutes
-        }
-    }
-};
-// Watch for changes in doctor details to regenerate time slots
-watch(doctor_details, (newVal) => {
-    if (newVal && newVal.data) {
-        generateTimeSlots();
-    }
-});
-
 //--------/form_menu
 
 </script>
@@ -212,7 +147,7 @@ watch(doctor_details, (newVal) => {
                                        filter
                                        name="doctor_name"
                                        data-testid="doctor_name"
-                                       @change="fetchDoctorDetails"
+                                       @change="store.fetchDoctorDetails"
                                        required/>
                             <div class="required-field hidden"></div>
                         </div>
@@ -220,11 +155,11 @@ watch(doctor_details, (newVal) => {
 
                         <div class="p-inputgroup">
                             <!-- Display Doctor Details -->
-                            <div v-if="doctor_details">
-                                <p>Name: <strong>{{doctor_details.data.name}}</strong></p>
-                                <p>Working hour: <strong>{{doctor_details.data.working_hours_start}} to {{doctor_details.data.working_hours_end}}</strong></p>
-                                <p>Appointment Slot Duration: <strong>30 minutes</strong></p>
-                                <p>Appointment: <strong>₹{{doctor_details.data.charges}}/-</strong></p>
+                            <div v-if="store.doctor_details">
+                                <p>Name: <strong>{{store.doctor_details.data.name}}</strong></p>
+                                <p>Working hour: <strong>{{store.doctor_details.data.working_hours_start}} to {{store.doctor_details.data.working_hours_end}}</strong></p>
+                                <p>Appointment Slot Duration: <strong>{{store.appointment_duration}} minutes</strong></p>
+                                <p>Appointment: <strong>{{store.currency}}{{store.doctor_details.data.charges}}</strong></p>
                             </div>
                         </div><br>
 
@@ -293,7 +228,7 @@ watch(doctor_details, (newVal) => {
                 <VhField label="Appointment Time">
                     <div class="p-inputgroup">
                         <Dropdown v-model="store.item.appointment_time"
-                                  :options="time_slots"
+                                  :options="store.time_slots"
                                   option-label="name"
                                   option-value="value"
                                   name="appointment_time"

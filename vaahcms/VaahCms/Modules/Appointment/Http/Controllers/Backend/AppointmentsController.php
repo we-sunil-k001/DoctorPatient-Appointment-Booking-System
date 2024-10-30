@@ -42,6 +42,9 @@ class AppointmentsController extends Controller
             $data['empty_item'] = Appointment::getEmptyItem();
             //pass data from confing.php
             $data['appointment_slot_available_for_days_including_today'] = config('appointment.appointment_slot_available_for_days_including_today');
+            $data['appointment_duration'] = config('appointment.appointment_duration');
+            $data['appointment_duration'] = config('appointment.appointment_duration');
+            $data['currency'] = config('appointment.currency');
 
             // Fetching data from Doctor - after making relation
             $data['doctor'] = Doctor::where('is_active',1)->select('id','name','email','phone_number')->get();

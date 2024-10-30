@@ -699,12 +699,15 @@ export const useAppointmentStore = defineStore({
             this.$router.push({name: 'appointments.view', params:{id:item.id},query:this.query})
         },
         //---------------------------------------------------------------------
-        toEdit(item)
+        toEdit(item, doctor_id)
         {
+            // console.log(item.id);
             if(!this.item || !this.item.id || this.item.id !== item.id){
                 this.item = vaah().clone(item);
             }
             this.$router.push({name: 'appointments.form', params:{id:item.id},query:this.query})
+            this.fetchDoctorDetailsForRschedule(doctor_id)
+
         },
         //---------------------------------------------------------------------
         isViewLarge()
@@ -1002,7 +1005,26 @@ export const useAppointmentStore = defineStore({
         async fetchDoctorDetails(event)
         {
             const selectedDoctorId = event.value; // Get the selected doctor ID
+            if (selectedDoctorId) {
+                try {
+                        const response = await vaah().ajax(
+                            base_url + '/appointment/doctors/'+selectedDoctorId
+                        );
+                    this.doctor_details = response.data;
+                    this.generateTimeSlots();
+                } catch (error) {
+                    console.error('Error fetching doctor details:', error);
+                    doctor_details.value = null; // Reset if there's an error
+                }
+            } else {
+                doctor_details.value = null; // Reset if no doctor is selected
+            }
+        },
 
+        async fetchDoctorDetailsForRschedule(id)
+        {
+            const selectedDoctorId = id; // Get the selected doctor ID
+            console.log(selectedDoctorId);
             if (selectedDoctorId) {
                 try {
                         const response = await vaah().ajax(
@@ -1488,14 +1510,6 @@ export const useAppointmentStore = defineStore({
             this.max_date = tomorrow;
         }
 
-
-        // Function to fetch doctor details on dropdown selection
-        // async fetchDoctorDetails(event) {
-        //     const response = await vaah().ajax(
-        //         base_url + 'appointment/doctors/${selectedDoctorId}'
-        //     );
-        //     this.getItemAfter(response);
-        // },
 
         //---------------------------------------------------------------------
     }

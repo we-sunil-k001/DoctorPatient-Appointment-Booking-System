@@ -103,7 +103,7 @@ const useVaah = vaah();
                          <div v-for="permission in store.assets.permission">
                              <Button v-if="permission == 'appointment-has-access-of-patient-section' && prop.data.status == 'pending'"
                                      label="Reschedule" severity="info" rounded
-                                     @click="store.toEdit(prop.data)"
+                                     @click="store.toEdit(prop.data, prop.data.doctor_id)"
                                      v-tooltip.top="'Reschedule'"/>
                          </div>
 

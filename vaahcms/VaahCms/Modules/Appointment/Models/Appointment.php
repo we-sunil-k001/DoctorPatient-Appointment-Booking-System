@@ -652,6 +652,28 @@ class Appointment extends VaahModel
         $item = self::where('id', $id)->withTrashed()->first();
         $item->fill($inputs);
 
+
+        //-------------------------------------------------------------------------------------
+        //Check if requested time slot is outdated and expire
+
+        // Get variable from config.php
+        $appointment_slot_available_for_days_including_today = config('appointment.appointment_slot_available_for_days_including_today');
+
+        $appoint_date = Carbon::parse($inputs['appointment_date'])->setTimezone('Asia/Kolkata')->format('Y-m-d');
+        $appoint_time = Carbon::parse($inputs['appointment_time'])->setTimezone('Asia/Kolkata')->format('H:i:00');
+
+        $appointment_date_time = Carbon::createFromFormat('Y-m-d H:i:s', $appoint_date . ' ' . $appoint_time, 'Asia/Kolkata');
+
+        // Get the current date and time in IST
+        $current_date_time = Carbon::now('Asia/Kolkata');
+
+        if ($appointment_date_time->lessThan($current_date_time)) {
+            $response['success'] = false;
+            $response['errors'][] = "Requested Time slot is Expired! Please choose from available time slots.";
+            return $response;
+        }
+
+
         //------------------------------------------------------------
         // Check if booking time is in b/w working hours
 
