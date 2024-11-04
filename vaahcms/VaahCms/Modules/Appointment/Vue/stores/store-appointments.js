@@ -205,7 +205,6 @@ export const useAppointmentStore = defineStore({
                 },{deep: true}
             ),
             watch(this.doctor_details, (newVal,oldVal) => {
-                console.log("hello");
                 if (newVal && newVal.data) {
                     generateTimeSlots();
                 }

@@ -85,7 +85,7 @@ export const usedoctorStore = defineStore({
 
         // Set min and max time
         min_time : null,
-        max_time: null,
+        max_time: null
 
     }),
     getters: {
@@ -230,6 +230,9 @@ export const usedoctorStore = defineStore({
 
                 //Call function to set min and max time/ working hours
                 this.setMinMaxTime();
+
+                // Set Max time/ working hours
+                this.max_time = this.assets.working_hour_end_max;
 
             }
         },
@@ -1127,11 +1130,9 @@ export const usedoctorStore = defineStore({
 
             // Combine date with working hour times and parse them
             const minTimeString = `${dateString} ${this.assets.working_hour_start_min}`;
-            const maxTimeString = `${dateString} ${this.assets.working_hour_end_max}`;
 
             // Convert to Date objects
             this.min_time = new Date(Date.parse(minTimeString));
-            this.max_time = new Date(Date.parse(maxTimeString));
 
         }
 

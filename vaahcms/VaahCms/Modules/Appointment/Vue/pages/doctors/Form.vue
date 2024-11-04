@@ -38,14 +38,40 @@ watch([() => store.item?.no_of_slot, () => store.item?.working_hours_start], () 
     const formattedTime = store.formatTime(start_time);
 
     // Add minutes based on the number of slots
-    const end_time = store.addMinutesToTime(formattedTime, store.item.no_of_slot * 30);
+    const end_time = store.addMinutesToTime(formattedTime, store.item.no_of_slot * store.assets.appointment_duration);
 
     // Store the end time temporarily for display in the 12-hour format
-    store.end_time_temp = end_time;
 
-    // Convert the end time to UTC format for submission
-    store.item.working_hours_end = store.convertToUTC(end_time);
+
+    // Convert times to Date objects
+    const end_time_temp = convertToDate(store.end_time_temp);
+    const max_time = convertToDate(store.max_time);
+
+    if (end_time_temp > max_time) {
+        alert("Working hours end! Can't go above the set time.");
+    } else {
+        // Convert the end time to UTC format for submission
+        store.end_time_temp = end_time;
+        store.item.working_hours_end = store.convertToUTC(end_time);
+    }
+
+    // if(store.end_time_temp > store.max_time){
+    //     alert("Working hours ends! can't go above")
+    // }else{
+    //     // Convert the end time to UTC format for submission
+    //     store.end_time_temp = end_time;
+    //     store.item.working_hours_end = store.convertToUTC(end_time);
+    // }
+    // console.log(store.end_time_temp)
+
+
 });
+
+function convertToDate(timeStr) {
+    const today = new Date();
+    const dateString = today.toDateString(); // e.g., "Mon Nov 04 2024"
+    return new Date(Date.parse(`${dateString} ${timeStr}`));
+}
 
 
 //--------form_menu
@@ -57,9 +83,8 @@ const toggleFormMenu = (event) => {
 //--------/form_menu
 </script>
 <template>
-
     <div class="col-6" >
-
+{{store.end_time_temp}}
         <Panel class="is-small">
 
             <template class="p-1" #header>
@@ -242,7 +267,6 @@ const toggleFormMenu = (event) => {
                             name="working_hours_start"
                             :step-minute="5"
                             :minDate="store.min_time"
-                            :maxDate="store.max_time"
                         ></Calendar>
                     </div>
                 </VhField>

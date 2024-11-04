@@ -39,6 +39,7 @@ class doctorsController extends Controller
             $data['currency'] = config('appointment.currency');
             $data['working_hour_start_min'] = config('appointment.working_hour_start_min');
             $data['working_hour_end_max'] = config('appointment.working_hour_end_max');
+            $data['appointment_duration'] = config('appointment.appointment_duration');
 
 
             //send env variable
