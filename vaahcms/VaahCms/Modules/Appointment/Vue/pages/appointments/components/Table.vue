@@ -53,7 +53,7 @@ const useVaah = vaah();
                     class="overflow-wrap-anywhere"
                     :sortable="true">
                 <template #body="prop">
-                    ₹{{ prop.data.doctor?.charges ?? 'NA' }}/-
+                    {{store.currency}}{{ prop.data.doctor?.charges ?? 'NA' }}
                 </template>
             </Column>
 
