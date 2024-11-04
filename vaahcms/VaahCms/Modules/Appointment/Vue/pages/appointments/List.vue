@@ -104,12 +104,6 @@ const toggleCreateMenu = (event) => {
                             Export
                         </Button>
 
-                        <Button data-testid="appointments-list-reload"
-                                class="p-button-sm"
-                                @click="store.getList()">
-                            <i class="pi pi-refresh mr-1"></i>
-                        </Button>
-
                     <Button data-testid="appointments-list-reload"
                             class="p-button-sm"
                             @click="store.getList()">
