@@ -7,9 +7,17 @@ use Illuminate\Routing\Controller;
 class ExtendController extends Controller
 {
 
+    public static $base;
+    public static $link;
+
     //----------------------------------------------------------
     public function __construct()
     {
+        $base_url = route('vh.backend.appointment')."#/";
+        $link = $base_url;
+
+        self::$base = $base_url;
+        self::$link = $link;
     }
     //----------------------------------------------------------
     public static function topLeftMenu()
@@ -41,7 +49,29 @@ class ExtendController extends Controller
         $links[0] = [
             'icon' => 'table',
             'label'=> 'Appointment',
-            'link'=> route('vh.backend.appointment')
+            'link'=> route('vh.backend.appointment'),
+            'items' => [
+                [
+                    'link'=> self::$link,
+                    'icon' => 'chart-bar',
+                    'label'=> 'Dashboard'
+                ],
+                [
+                    'link'=> self::$link."doctors",
+                    'icon' => 'user',
+                    'label'=> 'Doctors',
+                ],
+                [
+                    'link'=> self::$link."patients",
+                    'icon' => 'user-plus',
+                    'label'=> 'Patients',
+                ],
+                [
+                    'link'=> self::$link."appointments",
+                    'icon' => 'calendar',
+                    'label'=> 'My Appointments',
+                ]
+            ]
         ];
 
 
