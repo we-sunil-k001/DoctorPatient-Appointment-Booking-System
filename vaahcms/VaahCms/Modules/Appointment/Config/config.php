@@ -21,5 +21,7 @@ return [
     "aside-menu-order"=> null,
     "currency" => "₹",
     "appointment_duration" => 30,
-    "appointment_slot_available_for_days_including_today" => 2
+    "appointment_slot_available_for_days_including_today" => 2,
+    "working_hour_start_min" => "9:00 AM",
+    "working_hour_end_max" => "8:00 PM"
 ];

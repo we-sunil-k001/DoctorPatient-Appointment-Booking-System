@@ -55,8 +55,6 @@ const toggleFormMenu = (event) => {
 };
 
 //--------/form_menu
-
-
 </script>
 <template>
 
@@ -243,6 +241,8 @@ const toggleFormMenu = (event) => {
                             placeholder="Select time"
                             name="working_hours_start"
                             :step-minute="5"
+                            :minDate="store.min_time"
+                            :maxDate="store.max_time"
                         ></Calendar>
                     </div>
                 </VhField>

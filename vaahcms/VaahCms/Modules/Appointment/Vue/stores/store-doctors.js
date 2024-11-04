@@ -81,7 +81,12 @@ export const usedoctorStore = defineStore({
         appointments: [],
         //Import File
         file_to_upload: null,
-        file_date: null
+        file_date: null,
+
+        // Set min and max time
+        min_time : null,
+        max_time: null,
+
     }),
     getters: {
 
@@ -222,6 +227,9 @@ export const usedoctorStore = defineStore({
                 if(this.route.params && !this.route.params.id){
                     this.item = vaah().clone(data.empty_item);
                 }
+
+                //Call function to set min and max time/ working hours
+                this.setMinMaxTime();
 
             }
         },
@@ -1110,6 +1118,21 @@ export const usedoctorStore = defineStore({
             } catch (error) {
                 console.error('Error:', error);
             }
+        },
+
+        // Function to set min and max time
+        setMinMaxTime(){
+            const today = new Date();
+            const dateString = today.toDateString(); // get current date without time, e.g., "Mon Nov 04 2024"
+
+            // Combine date with working hour times and parse them
+            const minTimeString = `${dateString} ${this.assets.working_hour_start_min}`;
+            const maxTimeString = `${dateString} ${this.assets.working_hour_end_max}`;
+
+            // Convert to Date objects
+            this.min_time = new Date(Date.parse(minTimeString));
+            this.max_time = new Date(Date.parse(maxTimeString));
+
         }
 
 

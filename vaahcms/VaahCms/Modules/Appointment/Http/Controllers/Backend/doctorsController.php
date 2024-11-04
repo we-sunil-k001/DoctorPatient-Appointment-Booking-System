@@ -36,6 +36,17 @@ class doctorsController extends Controller
             $data['fillable']['columns'] = doctor::getFillableColumns();
             $data['fillable']['except'] = doctor::getUnFillableColumns();
             $data['empty_item'] = doctor::getEmptyItem();
+            $data['currency'] = config('appointment.currency');
+            $data['working_hour_start_min'] = config('appointment.working_hour_start_min');
+            $data['working_hour_end_max'] = config('appointment.working_hour_end_max');
+
+
+            //send env variable
+//            $data['env'] = env('CURRENCY');
+            $data['env'] = [
+                'currency' => env('CURRENCY'),
+                'app' => env('APP_ENV'),
+            ];
 
             $data['actions'] = [];
 

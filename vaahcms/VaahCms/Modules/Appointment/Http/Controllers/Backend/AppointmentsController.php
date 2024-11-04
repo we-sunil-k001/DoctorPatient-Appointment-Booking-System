@@ -43,7 +43,6 @@ class AppointmentsController extends Controller
             //pass data from confing.php
             $data['appointment_slot_available_for_days_including_today'] = config('appointment.appointment_slot_available_for_days_including_today');
             $data['appointment_duration'] = config('appointment.appointment_duration');
-            $data['appointment_duration'] = config('appointment.appointment_duration');
             $data['currency'] = config('appointment.currency');
 
             // Fetching data from Doctor - after making relation
