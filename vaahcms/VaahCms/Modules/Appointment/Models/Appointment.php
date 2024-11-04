@@ -1079,6 +1079,8 @@ class Appointment extends VaahModel
         $inputs = $request->all();
         $responses = [];
         $valid_records = []; // Array to hold valid records
+        $successful_count = 0; // Counter for successfully inserted records
+        $failed_count = 0; // Counter for failed insertions
 
         // Check if the input arrays are set and are valid arrays
         if (!isset($inputs['patient_email']) || !is_array($inputs['patient_email']) || empty($inputs['patient_email'])) {
@@ -1101,6 +1103,8 @@ class Appointment extends VaahModel
             return response()->json([
                 'success' => true,
                 'error' => $responses,
+                'records_inserted' => $successful_count,
+                'records_failed' => $failed_count,
             ]);
         }
 
@@ -1125,6 +1129,8 @@ class Appointment extends VaahModel
                     'doctor_email' => $inputs['doctor_email'][$index] ?? null,
                     'error' => $validator->errors()->all(),
                 ];
+                $failed_count++;
+                continue;
             } else {
                 // Store valid records for further processing
                 $valid_records[] = [
@@ -1155,8 +1161,10 @@ class Appointment extends VaahModel
                     $responses[] = [
                         'patient_email' => $record['patient_email'],
                         'doctor_email' => $record['doctor_email'],
+                        'date_time' => $record['appointment_date'] . ' ' . $record['appointment_time'],
                         'error' => ["Requested Time slot is Expired, please choose from available Time slots."]
                     ];
+                    $failed_count++;
                     continue;
                 }
 
@@ -1166,8 +1174,10 @@ class Appointment extends VaahModel
                     $responses[] = [
                         'patient_email' => $record['patient_email'],
                         'doctor_email' => $record['doctor_email'],
+                        'date_time' => $record['appointment_date'] . ' ' . $record['appointment_time'],
                         'error' => ["Requested Time slot is not yet available for booking! please choose from available Time slots."]
                     ];
+                    $failed_count++;
                     continue;
                 }
 
@@ -1186,8 +1196,10 @@ class Appointment extends VaahModel
                 $responses[] = [
                     'patient_email' => $record['patient_email'],
                     'doctor_email' => $record['doctor_email'],
+                    'date_time' => $record['appointment_date'] . ' ' . $record['appointment_time'],
                     'error' => ['Doctor not found in the system.']
                 ];
+                $failed_count++;
                 continue;
             }
 
@@ -1196,8 +1208,10 @@ class Appointment extends VaahModel
                 $responses[] = [
                     'patient_email' => $record['patient_email'],
                     'doctor_email' => $record['doctor_email'],
+                    'date_time' => $record['appointment_date'] . ' ' . $record['appointment_time'],
                     'error' => ['Patient not found in the system.']
                 ];
+                $failed_count++;
                 continue;
             }
 
@@ -1212,16 +1226,18 @@ class Appointment extends VaahModel
                 $responses[] = [
                     'patient_email' => $record['patient_email'],
                     'doctor_email' => $record['doctor_email'],
+                    'date_time' => $record['appointment_date'] . ' ' . $record['appointment_time'],
                     'error' => ["Doctor is not available at this time!"]
                 ];
+                $failed_count++;
                 continue;
             }
 
             //------------------------------------------------------------------------------
             // Check $appointment_time should be at Appointment duration - Time slot interval
 
-                //Get APPOINTMENT_DURATION from env
-                $appointment_duration = (int) env('APPOINTMENT_DURATION');
+                //Get appointment_duration from config file
+                $appointment_duration = (int) config('appointment.appointment_duration');
 
                 $working_hours_start = Carbon::parse($doctor->working_hours_start);     // Had to create these variable again earlier already setting them to string
                 $working_hours_end = Carbon::parse($doctor->working_hours_end);
@@ -1239,8 +1255,10 @@ class Appointment extends VaahModel
                     $responses[] = [
                         'patient_email' => $record['patient_email'],
                         'doctor_email' => $record['doctor_email'],
+                        'date_time' => $record['appointment_date'] . ' ' . $record['appointment_time'],
                         'error' => ["Time Slot is not Valid!"]
                     ];
+                    $failed_count++;
                     continue;
                 }
 
@@ -1256,8 +1274,10 @@ class Appointment extends VaahModel
                 $responses[] = [
                     'patient_email' => $record['patient_email'],
                     'doctor_email' => $record['doctor_email'],
+                    'date_time' => $record['appointment_date'] . ' ' . $record['appointment_time'],
                     'error' => ['Requested time slot with Dr. ' . $doctor->name . ' is already booked! Choose any other slot.']
                 ];
+                $failed_count++;
                 continue;
             }
 
@@ -1271,12 +1291,15 @@ class Appointment extends VaahModel
                 'is_active' => 1,
                 'status' => 'confirmed'
             ]);
-        }
+            $successful_count++;
 
+        }
 
         return response()->json([
             'success' => true,
             'error' => $responses,
+            'records_inserted' => $successful_count,
+            'records_failed' => $failed_count,
         ]);
     }
 

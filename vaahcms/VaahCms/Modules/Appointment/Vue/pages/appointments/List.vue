@@ -261,37 +261,31 @@ const toggleCreateMenu = (event) => {
 
                     <!-- Success Tab -->
                     <TabPanel :header="store.tabs[2].header" :disabled="store.tabs[2].disabled">
-                        <div v-if="store.response_errors.length">
-                            <h3>Below rows are having issues: </h3>
-                            <ol>
-                                <li v-for="(error, index) in store.response_errors" :key="index">
-                                    <span v-if="error.patient_email">Patient Email: {{ error.patient_email }} - </span>
-                                    <span v-if="error.doctor_email">Doctor Email: {{ error.doctor_email }} - </span>
+                        <div v-if="store.response_errors && (store.response_errors.records_inserted || store.response_errors.records_failed)">
+                            <h3 class="text-success">
+                                <i class="pi pi-check-circle"></i> Rows Saved Successfully: {{ store.response_errors.records_inserted }}
+                            </h3>
+                            <h3 class="text-danger mt-2">
+                                <i class="pi pi-exclamation-triangle"></i> Rows are having issues: {{ store.response_errors.records_failed }}
+                            </h3>
 
-                                    <!-- Handle 'errors' array if it exists -->
-                                    <span v-if="error.errors" style="font-weight: bold">
-                                        {{ error.errors.join(', ') }}
-                                    </span>
+                            <DataTable :value="store.response_errors.error" class="p-datatable-striped mt-2">
+                                <Column field="patient_email" header="Patient Email" />
+                                <Column field="doctor_email" header="Doctor Email" />
+                                <Column field="date_time" header="Date & Time" />
+                                <Column header="Reason" class="font-semibold">
+                                    <template #body="slotProps" >
+                                        {{ slotProps.data.error.join(', ') }}
+                                    </template>
+                                </Column>
+                            </DataTable>
 
-                                    <!-- Handle 'error' array if it exists -->
-                                    <span v-if="error.error" style="font-weight: bold">
-                                        {{ error.error.join(', ') }}
-                                    </span>
-
-                                    <!-- Handle the 'message' field if it exists -->
-                                    <span v-if="error.message" style="font-weight: bold">
-                                        No records are inserted! {{ error.message }}
-                                    </span>
-                                </li>
-                            </ol>
                             <div class="flex justify-content-between gap-2">
-
-                                <Button type="button" severity="primary" label="Upload more" @click="store.uploadMore"
-                                        class=""></Button>
-                                <Button type="button" severity="danger" label="Close" @click="store.closeMoveToImport"
-                                        class=""></Button>
+                                <Button type="button" severity="primary" label="Upload more" @click="store.uploadMore" />
+                                <Button type="button" severity="danger" label="Close" @click="store.closeMoveToImport" />
                             </div>
                         </div>
+
                         <div v-else>
                             <div class="flex justify-content-between gap-2">
                                 <h3>Preview of Columns selected</h3 >

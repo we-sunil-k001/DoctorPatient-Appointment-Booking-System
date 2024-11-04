@@ -1486,8 +1486,7 @@ export const useAppointmentStore = defineStore({
                     options
                 );
                 this.response_errors = [];
-                this.response_errors = response.data.error;
-                console.log(response.data.error);
+                this.response_errors = response.data;
 
             } catch (error) {
                 console.error('Error:', error);
