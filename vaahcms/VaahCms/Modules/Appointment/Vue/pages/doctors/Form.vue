@@ -39,8 +39,8 @@ watch([() => store.item?.no_of_slot, () => store.item?.working_hours_start], () 
     const end_time_temp = convertToDate(end_time_calculated);
     const max_end_time = convertToDate(store.assets.working_hour_end_max);
 
-
-    if (end_time_temp  >= max_end_time) {
+    console.log(end_time_temp, max_end_time);
+    if (end_time_temp  > max_end_time) {
         alert("Adding more slots not allowed! As per working hours.");
         store.end_time_temp = end_time_calculated;
         store.item.working_hours_end = store.convertToUTC(end_time_calculated);
