@@ -235,7 +235,7 @@ const toggleFormMenu = (event) => {
                 <VhField label="Appointment Charges">
                     <div class="p-inputgroup">
                         <InputNumber class="w-full"
-                                     placeholder="₹"
+                                     :placeholder="store.currency"
                                      name="doctors-charges"
                                      data-testid="doctors-charges"
                                      :useGrouping="false"

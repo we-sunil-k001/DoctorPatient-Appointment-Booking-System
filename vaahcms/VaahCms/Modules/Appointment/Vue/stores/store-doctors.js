@@ -85,7 +85,8 @@ export const usedoctorStore = defineStore({
 
         // Set min and max time
         min_start_time : null,
-        max_start_time: null
+        max_start_time: null,
+        currency: null
 
     }),
     getters: {
@@ -232,7 +233,7 @@ export const usedoctorStore = defineStore({
                 this.setMinMaxTime();
 
                 // Set Max time/ working hours
-                // this.max_time = this.assets.working_hour_end_max;
+                this.currency = this.assets.currency;// this.max_time = this.assets.working_hour_end_max;
 
             }
         },

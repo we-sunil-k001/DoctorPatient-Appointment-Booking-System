@@ -955,6 +955,7 @@ class doctor extends VaahModel
         $inputs['phone_number'] = sprintf('%010d', random_int(0, 9999999999)); // Generates a 10-digit number
         $inputs['specialization'] = 'ENT';
         $inputs['is_active'] = 1;
+        $inputs['charges'] = 120;
 
         if(!$is_response_return){
             return $inputs;

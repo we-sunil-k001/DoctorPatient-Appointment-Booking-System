@@ -46,7 +46,7 @@ const store = usedoctorStore();
                         <Slider v-model="store.query.filter.charges" :min="store.charges[0]" :max="store.charges[1]" range class="w-full"/>
                         <!-- Validation to avoid reading undefined -->
                         <p v-if="store.query.filter.charges && store.query.filter.charges.length > 0">
-                            ₹{{ store.query.filter.charges[0] }} - ₹{{ store.query.filter.charges[1] }}
+                            {{store.currency}}{{ store.query.filter.charges[0] }} - {{store.currency}}{{ store.query.filter.charges[1] }}
                         </p>
                     </div>
 

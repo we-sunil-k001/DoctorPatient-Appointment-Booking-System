@@ -91,7 +91,7 @@ const useVaah = vaah();
                     <Badge v-if="prop.data.deleted_at"
                            value="Trashed"
                            severity="danger"></Badge>
-                    ₹{{ prop.data.charges }}/-
+                     {{store.currency}}{{ prop.data.charges }}
                 </template>
 
             </Column>
@@ -243,7 +243,7 @@ const useVaah = vaah();
                                         class="overflow-wrap-anywhere"
                                         :sortable="true">
                                     <template #body="prop">
-                                        ₹{{ prop.data.charges}}/-
+                                         {{store.currency}}{{ prop.data.charges}}
                                     </template>
                                 </Column>
 
@@ -315,7 +315,7 @@ const useVaah = vaah();
                                             class="overflow-wrap-anywhere"
                                             :sortable="true">
                                         <template #body="prop">
-                                            ₹{{ prop.data.charges}}/-
+                                             {{store.currency}}{{ prop.data.charges}}
                                         </template>
                                     </Column>
 
@@ -386,7 +386,7 @@ const useVaah = vaah();
                                         class="overflow-wrap-anywhere"
                                         :sortable="true">
                                     <template #body="prop">
-                                        ₹{{ prop.data.charges}}/-
+                                         {{store.currency}}{{ prop.data.charges}}
                                     </template>
                                 </Column>
 
