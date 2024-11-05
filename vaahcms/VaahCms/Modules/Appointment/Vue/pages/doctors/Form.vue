@@ -239,7 +239,9 @@ const toggleFormMenu = (event) => {
                                      name="doctors-charges"
                                      data-testid="doctors-charges"
                                      :useGrouping="false"
-                                     v-model="store.item.charges" required/>
+                                     v-model="store.item.charges"
+                                     :min="100" :max="1000"
+                                     required/>
                         <div class="required-field hidden"></div>
                     </div>
                 </VhField>
