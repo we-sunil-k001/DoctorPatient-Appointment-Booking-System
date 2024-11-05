@@ -17,11 +17,6 @@ onMounted(async () => {
     {
         await store.getItem(route.params.id);
 
-        // Set end_time_temp when loading the record
-        if (store.item.working_hours_end) {
-            store.end_time_temp = store.formatTime(store.item.working_hours_end); // Ensure to format if needed
-            console.log(store.end_time_temp);
-        }
     }
 
     await store.getFormMenu();
@@ -32,38 +27,32 @@ onMounted(async () => {
 watch([() => store.item?.no_of_slot, () => store.item?.working_hours_start], () => {
     const start_time = store.item.working_hours_start;
 
-    if (!start_time) return; // Ensure there's a valid start time before processing
+    if (!start_time) return;
 
     // Convert start time to 12hr format
     const formattedTime = store.formatTime(start_time);
 
     // Add minutes based on the number of slots
-    const end_time = store.addMinutesToTime(formattedTime, store.item.no_of_slot * store.assets.appointment_duration);
-
-    // Store the end time temporarily for display in the 12-hour format
-
+    const end_time_calculated = store.addMinutesToTime(formattedTime, store.item.no_of_slot * store.assets.appointment_duration);
 
     // Convert times to Date objects
-    const end_time_temp = convertToDate(store.end_time_temp);
-    const max_time = convertToDate(store.max_time);
+    const end_time_temp = convertToDate(end_time_calculated);
+    const max_end_time = convertToDate(store.assets.working_hour_end_max);
 
-    if (end_time_temp > max_time) {
-        alert("Working hours end! Can't go above the set time.");
-    } else {
-        // Convert the end time to UTC format for submission
-        store.end_time_temp = end_time;
-        store.item.working_hours_end = store.convertToUTC(end_time);
+
+    if (end_time_temp  >= max_end_time) {
+        alert("Adding more slots not allowed! As per working hours.");
+        store.end_time_temp = end_time_calculated;
+        store.item.working_hours_end = store.convertToUTC(end_time_calculated);
+
+        store.item.no_of_slot = store.item.no_of_slot - 1;
     }
-
-    // if(store.end_time_temp > store.max_time){
-    //     alert("Working hours ends! can't go above")
-    // }else{
-    //     // Convert the end time to UTC format for submission
-    //     store.end_time_temp = end_time;
-    //     store.item.working_hours_end = store.convertToUTC(end_time);
-    // }
-    // console.log(store.end_time_temp)
-
+    else
+    {
+        // Convert the end time to UTC format for submission
+        store.end_time_temp = end_time_calculated;
+        store.item.working_hours_end = store.convertToUTC(end_time_calculated);
+    }
 
 });
 
@@ -255,6 +244,7 @@ const toggleFormMenu = (event) => {
                     </div>
                 </VhField>
                 <VhField label="Working Hour starts at">
+                    <span class="text-danger font-bold">You can start between {{store.assets.working_hour_start_min}} to {{store.assets.working_hour_end_max}}<sup>*</sup> </span>
                     <div class="p-inputgroup">
                         <Calendar
                             v-model="store.item.working_hours_start"
@@ -266,11 +256,14 @@ const toggleFormMenu = (event) => {
                             :step-minute="5"
                             :minDate="store.min_start_time"
                             :maxDate="store.max_start_time"
+                            :manualInput="false"
+                            required
                         ></Calendar>
                     </div>
                 </VhField>
 
                 <VhField label="Number of slots">
+                    <span class="text-danger font-bold">Session slot duration - {{store.assets.appointment_duration}}min. per each slots<sup>*</sup> </span>
                     <div class="p-inputgroup">
                         <InputNumber
                             class="w-full"
@@ -295,6 +288,7 @@ const toggleFormMenu = (event) => {
                             readonly
                             name="working_hours_end"
                             :step-minute="5"
+                            :manualInput="false"
                         ></Calendar>
                     </div>
                 </VhField>
