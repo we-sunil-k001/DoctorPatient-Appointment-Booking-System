@@ -84,8 +84,8 @@ export const usedoctorStore = defineStore({
         file_date: null,
 
         // Set min and max time
-        min_time : null,
-        max_time: null
+        min_start_time : null,
+        max_start_time: null
 
     }),
     getters: {
@@ -232,7 +232,7 @@ export const usedoctorStore = defineStore({
                 this.setMinMaxTime();
 
                 // Set Max time/ working hours
-                this.max_time = this.assets.working_hour_end_max;
+                // this.max_time = this.assets.working_hour_end_max;
 
             }
         },
@@ -1124,17 +1124,23 @@ export const usedoctorStore = defineStore({
         },
 
         // Function to set min and max time
-        setMinMaxTime(){
+        setMinMaxTime() {
             const today = new Date();
-            const dateString = today.toDateString(); // get current date without time, e.g., "Mon Nov 04 2024"
+            const dateString = today.toDateString(); // e.g., "Mon Nov 04 2024"
 
-            // Combine date with working hour times and parse them
-            const minTimeString = `${dateString} ${this.assets.working_hour_start_min}`;
+            const min_time_string = `${dateString} ${this.assets.working_hour_start_min}`;
+            const max_time_string = `${dateString} ${this.assets.working_hour_end_max}`;
 
-            // Convert to Date objects
-            this.min_time = new Date(Date.parse(minTimeString));
+            // Convert min_time_string to a Date object
+            this.min_start_time = new Date(Date.parse(min_time_string));
 
+            // subtract appointment_duration minutes from max time
+            let max_time = new Date(Date.parse(max_time_string));
+            max_time.setMinutes(max_time.getMinutes() - this.assets.appointment_duration);
+
+            this.max_start_time = max_time;
         }
+
 
 
 //---------------------------------------------------------------------

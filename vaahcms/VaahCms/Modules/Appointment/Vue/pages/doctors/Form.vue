@@ -84,7 +84,6 @@ const toggleFormMenu = (event) => {
 </script>
 <template>
     <div class="col-6" >
-{{store.end_time_temp}}
         <Panel class="is-small">
 
             <template class="p-1" #header>
@@ -255,7 +254,6 @@ const toggleFormMenu = (event) => {
                         <div class="required-field hidden"></div>
                     </div>
                 </VhField>
-
                 <VhField label="Working Hour starts at">
                     <div class="p-inputgroup">
                         <Calendar
@@ -266,7 +264,8 @@ const toggleFormMenu = (event) => {
                             placeholder="Select time"
                             name="working_hours_start"
                             :step-minute="5"
-                            :minDate="store.min_time"
+                            :minDate="store.min_start_time"
+                            :maxDate="store.max_start_time"
                         ></Calendar>
                     </div>
                 </VhField>
