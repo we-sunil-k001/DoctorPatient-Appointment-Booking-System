@@ -1,5 +1,5 @@
 import {createApp, markRaw} from 'vue';
-import { createPinia, PiniaVuePlugin  } from 'pinia'
+import { createPinia, PiniaVuePlugin  } from 'pinia';
 
 
 //-------------PrimeVue Imports
@@ -21,6 +21,8 @@ import Slider from 'primevue/slider';
 import Dialog from 'primevue/dialog';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
+
+
 //-------------/PrimeVue Imports
 
 //-------------CRUD PrimeVue Imports
@@ -54,6 +56,7 @@ import FileUpload from 'primevue/fileupload';
 //-------------APP
 import App from './layouts/App.vue'
 import router from './routes/router'
+import ApexCharts from 'vue3-apexcharts';
 
 const app = createApp(App);
 
@@ -64,6 +67,8 @@ pinia.use(({ store }) => {
 app.use(pinia);
 app.use(PiniaVuePlugin);
 app.use(router);
+
+app.use(ApexCharts);
 //-------------/APP
 
 

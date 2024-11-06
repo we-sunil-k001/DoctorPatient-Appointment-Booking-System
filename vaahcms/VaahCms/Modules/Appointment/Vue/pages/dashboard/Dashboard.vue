@@ -3,6 +3,8 @@ import {onMounted, ref, watch} from "vue";
 import {vaah} from '../../vaahvue/pinia/vaah';
 import {useAppointmentStore} from '../../stores/store-appointments';
 import {useRoute} from 'vue-router';
+import Appexchart from '../../components/Appex-chart.vue';
+
 
 const store = useAppointmentStore();
 const route = useRoute();
@@ -39,7 +41,14 @@ onMounted(async () => {
 
         // Set Pie data and options only after data is available
         pie_data.value = setpieData();
-        pie_options.value = setpieOptions();
+        pie_options.value = setpieOptions()
+
+        // Setting Apex custom Pie chart data chartSeries
+        chartSeries.value = [
+            confirm_appointments.value,
+            cancelled_appointments.value,
+            reschedule_pending.value,
+        ];
     } else {
         console.warn("store.item or store.item.data is null/undefined");
     }
@@ -137,6 +146,20 @@ const setpieOptions = () => {
         }
     };
 };
+
+
+//======================================================
+
+const chartOptions = ref({
+    chart: {
+        type: 'pie',
+    },
+    labels: ['Appointments Confirm', 'Appointments Cancelled', 'Appointments Pending for Reschedule'],
+
+});
+
+const chartSeries = ref([]);
+
 </script>
 
 
@@ -199,6 +222,17 @@ const setpieOptions = () => {
                     <div class="text-center">
                         <Chart type="doughnut" :data="pie_data" :options="pie_options" class="pie w-full md:w-30rem" />
                         <h3 class="font-normal pt-5">Appointments Count with Status</h3>
+                    </div>
+                </div>
+
+                <div class="col-12 md:col-6 lg:col-6 flex justify-content-center ">
+                    <div class="text-center">
+                        <Appexchart
+                            type="pie"
+                            :chartSeries="chartSeries"
+                            :chartOptions="chartOptions"
+                            height=300 width=600
+                            titleAlign="center"/>
                     </div>
                 </div>
             </div>
